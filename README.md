@@ -77,8 +77,8 @@ AAAAAAAAAHHH!!!
 ```
 
 ## Installation
-Clone this repository, then do
 ```
+git clone https://github.com/davekch/textgame.git
 cd textgame
 pip3 install -e .
 ```
