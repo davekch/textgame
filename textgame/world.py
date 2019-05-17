@@ -12,12 +12,24 @@ class World:
     holds all rooms, items and monsters, is responsible for daylight and spawning
     """
 
-    def __init__(self):
+    def __init__(self, rooms=None, items=None, weapons=None, monsters=None):
         self.rooms = {}
         self.items = {}
         self.monsters = {}
         self.daytime = "day"
         self.time = 0  # increases by one after each step
+
+        # fill stuff
+        if rooms:
+            self.create_rooms(rooms)
+        if items:
+            self.create_items(items)
+        if weapons:
+            self.create_items(weapons, tag="weapons")
+        if monsters:
+            self.create_items(monsters, tag="monsters")
+        self.put_items_in_place()
+        self.put_monsters_in_place()
 
 
     def create_rooms(self, descriptions):

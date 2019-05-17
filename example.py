@@ -2,7 +2,7 @@ import textgame
 
 
 # describe some basic rooms
-rooms = {
+myrooms = {
     "field_0": {
         # long description
         "descript": "You are standing in the middle of a wide open field. In the west the silhouette of an enormeous castle cuts the sky. North of you is a birch grove. A dark forest reaches to the east.",
@@ -36,7 +36,7 @@ rooms = {
 }
 
 # add a random item to field_1
-items = {
+myitems = {
     "diamond": {
         "description": "A sparkling diamond lies around!",
         "name": "diamond",
@@ -45,7 +45,7 @@ items = {
 }
 
 # add a basic monster that spawns randomly
-monsters = {
+mymonsters = {
     "wolf": {
         "name": "wolf",
         "description": "A wolf runs towards you!",
@@ -71,12 +71,7 @@ class MyPlayer(textgame.Player):
 
 
 # create the world based on our rooms and items
-world = textgame.World()
-world.create_rooms(rooms)
-world.create_items(monsters, tag="monsters")
-world.create_items(items)
-world.put_items_in_place()
-
+world = textgame.World(rooms=myrooms, items=myitems, monsters=mymonsters)
 # create instance of MyPlayer
 player = MyPlayer(world, world.room("field_0"))
 
