@@ -3,7 +3,7 @@ from collections import namedtuple
 import logging
 logger = logging.getLogger(__name__)
 
-from textgame.globals import DIRECTIONS, MOVING, INFO, ACTION, LIGHT
+from textgame.globals import DIRECTIONS, MOVING, INFO, ACTION, LIGHT, DESCRIPTIONS
 
 
 # return this if a player's method should trigger a yes/no conversation
