@@ -1,5 +1,6 @@
 import logging
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("textgame.parser")
+logger.addHandler(logging.NullHandler())
 
 from textgame.globals import INFO
 from textgame.player import EnterYesNoLoop

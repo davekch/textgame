@@ -1,5 +1,10 @@
 import textgame
 
+# the module makes use of logging, I recommend using it
+# the logger will warn you for example if the rooms / ActionMapper are inconsistent
+import logging
+logging.basicConfig(level=logging.WARNING, format='%(name)-16s %(levelname)-8s %(message)s')
+
 
 # describe some basic rooms
 myrooms = {

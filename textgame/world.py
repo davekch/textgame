@@ -1,5 +1,6 @@
 import logging
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("textgame.world")
+logger.addHandler(logging.NullHandler())
 import random
 
 from textgame.room import Room

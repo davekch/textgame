@@ -1,5 +1,6 @@
 import logging
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("textgame.room")
+logger.addHandler(logging.NullHandler())
 
 from textgame.globals import MOVING, DESCRIPTIONS, INFO, DIRECTIONS, LIGHT
 

@@ -1,7 +1,8 @@
 from inspect import signature
 from collections import namedtuple
 import logging
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("textgame.player")
+logger.addHandler(logging.NullHandler())
 
 from textgame.globals import DIRECTIONS, MOVING, INFO, ACTION, LIGHT, DESCRIPTIONS
 
