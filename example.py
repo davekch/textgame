@@ -75,26 +75,31 @@ class MyPlayer(textgame.Player):
         return "AAAAAAAAAHHH!!!"
 
 
+# create mapping between input and our new method
+class MyActionMapper(textgame.ActionMapper):
+
+    def __init__(self, player):
+        textgame.ActionMapper.__init__(self, player)
+
+        # first, we map the inputs "scream" and "shout" both to the word "scream"
+        self.legal_verbs.update({
+            "scream": "scream",
+            "shout": "scream"
+        })
+        # now we map the word "scream" to our method
+        self.actionmap.update({
+            "scream": player.scream
+        })
+
+
 # create the world based on our rooms and items
 world = textgame.World(rooms=myrooms, items=myitems, monsters=mymonsters)
 # create instance of MyPlayer
 player = MyPlayer(world, world.room("field_0"))
 
-
-# create mapping between user input and our new method scream
-actmap = textgame.ActionMapper(player)
-# first, we map the inputs "scream" and "shout" both to the word "scream"
-actmap.legal_verbs.update({
-    "scream": "scream",
-    "shout": "scream"
-})
-# now we map the word "scream" to our method
-actmap.actionmap.update({
-    "scream": player.scream
-})
-
 # create a parser
-parser = textgame.Parser(actmap)
+parser = textgame.Parser( MyActionMapper(player) )
+
 
 # start the game routine
 while True:
