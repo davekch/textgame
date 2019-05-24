@@ -76,10 +76,10 @@ class MyPlayer(textgame.Player):
 
 
 # create mapping between input and our new method
-class MyActionMapper(textgame.ActionMapper):
+class MyParser(textgame.Parser):
 
     def __init__(self, player):
-        textgame.ActionMapper.__init__(self, player)
+        textgame.Parser.__init__(self, player)
 
         # first, we map the inputs "scream" and "shout" both to the word "scream"
         self.legal_verbs.update({
@@ -98,7 +98,7 @@ world = textgame.World(rooms=myrooms, items=myitems, monsters=mymonsters)
 player = MyPlayer(world, world.room("field_0"))
 
 # create a parser
-parser = textgame.Parser( MyActionMapper(player) )
+parser = MyParser(player)
 
 
 # start the game routine

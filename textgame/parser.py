@@ -6,12 +6,20 @@ from textgame.globals import INFO
 from textgame.player import EnterYesNoLoop
 
 
-class ActionMapper:
+class Parser:
     """
+    makes sense of user's input, performs actions,
     defines which words are allowed to use and maps them to player's methods
     """
 
     def __init__(self, player):
+
+        self.player = player
+
+        self.in_yesno = False    # are we inside a yes/no conversation?
+        # yesno_backup must be a function that takes a bool and returns
+        # user output. it will be executed if yes/no conversation ends with yes
+        self.yesno_backup = None
 
         self.legal_verbs = {
             "": "continue",    # dont do anything on empty input
@@ -72,6 +80,8 @@ class ActionMapper:
             "west": lambda x: player.go("west"),
         }
 
+        self.check()
+
 
     def lookup_verb(self, verb):
         return self.legal_verbs.get(verb)
@@ -95,22 +105,12 @@ class ActionMapper:
     def do(self, verb, noun):
         """
         call function associated with verb with noun as argument
+        also, time passes / world might react to action (world.update gets called)
         """
-        return self.actionmap[verb](noun)
-
-
-class Parser:
-    """
-    makes sense of user's input, performs actions
-    """
-
-    def __init__(self, actionmapper):
-        self.actionmapper = actionmapper
-        self.actionmapper.check()
-        self.in_yesno = False    # are we inside a yes/no conversation?
-        # yesno_backup must be a function that takes a bool and returns
-        # user output. it will be executed if yes/no conversation ends with yes
-        self.yesno_backup = None
+        msg = self.actionmap[verb](noun)
+        # TODO: this feels like an ugly hack
+        # msg += self.player.world.update()
+        return msg
 
 
     def _split_input(self, input):
@@ -154,8 +154,8 @@ class Parser:
                 self.in_yesno = False
                 return ""
 
-        commandverb = self.actionmapper.lookup_verb(verb)
-        commandnoun = self.actionmapper.lookup_noun(noun)
+        commandverb = self.lookup_verb(verb)
+        commandnoun = self.lookup_noun(noun)
         # if noun is illegal, reset to it's original value and feed it to
         # the actionmethods. More creative output if erronous input :)
         if not commandnoun:
@@ -167,7 +167,7 @@ class Parser:
             return INFO.NOT_UNDERSTOOD
 
         # perform the associated method
-        result = self.actionmapper.do(commandverb, commandnoun)
+        result = self.do(commandverb, commandnoun)
         if type(result) is EnterYesNoLoop:
             self.in_yesno = True
             # result.func takes bool as only argument, save it

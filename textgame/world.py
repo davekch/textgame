@@ -19,6 +19,7 @@ class World:
         self.monsters = {}
         self.daytime = "day"
         self.time = 0  # increases by one after each step
+        self.nighttime = 200
 
         # fill stuff
         if rooms:
@@ -139,7 +140,7 @@ class World:
 
 
     def manage_daylight(self):
-        if self.time > 20 and self.daytime == "day":
+        if self.time > self.nighttime and self.daytime == "day":
             self.daytime = "night"
             # turn all rooms to always dark
             for room in self.rooms.values():
