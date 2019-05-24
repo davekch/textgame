@@ -105,12 +105,16 @@ class Parser:
     def do(self, verb, noun):
         """
         call function associated with verb with noun as argument
-        also, time passes / world might react to action (world.update gets called)
+        check if parser should fall into yesno loop
         """
-        msg = self.actionmap[verb](noun)
-        # TODO: this feels like an ugly hack
-        # msg += self.player.world.update()
-        return msg
+        result = self.actionmap[verb](noun)
+        if type(result) is EnterYesNoLoop:
+            self.in_yesno = True
+            # result.func takes bool as only argument, save it
+            self.yesno_backup = result.func
+            # what does result.func say at the beginning?
+            return result.func(False)
+        return result
 
 
     def _split_input(self, input):
@@ -168,11 +172,5 @@ class Parser:
 
         # perform the associated method
         result = self.do(commandverb, commandnoun)
-        if type(result) is EnterYesNoLoop:
-            self.in_yesno = True
-            # result.func takes bool as only argument, save it
-            self.yesno_backup = result.func
-            # what does result.func say at the beginning?
-            return result.func(False)
 
         return result

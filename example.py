@@ -27,7 +27,9 @@ myrooms = {
             "west": "The slope is too steep here.",
             "east": "The slope is too steep here."
         },
-        "doors": {"north": "field_0", "up": "field_0"}
+        "doors": {"north": "field_0", "up": "field_0"},
+        "hint": "here's my special hint for you.",
+        "hint_value": 7
     },
     "field_2": {
         "descript": "You are in a clear birch grove. A small stream flows by.",
@@ -105,6 +107,5 @@ parser = MyParser(player)
 while True:
     command = input("> ")
     response = parser.understand(command)
-    response += world.update()
     print(response)
     print()

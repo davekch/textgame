@@ -11,20 +11,39 @@ from textgame.globals import DIRECTIONS, MOVING, INFO, ACTION, LIGHT, DESCRIPTIO
 EnterYesNoLoop = namedtuple("EnterYesNoLoop", ["func"])
 
 
-def action_method(f):
+def player_method(f):
     """
     wrapper for player methods
     player methods that are mapped to verbs must take a noun as an argument
     """
+    func = f
+
+    # check signature of f
     n_args = len(signature(f).parameters)
     if n_args == 1:
         # add a dummy argument
         def _f(self, noun):
             return f(self)
-        return _f
+        func = _f
     elif n_args > 2:
         raise TypeError("Action methods can't have more than 2 arguments")
-    return f
+
+    return func
+
+
+def action_method(f):
+    """
+    player_method that appends world.update (time passing, daylight handling ...)
+    to the passed function
+    """
+    func = player_method(f)
+
+    # append self.world.update to the end of every method
+    def _f(self, noun):
+        msg = func(self, noun)
+        msg += self.world.update()
+        return msg
+    return _f
 
 
 
@@ -195,7 +214,7 @@ class Player:
         return any([lamp in self.inventory for lamp in LIGHT])
 
 
-    @action_method
+    @player_method
     def ask_hint(self):
         """
         ask for a hint in the current location,
