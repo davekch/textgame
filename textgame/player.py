@@ -1,10 +1,12 @@
 from inspect import signature
 from collections import namedtuple
+import random
 import logging
 logger = logging.getLogger("textgame.player")
 logger.addHandler(logging.NullHandler())
 
 from textgame.globals import DIRECTIONS, MOVING, INFO, ACTION, LIGHT, DESCRIPTIONS
+from textgame.globals import FIGHTING
 
 
 # return this if a player's method should trigger a yes/no conversation
@@ -41,7 +43,7 @@ def action_method(f):
     # append self.world.update to the end of every method
     def _f(self, noun):
         msg = func(self, noun)
-        msg += self.world.update()
+        msg += self.world.update(self)
         return msg
     return _f
 
@@ -81,7 +83,8 @@ class Player:
             return MOVING.FAIL_TRAPPED
         elif self.status["fighting"]:
             # running away from a fight will kill player
-            return MOVING.DEATH_BY_COWARDICE + self.die()
+            self.status["alive"] = False
+            return MOVING.DEATH_BY_COWARDICE
         else:
             destination = self.location.doors[direction]
             # see if there is a door
@@ -184,8 +187,34 @@ class Player:
 
 
     @action_method
-    def die(self):
-        pass
+    def attack(self, monstername):
+        monsters = [m for m in self.location.monsters.values() if m.name==monstername]
+        # should be max 1
+        if len(monsters) == 0:
+            # maybe there's a dead one?
+            if monstername in [m.name for m in self.location.items.values()]:
+                return FIGHTING.ALREADY_DEAD.format(monstername)
+            return FIGHTING.NO_MONSTER.format(monstername)
+
+        elif len(monsters) == 1:
+            monster = monsters[0]
+            monster.status["fighting"] = True
+            if monster.history == -1:
+                return monster.ignoretext
+            elif monster.history < 2:
+                if random.random() > monster.strength-monster.history/10:
+                    monster.kill()
+                return FIGHTING.ATTACK
+            elif monster.history == 2:
+                if random.random() > monster.strength-0.2:
+                    monster.kill()
+                    return FIGHTING.LAST_ATTACK
+                self.status["alive"] = False
+                return FIGHTING.DEATH
+
+        else:
+            logger.error("There's currently more than one monster with "
+                "name {} in room {}. This should not be possible!".format(monstername, self.location.id))
 
 
     @action_method

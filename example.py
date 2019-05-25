@@ -61,7 +61,8 @@ mymonsters = {
         "spawns_in": ["field"],
         # define a time at which monster should spawn (day/night/always)
         "spawns_at": "always",
-        "spawn_prob": 0.5,
+        "spawn_prob": 0.3,
+        "strength": 0.3
     }
 }
 
@@ -104,7 +105,7 @@ parser = MyParser(player)
 
 
 # start the game routine
-while True:
+while player.status["alive"]:
     command = input("> ")
     response = parser.understand(command)
     print(response)

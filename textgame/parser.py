@@ -23,6 +23,7 @@ class Parser:
 
         self.legal_verbs = {
             "": "continue",    # dont do anything on empty input
+            "attack": "attack",
             "back": "back",
             "d": "down",
             "down": "down",
@@ -35,6 +36,7 @@ class Parser:
             "hear": "listen",
             "hint": "hint",
             "inventory": "inventory",
+            "kill": "attack",
             "listen": "listen",
             "look": "look",
             "n": "north",
@@ -62,6 +64,7 @@ class Parser:
         # the lambdas are there because the values in this dict must be
         # callable with exactly one argument
         self.actionmap = {
+            "attack": player.attack,
             "back": lambda x: player.go("back"),
             "continue": lambda x: "",
             "down": lambda x: player.go("down"),

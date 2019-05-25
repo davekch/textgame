@@ -45,7 +45,7 @@ class Monster(Item):
 
         # description of the thing when it's dead
         self.deaddescript = deaddescript
-        self.strength = strength    # how hard will it be to kill (int)
+        self.strength = strength    # how hard will it be to kill ([0..1])
         # rooms in which monster should be spawned randomly (may only be part of room.id)
         self.spawns_in = spawns_in if spawns_in else []
         # time to spawn
@@ -55,14 +55,6 @@ class Monster(Item):
         self.history = -1   # used to keep track of fights/conversations
         # this is shown if the monster is passive
         self.ignoretext = ignoretext
-
-        # safekill is a dict that describes a method to kill a monster
-        # killtext will be displayed when method is applied, eg
-        # method: behead, killtext: you behead the monster
-        if safe_kill and ("method" not in safe_kill or "killtext" in safe_kill):
-            logger.error("safe_kill of monster {} is badly formatted".format(ID))
-        self.safe_kill = {} if not safe_kill else safe_kill
-
         self.status = {"alive": True, "active": False, "fighting": False,\
             "trap": False, "singleencounter": False, "harmless": False}
         if status:

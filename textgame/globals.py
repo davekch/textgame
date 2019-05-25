@@ -46,3 +46,17 @@ INFO.NOTHING = "Nothing happens."
 INFO.SCORE = "Your score is {}."
 INFO.TOO_MANY_ARGUMENTS = "Please restrict your command to two words."
 INFO.YES_NO = "Please answer yes or no."
+
+
+FIGHTING = namedtuple("FIGHTING", [])
+FIGHTING.DARK_DEATH = "A {} certainly has better night vision than you do. At least this was a fast and painless death for you."
+FIGHTING.ALREADY_DEAD = "The {} is already dead!"
+FIGHTING.NO_MONSTER = "There is no {} to attack."
+FIGHTING.ATTACK = "You attack the beast."
+FIGHTING.LAST_ATTACK = "For dear life you start one last attack against the fiend."
+FIGHTING.DEATH = "Your enemy has gone fully berserk. Badly injured and somewhat aghast of your own inferiority in this fight, you crawl backwards, a last hopeless attempt in saving your life. Goodbye, blue sky."
+FIGHTING.SURVIVED_ATTACK = "The {} has survived your attack and is very angry at you!"
+FIGHTING.IGNORE = "Ignoring such a dangerous beast is a really bad idea."
+FIGHTING.DEFEND_REMINDER = "You must defend yourself! A {} is a serious threat to your life."
+FIGHTING.SUCCESS = "You killed the {}."
+FIGHTING.LOSER = "You should consider working on your fighting technique. Your amateurish attempts didn't stop the {} from killing you."

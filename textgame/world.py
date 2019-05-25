@@ -5,7 +5,7 @@ import random
 
 from textgame.room import Room
 from textgame.movable import Item, Weapon, Monster
-from textgame.globals import INFO
+from textgame.globals import INFO, FIGHTING
 
 
 class World:
@@ -132,11 +132,13 @@ class World:
         logger.info("Put monsters in place")
 
 
-    def update(self):
+    def update(self, player):
         """upate world's status
         """
         self.time += 1
-        return self.manage_daylight()
+        msg = self.manage_fight(player)
+        msg += self.manage_daylight()
+        return msg
 
 
     def manage_daylight(self):
@@ -171,7 +173,45 @@ class World:
                 if cond:
                     location.add_monster(monster)
                     monster.status["active"] = True
+                    monster.history = 0
                     logger.debug("Spawned {} in {}".format(monster.id, location.id))
         elif active_beast and active_beast.status["harmless"]:
             # TODO: implement behaviour of harmless monsters
             pass
+
+
+    def manage_fight(self, player):
+        msg = ''
+        for monsterid,monster in self.monsters.items():
+            if monster.status["active"] and not monster.status["harmless"]:
+                player.status["fighting"] = True
+                # player dies if attacked in the dark
+                if player.location.dark["now"]:
+                    player.status["alive"] = False
+                    return '\n'+FIGHTING.DARK_DEATH.format(monster.name)
+
+                if monster.status["alive"] and player.status["alive"]:
+                    if monster.status["fighting"]:
+                        msg += '\n'+FIGHTING.SURVIVED_ATTACK.format(monster.name)
+                    elif monster.history > 1:
+                        player.status["alive"] = False
+                        msg += '\n'+FIGHTING.IGNORE
+                    elif monster.history >= 0:
+                        msg += '\n'+FIGHTING.DEFEND_REMINDER.format(monster.name)
+
+                elif not monster.status["alive"]:
+                    monster.status["active"] = False
+                    player.status["fighting"] = False
+                    player.status["trapped"] = False
+                    # move monster from monsters to items to make it takable
+                    player.location.add_item( player.location.monsters.pop(monsterid) )
+                    msg += '\n'+FIGHTING.SUCCESS.format(monster.name)
+
+                if not player.status["alive"]:
+                    msg += '\n'+FIGHTING.LOSER.format(monster.name)
+
+                monster.history += 1
+                monster.status["fighting"] = False
+
+                return msg
+        return ''
