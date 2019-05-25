@@ -204,6 +204,7 @@ class World:
                     player.status["fighting"] = False
                     player.status["trapped"] = False
                     # move monster from monsters to items to make it takable
+                    monster.id = monster.name
                     player.location.add_item( player.location.monsters.pop(monsterid) )
                     msg += '\n'+FIGHTING.SUCCESS.format(monster.name)
 
