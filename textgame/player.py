@@ -10,7 +10,7 @@ from textgame.globals import FIGHTING
 
 
 # return this if a player's method should trigger a yes/no conversation
-EnterYesNoLoop = namedtuple("EnterYesNoLoop", ["func"])
+EnterYesNoLoop = namedtuple("EnterYesNoLoop", ["func", "denial"])
 
 
 def player_method(f):
@@ -141,9 +141,9 @@ class Player:
             if item.takable:
                 # move item from location to inventory
                 self.inventory[itemid] = self.location.items.pop(itemid)
-                return ACTION.SUCC_TAKE.format(itemid)
+                return ACTION.SUCC_TAKE.format(item.name)
             return ACTION.FAIL_TAKE
-        return ACTION.NO_SUCH_ITEM.format(itemid)
+        return ACTION.NO_SUCH_ITEM.format(item.name)
 
 
     def takeall(self):
@@ -161,7 +161,7 @@ class Player:
     def list_inventory(self):
         if self.inventory:
             response = "You are now carrying:\n A "
-            response += '\n A '.join(self.inventory.keys())
+            response += '\n A '.join(i.name for i in self.inventory.values())
             return response
         return ACTION.NO_INVENTORY
 
@@ -255,7 +255,7 @@ class Player:
             return INFO.NO_HINT
         # stuff self.hint_conversation inside the EnterYesNoLoop,
         # this will be called during conversation
-        return EnterYesNoLoop(self.hint_conversation)
+        return EnterYesNoLoop(self.hint_conversation, "ok")
 
     def hint_conversation(self, really):
         warning, hint = self.location.get_hint()

@@ -114,7 +114,7 @@ class Parser:
         if type(result) is EnterYesNoLoop:
             self.in_yesno = True
             # result.func takes bool as only argument, save it
-            self.yesno_backup = result.func
+            self.yesno_backup = result
             # what does result.func say at the beginning?
             return result.func(False)
         return result
@@ -156,10 +156,18 @@ class Parser:
             elif verb == "yes":
                 self.in_yesno = False
                 # execute and return the method that asked for a yes before
-                return self.yesno_backup(True)
+                result = self.yesno_backup.func(True)
+                # maybe we have a nested yes no loop
+                if type(result) is EnterYesNoLoop:
+                    self.in_yesno = True
+                    # result.func takes bool as only argument, save it
+                    self.yesno_backup = result
+                    # what does result.func say at the beginning?
+                    return result.func(False)
+                return result
             else:
                 self.in_yesno = False
-                return ""
+                return self.yesno_backup.denial
 
         commandverb = self.lookup_verb(verb)
         commandnoun = self.lookup_noun(noun)
