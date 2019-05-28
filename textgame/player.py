@@ -143,7 +143,7 @@ class Player:
                 self.inventory[itemid] = self.location.items.pop(itemid)
                 return ACTION.SUCC_TAKE.format(item.name)
             return ACTION.FAIL_TAKE
-        return ACTION.NO_SUCH_ITEM.format(item.name)
+        return ACTION.NO_SUCH_ITEM.format(itemid)
 
 
     def takeall(self):

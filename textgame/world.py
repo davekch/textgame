@@ -20,6 +20,8 @@ class World:
         self.daytime = "day"
         self.time = 0  # increases by one after each step
         self.nighttime = 200
+        # dummy room to keep stuff out of the actual world
+        self.storage_room = Room("storage")
 
         # fill stuff
         if rooms:

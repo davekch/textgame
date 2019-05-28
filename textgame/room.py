@@ -16,7 +16,7 @@ class Room:
         # monsters that are in this room, format {ID: monster}
         self.monsters = {}
         self.visited = False
-        self.hiddendoors = {dir: None for dir in DIRECTIONS}
+        self.hiddendoors = {}
         # special_func gets called on Room.check_restrictions
         # which is called when the player enters the room
         self.special_func = None
@@ -104,6 +104,12 @@ class Room:
         if self.special_func:
             return self.special_func(self, *self.special_args)
         return ""
+
+
+    def reveal_hiddendoors(self):
+        logger.debug("revealing hiddendoors in room {} to {}"\
+            .format(self.id, ", ".join([dir for dir in self.hiddendoors])))
+        self.doors.update(self.hiddendoors)
 
 
     def add_item(self, item):
