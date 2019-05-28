@@ -98,10 +98,10 @@ class Player:
                     # spawn monsters before describing the room
                     self.world.spawn_monster(destination)
                     # check if room is dark etc, plus extrawürste
-                    msg = destination.check_restrictions(self)
-                    msg += destination.describe()
-                    if not destination.visited:
-                        self.score += destination.visit()
+                    msg = self.location.check_restrictions(self)
+                    msg += self.location.describe()
+                    if not self.location.visited:
+                        self.score += self.location.visit()
                     return msg
                 else:
                     return MOVING.FAIL_DOOR_LOCKED

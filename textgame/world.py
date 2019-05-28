@@ -134,6 +134,14 @@ class World:
         logger.info("Put monsters in place")
 
 
+    def set_room_restrictions(self, restrictions):
+        for roomid,restriction in restrictions.items():
+            if not "func" in restriction:
+                logger.error("no 'func' defined in restrictions for room {}".format(roomid))
+                continue
+            self.room(roomid).set_specials(**restriction)
+
+
     def update(self, player):
         """upate world's status
         """

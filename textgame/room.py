@@ -20,7 +20,7 @@ class Room:
         # special_func gets called on Room.check_restrictions
         # which is called when the player enters the room
         self.special_func = None
-        self.special_args = None
+        self.special_args = {}
         # initialize descriptive information
         self.fill_info()
 
@@ -92,9 +92,9 @@ class Room:
         return any([lamp in self.items for lamp in LIGHT])
 
 
-    def set_specials(self, func, *args):
+    def set_specials(self, func, **args):
         self.special_func = func
-        self.special_args = args
+        self.special_args = args if args else {}
 
 
     def check_restrictions(self, player):
@@ -102,7 +102,7 @@ class Room:
         """
         self.dark["now"] = self.dark["always"] and not (self.has_light() or player.has_light())
         if self.special_func:
-            return self.special_func(self, *self.special_args)
+            return self.special_func(player, **self.special_args)
         return ""
 
 
