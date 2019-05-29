@@ -43,8 +43,16 @@ def action_method(f):
     # append self.world.update to the end of every method
     def _f(self, noun):
         msg = func(self, noun)
-        msg += self.world.update(self)
+        if type(msg) is str:
+            # the other possibility is EnterYesNoLoop
+            msg += self.world.update(self)
         return msg
+
+    # save the undecorated function
+    # reason: one might want to call action_methods from other action_methods,
+    # in this case nested decorations lead to bugs bc of multiple calls
+    # on world.update
+    _f.undecorated = f
     return _f
 
 
@@ -121,7 +129,7 @@ class Player:
                 if dest == self.oldlocation:
                     direction = dir
                     break
-            return self.go(direction)
+            return Player.go.undecorated(self, direction)
 
 
     @action_method
@@ -185,7 +193,7 @@ class Player:
             return DESCRIPTIONS.DARK_S
         response = []
         for itemid in list(self.location.items.keys()):
-            response.append(self.take(itemid))
+            response.append(Player.take.undecorated(self, itemid))
         return '\n'.join(response)
 
 
@@ -214,7 +222,7 @@ class Player:
         if not self.inventory:
             return ACTION.NO_INVENTORY
         for item in list(self.inventory.keys()):
-            self.drop(item)
+            Player.drop.undecorated(self, item)
         return ACTION.SUCC_DROP
 
 

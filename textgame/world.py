@@ -129,7 +129,7 @@ class World:
             initlocation = self.rooms.get(monster.initlocation)
             if initlocation:
                 initlocation.add_monster(monster)
-            else:
+            elif monster.initlocation:
                 logger.warning("Monster {}'s initlocation ({}) could not be found".format(monster.id, repr(monster.initlocation)))
         logger.info("Put monsters in place")
 
@@ -146,6 +146,7 @@ class World:
         """upate world's status
         """
         self.time += 1
+        logger.debug("time set to {}".format(self.time))
         msg = self.manage_fight(player)
         msg += self.manage_daylight()
         return msg
