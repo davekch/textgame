@@ -134,7 +134,7 @@ class Player:
 
     def close_or_lock(self, action, direction):
         if direction not in DIRECTIONS:
-            return ACTION.FAIL_OPENDIR
+            return ACTION.FAIL_OPENDIR.format(action)
         # check if there's a door
         if not self.location.doors[direction]:
             return MOVING.FAIL_NO_DOOR
@@ -220,6 +220,8 @@ class Player:
 
     @action_method
     def attack(self, monstername):
+        if not monstername:
+            return FIGHTING.WHAT
         monsters = [m for m in self.location.monsters.values() if m.name==monstername]
         # should be max 1
         if len(monsters) == 0:

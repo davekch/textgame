@@ -185,6 +185,7 @@ class World:
                     monster.status["active"] = True
                     monster.history = 0
                     logger.debug("Spawned {} in {}".format(monster.id, location.id))
+                    break   # spawn no more
         elif active_beast and active_beast.status["harmless"]:
             # TODO: implement behaviour of harmless monsters
             pass
@@ -194,6 +195,7 @@ class World:
         msg = ''
         for monsterid,monster in self.monsters.items():
             if monster.status["active"] and not monster.status["harmless"]:
+                logger.debug("managing fight with {}".format(monsterid))
                 player.status["fighting"] = True
                 # player dies if attacked in the dark
                 if player.location.dark["now"]:

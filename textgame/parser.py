@@ -51,6 +51,7 @@ class Parser:
             "u": "up",
             "up": "up",
             "w": "west",
+            "walk": "go",
             "west": "west",
         }
 
