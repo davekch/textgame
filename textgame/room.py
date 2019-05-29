@@ -10,7 +10,8 @@ class Room:
     def __init__(self, ID):
         self.id = ID   # unique, similar rooms should have a common keyword in ID
         self.doors = {dir: None for dir in DIRECTIONS}
-        self.locked = []
+        # dict that describes the locked/opened state of doors
+        self.locked = {dir: {"closed":False, "key":None} for dir in DIRECTIONS}
         # items that lie around in this room, format {ID: item}
         self.items = {}
         # monsters that are in this room, format {ID: monster}
@@ -28,7 +29,7 @@ class Room:
     def fill_info(self, descript="", sdescript="", value=5,\
                   dark={"now": False, "always": False}, sound=DESCRIPTIONS.NO_SOUND,\
                   hint="", hint_value=2, errors={},\
-                  doors={}, hiddendoors={}):
+                  doors={}, hiddendoors={}, locked={}):
         self.description = descript
         self.shortdescription = sdescript
         self.value = value
@@ -48,6 +49,13 @@ class Room:
             self.add_connection(dir, room)
         for dir,room in hiddendoors.items():
             self.add_connection(dir, room, hidden=True)
+        for dir,lock in locked.items():
+            if "closed" not in lock or "key" not in lock:
+                logger.warning("locked dict of room {} in direction {} is "
+                    "badly formatted".format(self.id, dir))
+            if dir not in DIRECTIONS:
+                logger.warning("locked dict of room {}: {} is not a direction".format(self.id, dir))
+        self.locked.update(locked)
 
 
     def describe(self, long=False):

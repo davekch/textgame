@@ -90,7 +90,7 @@ class Player:
             # see if there is a door
             if destination:
                 # see if door is open
-                if not direction in self.location.locked:
+                if not self.location.locked[direction]["closed"]:
                     # move, but remember previous room
                     self.oldlocation = self.location
                     self.location = destination
@@ -122,6 +122,38 @@ class Player:
                     direction = dir
                     break
             return self.go(direction)
+
+
+    @action_method
+    def close(self, direction):
+        return self.close_or_lock("lock", direction)
+
+    @action_method
+    def open(self, direction):
+        return self.close_or_lock("open", direction)
+
+    def close_or_lock(self, action, direction):
+        if direction not in DIRECTIONS:
+            return ACTION.FAIL_OPENDIR
+        # check if there's a door
+        if not self.location.doors[direction]:
+            return MOVING.FAIL_NO_DOOR
+        # check if door is already open/closed
+        if action=="open" and not self.location.locked[direction]["closed"]:
+            return ACTION.ALREADY_OPEN
+        elif action=="lock" and self.location.locked[direction]["closed"]:
+            return ACTION.ALREADY_CLOSED
+        # check if there are any items that are keys
+        if any([i.key for i in self.inventory.values()]):
+            # get all keys and try them out
+            keys = [i for i in self.inventory.values() if i.key]
+            for key in keys:
+                if key.key == self.location.locked[direction]["key"]:
+                    # open/close the door, depending on action
+                    self.location.locked[direction]["closed"] = (action == "lock")
+                    return ACTION.NOW_OPEN.format(action)
+            return ACTION.FAIL_OPEN
+        return ACTION.FAIL_NO_KEY
 
 
     @action_method

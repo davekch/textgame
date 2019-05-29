@@ -35,7 +35,12 @@ ACTION.FAIL_DROP = "You don't have one."
 ACTION.FAIL_TAKE = "You can't take that."
 ACTION.NO_SUCH_ITEM = "I see no {} here."
 ACTION.NO_INVENTORY = "You don't have anything with you."
-
+ACTION.FAIL_OPENDIR = "I can only open doors if you tell me the direction. Eg. 'open west'."
+ACTION.FAIL_NO_KEY = "You have no keys!"
+ACTION.ALREADY_OPEN = "The door is already open."
+ACTION.ALREADY_CLOSED = "The door is already closed."
+ACTION.FAIL_OPEN = "None of your keys fit."
+ACTION.NOW_OPEN = "You take the key and {} the door."
 
 INFO = namedtuple("INFO", [])
 INFO.HINT_WARNING = "I have a hint for you, but it will cost you {} points. Do you want to hear it?"

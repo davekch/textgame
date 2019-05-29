@@ -8,12 +8,14 @@ class Item:
     everything that is somewhat movable like treasures, weapons, tools, monsters
     """
 
-    def __init__(self, description, name, ID="", takable=True, value=0, initlocation=""):
+    def __init__(self, description, name, ID="", takable=True, value=0, key=None, initlocation=""):
         self.description = description
         self.name = name    # thing will be called like this in the game
         self.id = ID if ID else name    # key in world.items, must be unique
         self.takable = takable
         self.value = value
+        # this can be used for items that need to fit somewhere
+        self.key = key
         # room id to put the item at game start
         self.initlocation = initlocation
 

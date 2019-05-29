@@ -28,6 +28,7 @@ myrooms = {
             "east": "The slope is too steep here."
         },
         "doors": {"north": "field_0", "up": "field_0"},
+        "locked": {"north":{"closed":True, "key":123}},
         "hint": "here's my special hint for you.",
         "hint_value": 7
     },
@@ -44,6 +45,12 @@ myrooms = {
 
 # add a random item to field_1
 myitems = {
+    "key": {
+        "description": "A key lies around.",
+        "name": "key",
+        "key": 123,
+        "initlocation": "field_0"
+    },
     "diamond": {
         "description": "A sparkling diamond lies around!",
         "name": "diamond",
@@ -61,7 +68,7 @@ mymonsters = {
         "spawns_in": ["field"],
         # define a time at which monster should spawn (day/night/always)
         "spawns_at": "always",
-        "spawn_prob": 0.3,
+        "spawn_prob": 0,
         "strength": 0.3
     }
 }
