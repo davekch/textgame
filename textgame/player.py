@@ -10,7 +10,7 @@ from textgame.globals import FIGHTING
 
 
 # return this if a player's method should trigger a yes/no conversation
-EnterYesNoLoop = namedtuple("EnterYesNoLoop", ["func", "denial"])
+EnterYesNoLoop = namedtuple("EnterYesNoLoop", ["func", "denial", "question"])
 
 
 def player_method(f):
@@ -295,15 +295,12 @@ class Player:
         warning, hint = self.location.get_hint()
         if not hint:
             return INFO.NO_HINT
-        # stuff self.hint_conversation inside the EnterYesNoLoop,
-        # this will be called during conversation
-        return EnterYesNoLoop(self.hint_conversation, "ok")
 
-    def hint_conversation(self, really):
-        warning, hint = self.location.get_hint()
-        if not really:
-            return warning
-        else:
-            # if player really wanted that hint, substract from score and return hint
+        def hint_conversation():
+            warning, hint = self.location.get_hint()
             self.score -= self.location.hint_value
             return hint
+
+        # stuff hint_conversation inside the EnterYesNoLoop,
+        # this will be called during conversation
+        return EnterYesNoLoop(func=hint_conversation, question=warning, denial="ok")
