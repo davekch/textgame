@@ -270,7 +270,12 @@ class Player:
 
     @action_method
     def look(self):
-        return self.location.describe(long=True)
+        # spawn monsters before describing the room
+        self.world.spawn_monster(self.location)
+        # check if room is dark etc, plus extrawürste
+        msg = self.location.check_restrictions(self)
+        msg += self.location.describe(long=True)
+        return msg
 
 
     @action_method
