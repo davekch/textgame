@@ -66,3 +66,4 @@ FIGHTING.DEFEND_REMINDER = "You must defend yourself! A {} is a serious threat t
 FIGHTING.SUCCESS = "You killed the {}."
 FIGHTING.LOSER = "You should consider working on your fighting technique. Your amateurish attempts didn't stop the {} from killing you."
 FIGHTING.WHAT = "Attack what?"
+FIGHTING.ALREADY_GONE = "The {} is already gone."

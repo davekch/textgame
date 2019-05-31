@@ -240,6 +240,9 @@ class Player:
 
         elif len(monsters) == 1:
             monster = monsters[0]
+            if monster.status["singleencounter"]:
+                return FIGHTING.ALREADY_GONE.format(monstername)
+
             monster.status["fighting"] = True
             if monster.history == -1:
                 return monster.ignoretext
