@@ -129,7 +129,7 @@ class Player:
                 if dest == self.oldlocation:
                     direction = dir
                     break
-            return Player.go.undecorated(self, direction)
+            return type(self).go.undecorated(self, direction)
 
 
     @action_method
@@ -193,7 +193,7 @@ class Player:
             return DESCRIPTIONS.DARK_S
         response = []
         for itemid in list(self.location.items.keys()):
-            response.append(Player.take.undecorated(self, itemid))
+            response.append(type(self).take.undecorated(self, itemid))
         return '\n'.join(response)
 
 
@@ -222,7 +222,8 @@ class Player:
         if not self.inventory:
             return ACTION.NO_INVENTORY
         for item in list(self.inventory.keys()):
-            Player.drop.undecorated(self, item)
+            # type(self) may be Player or a derived class from player
+            type(self).drop.undecorated(self, item)
         return ACTION.SUCC_DROP
 
 
