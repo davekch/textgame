@@ -99,6 +99,8 @@ class Player:
             if destination:
                 # see if door is open
                 if not self.location.locked[direction]["closed"]:
+                    # how does moving to this direction look like?
+                    dir_description = self.location.dir_descriptions[direction]
                     # move, but remember previous room
                     self.oldlocation = self.location
                     self.location = destination
@@ -107,6 +109,9 @@ class Player:
                     self.world.spawn_monster(destination)
                     # check if room is dark etc, plus extrawürste
                     msg = self.location.check_restrictions(self)
+                    # if the room is not dark, add dir_description to the beginning
+                    if not self.location.dark["now"] and dir_description:
+                        msg = dir_description + '\n' + msg
                     msg += self.location.describe()
                     if not self.location.visited:
                         self.score += self.location.visit()
@@ -182,6 +187,8 @@ class Player:
                 # move item from location to inventory
                 self.inventory[itemid] = self.location.items.pop(itemid)
                 return ACTION.SUCC_TAKE.format(item.name)
+            return ACTION.FAIL_TAKE
+        elif itemid in self.location.description:
             return ACTION.FAIL_TAKE
         return ACTION.NO_SUCH_ITEM.format(itemid)
 

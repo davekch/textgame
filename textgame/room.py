@@ -12,6 +12,8 @@ class Room:
         self.doors = {dir: None for dir in DIRECTIONS}
         # dict that describes the locked/opened state of doors
         self.locked = {dir: {"closed":False, "key":None} for dir in DIRECTIONS}
+        # description to print when going in this direction
+        self.dir_descriptions = {dir: "" for dir in DIRECTIONS}
         # items that lie around in this room, format {ID: item}
         self.items = {}
         # monsters that are in this room, format {ID: monster}
@@ -29,7 +31,7 @@ class Room:
     def fill_info(self, descript="", sdescript="", value=5,\
                   dark={"now": False, "always": False}, sound=DESCRIPTIONS.NO_SOUND,\
                   hint="", hint_value=2, errors={},\
-                  doors={}, hiddendoors={}, locked={}):
+                  doors={}, hiddendoors={}, locked={}, dir_descriptions={}):
         self.description = descript
         self.shortdescription = sdescript
         self.value = value
@@ -56,13 +58,16 @@ class Room:
             if dir not in DIRECTIONS:
                 logger.warning("locked dict of room {}: {} is not a direction".format(self.id, dir))
         self.locked.update(locked)
+        for dir in dir_descriptions:
+            if dir not in DIRECTIONS:
+                logger.warning("dir_descriptions dict of room {}: {} is not a direction".format(self.id, dir))
+        self.dir_descriptions.update(dir_descriptions)
 
 
     def describe(self, long=False):
         long = long or not self.visited
         if self.dark["now"]:
-            # TODO: is this right? (two different darks)
-            return DESCRIPTIONS.DARK_L if long else DESCRIPTIONS.DARK_S
+            return DESCRIPTIONS.DARK_L
         descript = self.description if long else self.shortdescription
         for item in self.items.values():
             descript += "\n" + item.describe()

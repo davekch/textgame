@@ -28,6 +28,8 @@ myrooms = {
             "east": "The slope is too steep here."
         },
         "doors": {"north": "field_0", "up": "field_0"},
+        # this will only be printed if the player leaves this room in the given direction
+        "dir_descriptions": {"up": "You spread your wings and start to fly."},
         "locked": {"north":{"closed":True, "key":123}},
         "hint": "here's my special hint for you.",
         "hint_value": 7
