@@ -172,7 +172,7 @@ class Player:
     @action_method
     def take(self, itemid):
         if not itemid:
-            return ACTION.WHICH_ITEM
+            return ACTION.WHICH_ITEM.format("take")
         elif itemid == "all":
             return self.takeall()
 
@@ -215,6 +215,9 @@ class Player:
 
     @action_method
     def drop(self, itemid):
+        if not itemid:
+            return ACTION.WHICH_ITEM.format("drop")
+
         if itemid == "all":
             return self.dropall()
 

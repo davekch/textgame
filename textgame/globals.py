@@ -28,7 +28,7 @@ DESCRIPTIONS.NO_SOUND = "It's all quiet."
 
 ACTION = namedtuple("ACTION", [])
 ACTION.OWN_ALREADY = "You already have it!"
-ACTION.WHICH_ITEM = "Please specify an item you want to take."
+ACTION.WHICH_ITEM = "Please specify an item you want to {}."
 ACTION.SUCC_DROP = "Dropped."
 ACTION.SUCC_TAKE = "You carry now a {}."
 ACTION.FAIL_DROP = "You don't have one."
