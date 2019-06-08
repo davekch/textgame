@@ -29,39 +29,49 @@ class Room:
 
 
     def fill_info(self, descript="", sdescript="", value=5,\
-                  dark={"now": False, "always": False}, sound=DESCRIPTIONS.NO_SOUND,\
-                  hint="", hint_value=2, errors={},\
-                  doors={}, hiddendoors={}, locked={}, dir_descriptions={}):
+                  dark=None, sound=DESCRIPTIONS.NO_SOUND,\
+                  hint="", hint_value=2, errors=None,\
+                  doors=None, hiddendoors=None, locked=None, dir_descriptions=None):
         self.description = descript
         self.shortdescription = sdescript
         self.value = value
-        self.dark = dark
+        self.dark = dark if dark else {"now": False, "always": False}
         self.sound = sound
         self.hint = hint
         self.hint_value = hint_value
+
         # errors is a dict that contains error messages that get printed if player
         # tries to move to a direction where there is no door
-        for dir in errors:
-            if dir not in DIRECTIONS:
-                logger.warning("In errors of room {}: {} is not"
-                               " a direction".format(self.id, dir))
-        self.errors = {dir: MOVING.FAIL_CANT_GO for dir in DIRECTIONS}
-        self.errors.update(errors)
-        for dir,room in doors.items():
-            self.add_connection(dir, room)
-        for dir,room in hiddendoors.items():
-            self.add_connection(dir, room, hidden=True)
-        for dir,lock in locked.items():
-            if "closed" not in lock or "key" not in lock:
-                logger.warning("locked dict of room {} in direction {} is "
-                    "badly formatted".format(self.id, dir))
-            if dir not in DIRECTIONS:
-                logger.warning("locked dict of room {}: {} is not a direction".format(self.id, dir))
-        self.locked.update(locked)
-        for dir in dir_descriptions:
-            if dir not in DIRECTIONS:
-                logger.warning("dir_descriptions dict of room {}: {} is not a direction".format(self.id, dir))
-        self.dir_descriptions.update(dir_descriptions)
+        if errors:
+            for dir in errors:
+                if dir not in DIRECTIONS:
+                    logger.warning("In errors of room {}: {} is not"
+                                   " a direction".format(self.id, dir))
+            self.errors = {dir: MOVING.FAIL_CANT_GO for dir in DIRECTIONS}
+            self.errors.update(errors)
+
+        if doors:
+            for dir,room in doors.items():
+                self.add_connection(dir, room)
+
+        if hiddendoors:
+            for dir,room in hiddendoors.items():
+                self.add_connection(dir, room, hidden=True)
+
+        if locked:
+            for dir,lock in locked.items():
+                if "closed" not in lock or "key" not in lock:
+                    logger.warning("locked dict of room {} in direction {} is "
+                        "badly formatted".format(self.id, dir))
+                if dir not in DIRECTIONS:
+                    logger.warning("locked dict of room {}: {} is not a direction".format(self.id, dir))
+            self.locked.update(locked)
+
+        if dir_descriptions:
+            for dir in dir_descriptions:
+                if dir not in DIRECTIONS:
+                    logger.warning("dir_descriptions dict of room {}: {} is not a direction".format(self.id, dir))
+            self.dir_descriptions.update(dir_descriptions)
 
 
     def describe(self, long=False):
