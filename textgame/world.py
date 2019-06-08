@@ -2,6 +2,7 @@ import logging
 logger = logging.getLogger("textgame.world")
 logger.addHandler(logging.NullHandler())
 import random
+from collections import OrderedDict
 
 from textgame.room import Room
 from textgame.movable import Item, Weapon, Monster
@@ -13,10 +14,10 @@ class World:
     holds all rooms, items and monsters, is responsible for daylight and spawning
     """
 
-    def __init__(self, rooms=None, items=None, weapons=None, monsters=None):
-        self.rooms = {}
-        self.items = {}
-        self.monsters = {}
+    def __init__(self, rooms=None, items=None, weapons=None, monsters=None, seed=None):
+        self.rooms = OrderedDict()
+        self.items = OrderedDict()
+        self.monsters = OrderedDict()
         self.daytime = "day"
         self.time = 0  # increases by one after each step
         self.nighttime = 200
@@ -34,6 +35,11 @@ class World:
             self.create_items(monsters, tag="monsters")
         self.put_items_in_place()
         self.put_monsters_in_place()
+
+        self.seed = seed if seed else random.random()
+        logger.debug("seeding world with {}".format(self.seed))
+        self.random = random.Random()
+        self.random.seed(self.seed)
 
 
     def create_rooms(self, descriptions):
@@ -177,7 +183,7 @@ class World:
         # only spawn new if room is empty
         if len(location.monsters) == 0:
             for monster in self.monsters.values():
-                cond = random.random() < monster.spawn_prob and \
+                cond = self.random.random() < monster.spawn_prob and \
                     any([r in location.id for r in monster.spawns_in]) and \
                     (monster.spawns_at == self.daytime or monster.spawns_at == "always") and \
                     not monster.status["active"]
