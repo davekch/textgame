@@ -1,5 +1,5 @@
 from inspect import signature
-from collections import namedtuple
+from collections import namedtuple, OrderedDict
 import random
 import logging
 logger = logging.getLogger("textgame.player")
@@ -72,8 +72,12 @@ class Player:
         self.score = 0
         self.age = 0    # TODO: maybe this is redundant with world.time
         # dict to contain all the items the player is carrying
-        self.inventory = {}
+        self.inventory = OrderedDict()
         self.status = {"alive": True, "fighting": False, "trapped": False}
+
+        self.random = random.Random()
+        logger.debug("seeding player with {}".format(self.world.seed+42))
+        self.random.seed(self.world.seed+42)
 
 
     @action_method
@@ -258,11 +262,11 @@ class Player:
             if monster.history == -1:
                 return monster.ignoretext
             elif monster.history < 2:
-                if random.random() > monster.strength-monster.history/10:
+                if self.random.random() > monster.strength-monster.history/10:
                     monster.kill()
                 return FIGHTING.ATTACK
             elif monster.history == 2:
-                if random.random() > monster.strength-0.2:
+                if self.random.random() > monster.strength-0.2:
                     monster.kill()
                     return FIGHTING.LAST_ATTACK
                 self.status["alive"] = False
