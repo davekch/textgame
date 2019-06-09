@@ -42,12 +42,12 @@ class Room:
 
         # errors is a dict that contains error messages that get printed if player
         # tries to move to a direction where there is no door
+        self.errors = {dir: MOVING.FAIL_CANT_GO for dir in DIRECTIONS}
         if errors:
             for dir in errors:
                 if dir not in DIRECTIONS:
                     logger.warning("In errors of room {}: {} is not"
                                    " a direction".format(self.id, dir))
-            self.errors = {dir: MOVING.FAIL_CANT_GO for dir in DIRECTIONS}
             self.errors.update(errors)
 
         if doors:
