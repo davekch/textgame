@@ -36,7 +36,7 @@ class World:
         self.put_items_in_place()
         self.put_monsters_in_place()
 
-        self.seed = seed if seed else random.random()
+        self.seed = seed if seed else random.randint(0,1000000)
         logger.debug("seeding world with {}".format(self.seed))
         self.random = random.Random()
         self.random.seed(self.seed)
