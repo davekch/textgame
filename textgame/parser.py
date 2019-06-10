@@ -1,9 +1,13 @@
+from collections import namedtuple
 import logging
 logger = logging.getLogger("textgame.parser")
 logger.addHandler(logging.NullHandler())
 
 from textgame.globals import INFO
-from textgame.player import EnterYesNoLoop
+
+
+# return this if a player's method should trigger a yes/no conversation
+EnterYesNoLoop = namedtuple("EnterYesNoLoop", ["func", "denial", "question"])
 
 
 class Parser:

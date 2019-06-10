@@ -1,5 +1,5 @@
 from inspect import signature
-from collections import namedtuple, OrderedDict
+from collections import OrderedDict
 import random
 import logging
 logger = logging.getLogger("textgame.player")
@@ -7,10 +7,7 @@ logger.addHandler(logging.NullHandler())
 
 from textgame.globals import DIRECTIONS, MOVING, INFO, ACTION, LIGHT, DESCRIPTIONS
 from textgame.globals import FIGHTING
-
-
-# return this if a player's method should trigger a yes/no conversation
-EnterYesNoLoop = namedtuple("EnterYesNoLoop", ["func", "denial", "question"])
+from textgame.parser import EnterYesNoLoop
 
 
 def player_method(f):
