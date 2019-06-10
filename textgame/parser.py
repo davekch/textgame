@@ -121,7 +121,7 @@ class Parser:
         check if parser should fall into yesno loop
         """
         result = self.actionmap[verb](noun)
-        if type(result) is EnterYesNoLoop:
+        if str(type(result)) == str(EnterYesNoLoop):
             self.in_yesno = True
             self.yesno_backup = result
             return result.question
@@ -166,7 +166,7 @@ class Parser:
                 # execute and return the method that asked for a yes before
                 result = self.yesno_backup.func()
                 # maybe we have a nested yes no loop
-                if type(result) is EnterYesNoLoop:
+                if str(type(result)) == str(EnterYesNoLoop):
                     self.in_yesno = True
                     self.yesno_backup = result
                     return result.question
