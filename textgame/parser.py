@@ -6,8 +6,22 @@ logger.addHandler(logging.NullHandler())
 from textgame.globals import INFO
 
 
-# return this if a player's method should trigger a yes/no conversation
-EnterYesNoLoop = namedtuple("EnterYesNoLoop", ["func", "denial", "question"])
+class EnterYesNoLoop:
+    
+    def __init__(self, question, yes, no):
+        self.question = question
+        self._yes = yes
+        self._no = no
+
+    def yes(self):
+        if callable(self._yes):
+            return self._yes()
+        return self._yes
+
+    def no(self):
+        if callable(self._no):
+            return self._no()
+        return self._no
 
 
 class Parser:
@@ -113,19 +127,26 @@ class Parser:
             if verb not in self.actionmap:
                 logger.error("{} is a legal verb but has no definition"
                     "in actionmap".format(verb))
+    
+    
+    def check_result(self, result):
+        """
+        checks if the result of the do() method is EnterYesNoLoop or str
+        """
+        if type(result) is str:
+            return result
+        else:
+            # assume that result is of type enteryesnoloop
+            self.in_yesno = True
+            self.yesno_backup = result
+            return result.question
 
 
     def do(self, verb, noun):
         """
         call function associated with verb with noun as argument
-        check if parser should fall into yesno loop
         """
-        result = self.actionmap[verb](noun)
-        if str(type(result)) == str(EnterYesNoLoop):
-            self.in_yesno = True
-            self.yesno_backup = result
-            return result.question
-        return result
+        return self.actionmap[verb](noun)
 
 
     def _split_input(self, input):
@@ -163,17 +184,14 @@ class Parser:
                 return INFO.YES_NO
             elif verb == "yes":
                 self.in_yesno = False
-                # execute and return the method that asked for a yes before
-                result = self.yesno_backup.func()
-                # maybe we have a nested yes no loop
-                if str(type(result)) == str(EnterYesNoLoop):
-                    self.in_yesno = True
-                    self.yesno_backup = result
-                    return result.question
-                return result
+                # return the yes case
+                result = self.yesno_backup.yes()
+                return self.check_result(result)
             else:
                 self.in_yesno = False
-                return self.yesno_backup.denial
+                # return the no case
+                result = self.yesno_backup.no()
+                return self.check_result(result)
 
         commandverb = self.lookup_verb(verb)
         commandnoun = self.lookup_noun(noun)
@@ -190,4 +208,4 @@ class Parser:
         # perform the associated method
         result = self.do(commandverb, commandnoun)
 
-        return result
+        return self.check_result(result)
