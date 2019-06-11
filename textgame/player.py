@@ -323,4 +323,8 @@ class Player:
 
         # stuff hint_conversation inside the EnterYesNoLoop,
         # this will be called during conversation
-        return EnterYesNoLoop(func=hint_conversation, question=warning, denial="ok")
+        return EnterYesNoLoop(
+            question = warning,
+            yes = hint_conversation,
+            no = "ok."
+        )
