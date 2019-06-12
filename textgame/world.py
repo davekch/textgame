@@ -2,6 +2,31 @@
 textgame.world
 =====================
 
+This module contains only one class, :class:`textgame.world.World` that
+holds all rooms, items and monsters, is responsible for spawning
+monsters randomly in the rooms and managing daylight.
+At initialization you can pass a dict to :class:`textgame.world.World` that's
+formatted like this:
+
+.. code-block:: JSON
+
+   {
+    "room_id1": {
+        "descript": "You're in the great room.",
+        "doors": {"south": "room_id2"}
+    },
+    "room_id2": {
+        "descript": "You're in the small room.",
+        "doors": {"north": "room_id1"}
+    }
+   }
+
+The items inside the dict automatically get converted to :class:`textgame.room.Room` objects
+and linked to each other according to the ``doors`` dict.
+Every argument of :func:`textgame.room.Room.fill_info` can be put as a key-value
+pair inside this dict.
+
+The same is true for items, weapons and monsters, see the example.
 """
 
 import logging
@@ -17,7 +42,12 @@ from textgame.globals import INFO, FIGHTING
 
 class World:
     """
-    holds all rooms, items and monsters, is responsible for daylight and spawning
+    :param rooms: dict describing all rooms (see above)
+    :param items: dict describing all items
+    :param weapons: dict describing all weapons
+    :param monsters: you guessed it
+    :param seed: seed for the random number generator. If ``None``, a random seed is taken
+    :type seed: int
     """
 
     def __init__(self, rooms=None, items=None, weapons=None, monsters=None, seed=None):
@@ -50,8 +80,8 @@ class World:
 
     def create_rooms(self, descriptions):
         """
-        create Room objects based on descriptions
-        this also sets up connections between the rooms (if given in descriptions)
+        create :class:`textgame.room.Room` objects based on description-dict (see above).
+        This gets called on initialization if ``rooms`` was provided.
         """
         for ID in descriptions:
             if not ID in self.rooms:
@@ -61,11 +91,11 @@ class World:
                 logger.warning("You're trying to add a room with ID {}"
                     " but it's already there".format(ID))
         logger.info("Created rooms")
-        self.fill_room_infos(descriptions)
+        self._fill_room_infos(descriptions)
         logger.info("Added room descriptions")
 
 
-    def fill_room_infos(self, descriptions):
+    def _fill_room_infos(self, descriptions):
         for ID,room in self.rooms.items():
             description = descriptions.get(ID)
             if not description:
@@ -75,20 +105,20 @@ class World:
             # contain the actual room objects instead of their names
             if "doors" in description:
                 description.update(
-                    { "doors": self.convert_door_dict(description["doors"]) }
+                    { "doors": self._convert_door_dict(description["doors"]) }
                 )
             else:
                 logger.warning("Room {} does not have any doors".format(ID))
             if "hiddendoors" in description:
                 description.update(
-                    { "hiddendoors": self.convert_door_dict(description["hiddendoors"]) }
+                    { "hiddendoors": self._convert_door_dict(description["hiddendoors"]) }
                 )
 
             # here's where the work is done
             room.fill_info(**description)
 
 
-    def convert_door_dict(self, doordict):
+    def _convert_door_dict(self, doordict):
         """
         take {dir: roomid} return {dir: roomobj}
         """
@@ -99,6 +129,13 @@ class World:
 
 
     def room(self, ID):
+        """get room by ID.
+        If the room is not found, the logger prints an error
+
+        :param ID: room ID
+
+        :rtype: :class:`textgame.room.Room` or ``None``
+        """
         result = self.rooms.get(ID)
         if not result:
             logger.error("Room not found: {}".format(ID))
@@ -107,8 +144,12 @@ class World:
 
     def create_items(self, descriptions, tag="items"):
         """
-        create item objects based on descritions
-        tag can be items, weapons, monsters
+        create :mod:`textgame.movable` ``[Weapon,Item,Monster]`` objects based on description-dict (see above).
+        This gets called on initialization if ``weapons,items,monsters`` was provided.
+
+        :param descriptions:
+        :type descriptions: dict
+        :param tag: can be 'items', 'monsters', 'weapons'
         """
         for ID,description in descriptions.items():
             if tag == "items":
@@ -122,7 +163,9 @@ class World:
 
     def put_items_in_place(self):
         """
-        iterate over all items and add them to their initlocation
+        iterate over all items, see if their ``initlocation`` points to a room
+        in this world and add it there.
+        This is done automatically if the items are passed at initialization
         """
         for item in self.items.values():
             initlocation = self.rooms.get(item.initlocation)
@@ -135,7 +178,9 @@ class World:
 
     def put_monsters_in_place(self):
         """
-        iterate over all monsters and add them to their initlocation
+        iterate over all monsters, see if their ``initlocation`` points to a room
+        in this world and add it there.
+        This is done automatically if the monsters are passed at initialization
         """
         for monster in self.monsters.values():
             initlocation = self.rooms.get(monster.initlocation)
@@ -147,6 +192,19 @@ class World:
 
 
     def set_room_restrictions(self, restrictions):
+        """
+        takes a dict of the following form:
+
+        .. code-block:: python
+
+           {
+            "room_ID": {"func": my_func}
+           }
+
+        for every ``room_ID``, find the corresponding room and call
+        ``set_specials`` with the mapped dict on it.
+        See :func:`textgame.room.Room.set_specials` for further reference.
+        """
         for roomid,restriction in restrictions.items():
             if not "func" in restriction:
                 logger.error("no 'func' defined in restrictions for room {}".format(roomid))
@@ -155,7 +213,11 @@ class World:
 
 
     def update(self, player):
-        """upate world's status
+        """
+        increase the time, call :func:`textgame.world.World.manage_fight` and
+        :func:`textgame.world.World.manage_daylight`
+
+        :rtype: output of ``manage_fight`` and ``manage_daylight`` (str)
         """
         self.time += 1
         logger.debug("time set to {}".format(self.time))
@@ -165,6 +227,11 @@ class World:
 
 
     def manage_daylight(self):
+        """
+        check if it's nighttime and turn all rooms dark if yes
+
+        :rtype: a message that night came in or an empty string
+        """
         if self.time > self.nighttime and self.daytime == "day":
             self.daytime = "night"
             # turn all rooms to always dark
@@ -176,6 +243,16 @@ class World:
 
     def spawn_monster(self, location):
         """randomly spawn a monster in location
+
+        the condition for a monster to spawn is:
+
+        - no other monsters in this room
+        - random number must be smaller than monster's ``spawn_prob``
+        - at least one of the strings in monster's ``spawns_in`` list must be contained in the location's ID
+        - monster's ``spawns_at`` must be equal to the current daytime or 'always'
+        - monster must not be active already
+
+        :param location: :class:`textgame.room.Room` in which a monster should spawn
         """
         # remove singleencounters / save active monsters in room for later
         active_beast = None
@@ -205,6 +282,13 @@ class World:
 
 
     def manage_fight(self, player):
+        """
+        if there are active, harmful monsters around, this method checks if the player is
+        fighting them and kills the player / the monster, depending on random numbers
+        and the monster's strenght
+
+        :rtype: string describing the status of the fight
+        """
         msg = ''
         for monsterid,monster in self.monsters.items():
             if monster.status["active"] and not monster.status["harmless"]:
