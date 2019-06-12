@@ -10,10 +10,7 @@ Welcome to textgame's documentation!
    :maxdepth: 2
    :caption: Contents:
 
-.. automodule:: textgame
-
-.. automodule:: textgame.player
-    :members:
+   source/modules
 
 
 Indices and tables
