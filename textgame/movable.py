@@ -1,3 +1,9 @@
+"""
+textgame.movable
+=====================
+
+"""
+
 import logging
 logger = logging.getLogger("textgame.movable")
 logger.addHandler(logging.NullHandler())

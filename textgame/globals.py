@@ -1,3 +1,9 @@
+"""
+textgame.globals
+=====================
+
+"""
+
 from collections import namedtuple
 
 

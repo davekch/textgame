@@ -10,7 +10,7 @@ Welcome to textgame's documentation!
    :maxdepth: 2
    :caption: Contents:
 
-   source/modules
+   textgame
 
 
 Indices and tables

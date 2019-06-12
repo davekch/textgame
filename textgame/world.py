@@ -1,3 +1,9 @@
+"""
+textgame.world
+=====================
+
+"""
+
 import logging
 logger = logging.getLogger("textgame.world")
 logger.addHandler(logging.NullHandler())

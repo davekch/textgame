@@ -1,3 +1,9 @@
+"""
+textgame.room
+=====================
+
+"""
+
 import logging
 logger = logging.getLogger("textgame.room")
 logger.addHandler(logging.NullHandler())

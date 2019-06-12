@@ -1,3 +1,9 @@
+"""
+textgame.player
+=====================
+
+"""
+
 from inspect import signature
 from collections import OrderedDict
 import random

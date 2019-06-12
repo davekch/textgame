@@ -1,3 +1,9 @@
+"""
+textgame.parser
+=====================
+
+"""
+
 from collections import namedtuple
 import logging
 logger = logging.getLogger("textgame.parser")
@@ -7,7 +13,7 @@ from textgame.globals import INFO
 
 
 class EnterYesNoLoop:
-    
+
     def __init__(self, question, yes, no):
         self.question = question
         self._yes = yes
@@ -127,8 +133,8 @@ class Parser:
             if verb not in self.actionmap:
                 logger.error("{} is a legal verb but has no definition"
                     "in actionmap".format(verb))
-    
-    
+
+
     def check_result(self, result):
         """
         checks if the result of the do() method is EnterYesNoLoop or str
