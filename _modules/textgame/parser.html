@@ -1,0 +1,409 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>textgame.parser &mdash; textgame 0.2 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> textgame
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.2
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../textgame.html">textgame documentation</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">textgame</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>textgame.parser</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for textgame.parser</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">textgame.parser</span>
+<span class="sd">=====================</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">namedtuple</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;textgame.parser&quot;</span><span class="p">)</span>
+<span class="n">logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">NullHandler</span><span class="p">())</span>
+
+<span class="kn">from</span> <span class="nn">textgame.globals</span> <span class="k">import</span> <span class="n">INFO</span>
+
+
+<div class="viewcode-block" id="EnterYesNoLoop"><a class="viewcode-back" href="../../source/textgame.parser.html#textgame.parser.EnterYesNoLoop">[docs]</a><span class="k">class</span> <span class="nc">EnterYesNoLoop</span><span class="p">:</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">question</span><span class="p">,</span> <span class="n">yes</span><span class="p">,</span> <span class="n">no</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">question</span> <span class="o">=</span> <span class="n">question</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_yes</span> <span class="o">=</span> <span class="n">yes</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_no</span> <span class="o">=</span> <span class="n">no</span>
+
+<div class="viewcode-block" id="EnterYesNoLoop.yes"><a class="viewcode-back" href="../../source/textgame.parser.html#textgame.parser.EnterYesNoLoop.yes">[docs]</a>    <span class="k">def</span> <span class="nf">yes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">callable</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_yes</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_yes</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_yes</span></div>
+
+<div class="viewcode-block" id="EnterYesNoLoop.no"><a class="viewcode-back" href="../../source/textgame.parser.html#textgame.parser.EnterYesNoLoop.no">[docs]</a>    <span class="k">def</span> <span class="nf">no</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">callable</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_no</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_no</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_no</span></div></div>
+
+
+<div class="viewcode-block" id="Parser"><a class="viewcode-back" href="../../source/textgame.parser.html#textgame.parser.Parser">[docs]</a><span class="k">class</span> <span class="nc">Parser</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    makes sense of user&#39;s input, performs actions,</span>
+<span class="sd">    defines which words are allowed to use and maps them to player&#39;s methods</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">player</span><span class="p">):</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">player</span> <span class="o">=</span> <span class="n">player</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">in_yesno</span> <span class="o">=</span> <span class="kc">False</span>    <span class="c1"># are we inside a yes/no conversation?</span>
+        <span class="c1"># yesno_backup must be a function that takes a bool and returns</span>
+        <span class="c1"># user output. it will be executed if yes/no conversation ends with yes</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">yesno_backup</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">legal_verbs</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;&quot;</span><span class="p">:</span> <span class="s2">&quot;continue&quot;</span><span class="p">,</span>    <span class="c1"># dont do anything on empty input</span>
+            <span class="s2">&quot;attack&quot;</span><span class="p">:</span> <span class="s2">&quot;attack&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;back&quot;</span><span class="p">:</span> <span class="s2">&quot;back&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;close&quot;</span><span class="p">:</span> <span class="s2">&quot;close&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;d&quot;</span><span class="p">:</span> <span class="s2">&quot;down&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;down&quot;</span><span class="p">:</span> <span class="s2">&quot;down&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;drop&quot;</span><span class="p">:</span> <span class="s2">&quot;drop&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;e&quot;</span><span class="p">:</span> <span class="s2">&quot;east&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;east&quot;</span><span class="p">:</span> <span class="s2">&quot;east&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;enter&quot;</span><span class="p">:</span> <span class="s2">&quot;go&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;go&quot;</span><span class="p">:</span> <span class="s2">&quot;go&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;grab&quot;</span><span class="p">:</span> <span class="s2">&quot;take&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;hear&quot;</span><span class="p">:</span> <span class="s2">&quot;listen&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;hint&quot;</span><span class="p">:</span> <span class="s2">&quot;hint&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;inventory&quot;</span><span class="p">:</span> <span class="s2">&quot;inventory&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;kill&quot;</span><span class="p">:</span> <span class="s2">&quot;attack&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;listen&quot;</span><span class="p">:</span> <span class="s2">&quot;listen&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;lock&quot;</span><span class="p">:</span> <span class="s2">&quot;close&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;look&quot;</span><span class="p">:</span> <span class="s2">&quot;look&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;n&quot;</span><span class="p">:</span> <span class="s2">&quot;north&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;north&quot;</span><span class="p">:</span> <span class="s2">&quot;north&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;open&quot;</span><span class="p">:</span> <span class="s2">&quot;open&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;s&quot;</span><span class="p">:</span> <span class="s2">&quot;south&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;score&quot;</span><span class="p">:</span> <span class="s2">&quot;score&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;south&quot;</span><span class="p">:</span> <span class="s2">&quot;south&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;take&quot;</span><span class="p">:</span> <span class="s2">&quot;take&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;u&quot;</span><span class="p">:</span> <span class="s2">&quot;up&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;up&quot;</span><span class="p">:</span> <span class="s2">&quot;up&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;w&quot;</span><span class="p">:</span> <span class="s2">&quot;west&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;walk&quot;</span><span class="p">:</span> <span class="s2">&quot;go&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;west&quot;</span><span class="p">:</span> <span class="s2">&quot;west&quot;</span><span class="p">,</span>
+        <span class="p">}</span>
+
+        <span class="c1"># this may be used to define synonyms</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">legal_nouns</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;d&quot;</span><span class="p">:</span> <span class="s2">&quot;down&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;e&quot;</span><span class="p">:</span> <span class="s2">&quot;east&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;n&quot;</span><span class="p">:</span> <span class="s2">&quot;north&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;s&quot;</span><span class="p">:</span> <span class="s2">&quot;south&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;u&quot;</span><span class="p">:</span> <span class="s2">&quot;up&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;w&quot;</span><span class="p">:</span> <span class="s2">&quot;west&quot;</span><span class="p">,</span>
+        <span class="p">}</span>
+
+        <span class="c1"># the lambdas are there because the values in this dict must be</span>
+        <span class="c1"># callable with exactly one argument</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">actionmap</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;attack&quot;</span><span class="p">:</span> <span class="n">player</span><span class="o">.</span><span class="n">attack</span><span class="p">,</span>
+            <span class="s2">&quot;back&quot;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">player</span><span class="o">.</span><span class="n">go</span><span class="p">(</span><span class="s2">&quot;back&quot;</span><span class="p">),</span>
+            <span class="s2">&quot;continue&quot;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;down&quot;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">player</span><span class="o">.</span><span class="n">go</span><span class="p">(</span><span class="s2">&quot;down&quot;</span><span class="p">),</span>
+            <span class="s2">&quot;drop&quot;</span><span class="p">:</span> <span class="n">player</span><span class="o">.</span><span class="n">drop</span><span class="p">,</span>
+            <span class="s2">&quot;east&quot;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">player</span><span class="o">.</span><span class="n">go</span><span class="p">(</span><span class="s2">&quot;east&quot;</span><span class="p">),</span>
+            <span class="s2">&quot;go&quot;</span><span class="p">:</span> <span class="n">player</span><span class="o">.</span><span class="n">go</span><span class="p">,</span>
+            <span class="s2">&quot;hint&quot;</span><span class="p">:</span> <span class="n">player</span><span class="o">.</span><span class="n">ask_hint</span><span class="p">,</span>
+            <span class="s2">&quot;inventory&quot;</span><span class="p">:</span> <span class="n">player</span><span class="o">.</span><span class="n">list_inventory</span><span class="p">,</span>
+            <span class="s2">&quot;listen&quot;</span><span class="p">:</span> <span class="n">player</span><span class="o">.</span><span class="n">listen</span><span class="p">,</span>
+            <span class="s2">&quot;look&quot;</span><span class="p">:</span> <span class="n">player</span><span class="o">.</span><span class="n">look</span><span class="p">,</span>
+            <span class="s2">&quot;close&quot;</span><span class="p">:</span> <span class="n">player</span><span class="o">.</span><span class="n">close</span><span class="p">,</span>
+            <span class="s2">&quot;north&quot;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">player</span><span class="o">.</span><span class="n">go</span><span class="p">(</span><span class="s2">&quot;north&quot;</span><span class="p">),</span>
+            <span class="s2">&quot;open&quot;</span><span class="p">:</span> <span class="n">player</span><span class="o">.</span><span class="n">open</span><span class="p">,</span>
+            <span class="s2">&quot;score&quot;</span><span class="p">:</span> <span class="n">player</span><span class="o">.</span><span class="n">show_score</span><span class="p">,</span>
+            <span class="s2">&quot;south&quot;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">player</span><span class="o">.</span><span class="n">go</span><span class="p">(</span><span class="s2">&quot;south&quot;</span><span class="p">),</span>
+            <span class="s2">&quot;take&quot;</span><span class="p">:</span> <span class="n">player</span><span class="o">.</span><span class="n">take</span><span class="p">,</span>
+            <span class="s2">&quot;up&quot;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">player</span><span class="o">.</span><span class="n">go</span><span class="p">(</span><span class="s2">&quot;up&quot;</span><span class="p">),</span>
+            <span class="s2">&quot;west&quot;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">player</span><span class="o">.</span><span class="n">go</span><span class="p">(</span><span class="s2">&quot;west&quot;</span><span class="p">),</span>
+        <span class="p">}</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">check</span><span class="p">()</span>
+
+
+<div class="viewcode-block" id="Parser.lookup_verb"><a class="viewcode-back" href="../../source/textgame.parser.html#textgame.parser.Parser.lookup_verb">[docs]</a>    <span class="k">def</span> <span class="nf">lookup_verb</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">verb</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">legal_verbs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">verb</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Parser.lookup_noun"><a class="viewcode-back" href="../../source/textgame.parser.html#textgame.parser.Parser.lookup_noun">[docs]</a>    <span class="k">def</span> <span class="nf">lookup_noun</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">noun</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">legal_nouns</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">noun</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Parser.check"><a class="viewcode-back" href="../../source/textgame.parser.html#textgame.parser.Parser.check">[docs]</a>    <span class="k">def</span> <span class="nf">check</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        check if every verb in self.legal_verbs has a function mapped to</span>
+<span class="sd">        if not, the game will crash on the input of this verb</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">verb</span> <span class="ow">in</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">legal_verbs</span><span class="o">.</span><span class="n">values</span><span class="p">()):</span>
+            <span class="k">if</span> <span class="n">verb</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">actionmap</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> is a legal verb but has no definition&quot;</span>
+                    <span class="s2">&quot;in actionmap&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">verb</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="Parser.check_result"><a class="viewcode-back" href="../../source/textgame.parser.html#textgame.parser.Parser.check_result">[docs]</a>    <span class="k">def</span> <span class="nf">check_result</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">result</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        checks if the result of the do() method is EnterYesNoLoop or str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">result</span><span class="p">)</span> <span class="ow">is</span> <span class="nb">str</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">result</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># assume that result is of type enteryesnoloop</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">in_yesno</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">yesno_backup</span> <span class="o">=</span> <span class="n">result</span>
+            <span class="k">return</span> <span class="n">result</span><span class="o">.</span><span class="n">question</span></div>
+
+
+<div class="viewcode-block" id="Parser.do"><a class="viewcode-back" href="../../source/textgame.parser.html#textgame.parser.Parser.do">[docs]</a>    <span class="k">def</span> <span class="nf">do</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">verb</span><span class="p">,</span> <span class="n">noun</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        call function associated with verb with noun as argument</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">actionmap</span><span class="p">[</span><span class="n">verb</span><span class="p">](</span><span class="n">noun</span><span class="p">)</span></div>
+
+
+    <span class="k">def</span> <span class="nf">_split_input</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        take input and return verb and noun</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">args</span> <span class="o">=</span> <span class="nb">input</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="c1"># this gets catched in Parser.understand</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="n">verb</span><span class="p">,</span> <span class="n">noun</span> <span class="o">=</span> <span class="n">args</span>
+        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">verb</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">noun</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">verb</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+            <span class="n">noun</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">verb</span><span class="p">,</span> <span class="n">noun</span>
+
+
+<div class="viewcode-block" id="Parser.understand"><a class="viewcode-back" href="../../source/textgame.parser.html#textgame.parser.Parser.understand">[docs]</a>    <span class="k">def</span> <span class="nf">understand</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        based on the input, perform player method and return its output</span>
+<span class="sd">        the return value is what will be printed to the user</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">verb</span><span class="p">,</span> <span class="n">noun</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_split_input</span><span class="p">(</span><span class="nb">input</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">INFO</span><span class="o">.</span><span class="n">TOO_MANY_ARGUMENTS</span>
+
+        <span class="c1"># if a yes/no conversation is going on, only allow yes/no as answers</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">in_yesno</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">verb</span> <span class="o">!=</span> <span class="s2">&quot;yes&quot;</span> <span class="ow">and</span> <span class="n">verb</span> <span class="o">!=</span> <span class="s2">&quot;no&quot;</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">INFO</span><span class="o">.</span><span class="n">YES_NO</span>
+            <span class="k">elif</span> <span class="n">verb</span> <span class="o">==</span> <span class="s2">&quot;yes&quot;</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">in_yesno</span> <span class="o">=</span> <span class="kc">False</span>
+                <span class="c1"># return the yes case</span>
+                <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">yesno_backup</span><span class="o">.</span><span class="n">yes</span><span class="p">()</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_result</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">in_yesno</span> <span class="o">=</span> <span class="kc">False</span>
+                <span class="c1"># return the no case</span>
+                <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">yesno_backup</span><span class="o">.</span><span class="n">no</span><span class="p">()</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_result</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+
+        <span class="n">commandverb</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lookup_verb</span><span class="p">(</span><span class="n">verb</span><span class="p">)</span>
+        <span class="n">commandnoun</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lookup_noun</span><span class="p">(</span><span class="n">noun</span><span class="p">)</span>
+        <span class="c1"># if noun is illegal, reset to it&#39;s original value and feed it to</span>
+        <span class="c1"># the actionmethods. More creative output if erronous input :)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">commandnoun</span><span class="p">:</span>
+            <span class="n">commandnoun</span> <span class="o">=</span> <span class="n">noun</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;I understood: verb=</span><span class="si">{}</span><span class="s2"> noun=</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">repr</span><span class="p">(</span><span class="n">commandverb</span><span class="p">),</span> <span class="nb">repr</span><span class="p">(</span><span class="n">commandnoun</span><span class="p">)))</span>
+
+        <span class="c1"># illegal nouns are okay but illegal verbs are not</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">commandverb</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">INFO</span><span class="o">.</span><span class="n">NOT_UNDERSTOOD</span>
+
+        <span class="c1"># perform the associated method</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">do</span><span class="p">(</span><span class="n">commandverb</span><span class="p">,</span> <span class="n">commandnoun</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_result</span><span class="p">(</span><span class="n">result</span><span class="p">)</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, David Koch
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

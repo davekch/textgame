@@ -1,0 +1,325 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>textgame.player &mdash; textgame 0.2 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="textgame.room" href="textgame.room.html" />
+    <link rel="prev" title="textgame.parser" href="textgame.parser.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> textgame
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.2
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../textgame.html">textgame documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="textgame.globals.html">textgame.globals</a></li>
+<li class="toctree-l2"><a class="reference internal" href="textgame.movable.html">textgame.movable</a></li>
+<li class="toctree-l2"><a class="reference internal" href="textgame.parser.html">textgame.parser</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">textgame.player</a></li>
+<li class="toctree-l2"><a class="reference internal" href="textgame.room.html">textgame.room</a></li>
+<li class="toctree-l2"><a class="reference internal" href="textgame.world.html">textgame.world</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">textgame</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../textgame.html">textgame documentation</a> &raquo;</li>
+        
+      <li>textgame.player</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/source/textgame.player.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <span class="target" id="module-textgame.player"></span><div class="section" id="textgame-player">
+<h1>textgame.player<a class="headerlink" href="#textgame-player" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="textgame.player.Player">
+<em class="property">class </em><code class="sig-prename descclassname">textgame.player.</code><code class="sig-name descname">Player</code><span class="sig-paren">(</span><em class="sig-param">world</em>, <em class="sig-param">initlocation</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/textgame/player.html#Player"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#textgame.player.Player" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>class to represent the player of the game
+does all the stuff like take drop kill listen …</p>
+<dl class="method">
+<dt id="textgame.player.Player.ask_hint">
+<code class="sig-name descname">ask_hint</code><span class="sig-paren">(</span><em class="sig-param">noun</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/textgame/player.html#Player.ask_hint"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#textgame.player.Player.ask_hint" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="textgame.player.Player.attack">
+<code class="sig-name descname">attack</code><span class="sig-paren">(</span><em class="sig-param">noun</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/textgame/player.html#Player.attack"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#textgame.player.Player.attack" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="textgame.player.Player.close">
+<code class="sig-name descname">close</code><span class="sig-paren">(</span><em class="sig-param">noun</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/textgame/player.html#Player.close"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#textgame.player.Player.close" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="textgame.player.Player.close_or_lock">
+<code class="sig-name descname">close_or_lock</code><span class="sig-paren">(</span><em class="sig-param">action</em>, <em class="sig-param">direction</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/textgame/player.html#Player.close_or_lock"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#textgame.player.Player.close_or_lock" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="textgame.player.Player.drop">
+<code class="sig-name descname">drop</code><span class="sig-paren">(</span><em class="sig-param">noun</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/textgame/player.html#Player.drop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#textgame.player.Player.drop" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="textgame.player.Player.dropall">
+<code class="sig-name descname">dropall</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/textgame/player.html#Player.dropall"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#textgame.player.Player.dropall" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="textgame.player.Player.forget">
+<code class="sig-name descname">forget</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/textgame/player.html#Player.forget"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#textgame.player.Player.forget" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="textgame.player.Player.go">
+<code class="sig-name descname">go</code><span class="sig-paren">(</span><em class="sig-param">noun</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/textgame/player.html#Player.go"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#textgame.player.Player.go" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="textgame.player.Player.goback">
+<code class="sig-name descname">goback</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/textgame/player.html#Player.goback"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#textgame.player.Player.goback" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="textgame.player.Player.has_light">
+<code class="sig-name descname">has_light</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/textgame/player.html#Player.has_light"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#textgame.player.Player.has_light" title="Permalink to this definition">¶</a></dt>
+<dd><p>returns true if player carries anything that lights a room up</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="textgame.player.Player.list_inventory">
+<code class="sig-name descname">list_inventory</code><span class="sig-paren">(</span><em class="sig-param">noun</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/textgame/player.html#Player.list_inventory"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#textgame.player.Player.list_inventory" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="textgame.player.Player.listen">
+<code class="sig-name descname">listen</code><span class="sig-paren">(</span><em class="sig-param">noun</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/textgame/player.html#Player.listen"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#textgame.player.Player.listen" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="textgame.player.Player.look">
+<code class="sig-name descname">look</code><span class="sig-paren">(</span><em class="sig-param">noun</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/textgame/player.html#Player.look"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#textgame.player.Player.look" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="textgame.player.Player.open">
+<code class="sig-name descname">open</code><span class="sig-paren">(</span><em class="sig-param">noun</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/textgame/player.html#Player.open"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#textgame.player.Player.open" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="textgame.player.Player.show_score">
+<code class="sig-name descname">show_score</code><span class="sig-paren">(</span><em class="sig-param">noun</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/textgame/player.html#Player.show_score"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#textgame.player.Player.show_score" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="textgame.player.Player.take">
+<code class="sig-name descname">take</code><span class="sig-paren">(</span><em class="sig-param">noun</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/textgame/player.html#Player.take"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#textgame.player.Player.take" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="textgame.player.Player.takeall">
+<code class="sig-name descname">takeall</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/textgame/player.html#Player.takeall"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#textgame.player.Player.takeall" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="textgame.player.action_method">
+<code class="sig-prename descclassname">textgame.player.</code><code class="sig-name descname">action_method</code><span class="sig-paren">(</span><em class="sig-param">f</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/textgame/player.html#action_method"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#textgame.player.action_method" title="Permalink to this definition">¶</a></dt>
+<dd><p>player_method that appends world.update (time passing, daylight handling …)
+to the passed function</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="textgame.player.player_method">
+<code class="sig-prename descclassname">textgame.player.</code><code class="sig-name descname">player_method</code><span class="sig-paren">(</span><em class="sig-param">f</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/textgame/player.html#player_method"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#textgame.player.player_method" title="Permalink to this definition">¶</a></dt>
+<dd><p>wrapper for player methods
+player methods that are mapped to verbs must take a noun as an argument</p>
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="textgame.room.html" class="btn btn-neutral float-right" title="textgame.room" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="textgame.parser.html" class="btn btn-neutral float-left" title="textgame.parser" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, David Koch
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

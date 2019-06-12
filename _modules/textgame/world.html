@@ -1,0 +1,435 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>textgame.world &mdash; textgame 0.2 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> textgame
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.2
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../textgame.html">textgame documentation</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">textgame</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>textgame.world</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for textgame.world</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">textgame.world</span>
+<span class="sd">=====================</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;textgame.world&quot;</span><span class="p">)</span>
+<span class="n">logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">NullHandler</span><span class="p">())</span>
+<span class="kn">import</span> <span class="nn">random</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">OrderedDict</span>
+
+<span class="kn">from</span> <span class="nn">textgame.room</span> <span class="k">import</span> <span class="n">Room</span>
+<span class="kn">from</span> <span class="nn">textgame.movable</span> <span class="k">import</span> <span class="n">Item</span><span class="p">,</span> <span class="n">Weapon</span><span class="p">,</span> <span class="n">Monster</span>
+<span class="kn">from</span> <span class="nn">textgame.globals</span> <span class="k">import</span> <span class="n">INFO</span><span class="p">,</span> <span class="n">FIGHTING</span>
+
+
+<div class="viewcode-block" id="World"><a class="viewcode-back" href="../../source/textgame.world.html#textgame.world.World">[docs]</a><span class="k">class</span> <span class="nc">World</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    holds all rooms, items and monsters, is responsible for daylight and spawning</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rooms</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">items</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">weapons</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">monsters</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rooms</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">items</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">monsters</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">daytime</span> <span class="o">=</span> <span class="s2">&quot;day&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">time</span> <span class="o">=</span> <span class="mi">0</span>  <span class="c1"># increases by one after each step</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nighttime</span> <span class="o">=</span> <span class="mi">200</span>
+        <span class="c1"># dummy room to keep stuff out of the actual world</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">storage_room</span> <span class="o">=</span> <span class="n">Room</span><span class="p">(</span><span class="s2">&quot;storage&quot;</span><span class="p">)</span>
+
+        <span class="c1"># fill stuff</span>
+        <span class="k">if</span> <span class="n">rooms</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">create_rooms</span><span class="p">(</span><span class="n">rooms</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">items</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">create_items</span><span class="p">(</span><span class="n">items</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">weapons</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">create_items</span><span class="p">(</span><span class="n">weapons</span><span class="p">,</span> <span class="n">tag</span><span class="o">=</span><span class="s2">&quot;weapons&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">monsters</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">create_items</span><span class="p">(</span><span class="n">monsters</span><span class="p">,</span> <span class="n">tag</span><span class="o">=</span><span class="s2">&quot;monsters&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">put_items_in_place</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">put_monsters_in_place</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">seed</span> <span class="o">=</span> <span class="n">seed</span> <span class="k">if</span> <span class="n">seed</span> <span class="k">else</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1000000</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;seeding world with </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">seed</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">random</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">Random</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">seed</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="World.create_rooms"><a class="viewcode-back" href="../../source/textgame.world.html#textgame.world.World.create_rooms">[docs]</a>    <span class="k">def</span> <span class="nf">create_rooms</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">descriptions</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        create Room objects based on descriptions</span>
+<span class="sd">        this also sets up connections between the rooms (if given in descriptions)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">ID</span> <span class="ow">in</span> <span class="n">descriptions</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">ID</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">rooms</span><span class="p">:</span>
+                <span class="c1"># create &#39;empty&#39; room</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">rooms</span><span class="p">[</span><span class="n">ID</span><span class="p">]</span> <span class="o">=</span> <span class="n">Room</span><span class="p">(</span><span class="n">ID</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;You&#39;re trying to add a room with ID </span><span class="si">{}</span><span class="s2">&quot;</span>
+                    <span class="s2">&quot; but it&#39;s already there&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ID</span><span class="p">))</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Created rooms&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fill_room_infos</span><span class="p">(</span><span class="n">descriptions</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Added room descriptions&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="World.fill_room_infos"><a class="viewcode-back" href="../../source/textgame.world.html#textgame.world.World.fill_room_infos">[docs]</a>    <span class="k">def</span> <span class="nf">fill_room_infos</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">descriptions</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">ID</span><span class="p">,</span><span class="n">room</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">rooms</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">description</span> <span class="o">=</span> <span class="n">descriptions</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">ID</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">description</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Room </span><span class="si">{}</span><span class="s2"> does not have a description&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ID</span><span class="p">))</span>
+
+            <span class="c1"># replace &quot;doors&quot; and &quot;hiddendoors&quot; dicts to dicts that</span>
+            <span class="c1"># contain the actual room objects instead of their names</span>
+            <span class="k">if</span> <span class="s2">&quot;doors&quot;</span> <span class="ow">in</span> <span class="n">description</span><span class="p">:</span>
+                <span class="n">description</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+                    <span class="p">{</span> <span class="s2">&quot;doors&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">convert_door_dict</span><span class="p">(</span><span class="n">description</span><span class="p">[</span><span class="s2">&quot;doors&quot;</span><span class="p">])</span> <span class="p">}</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Room </span><span class="si">{}</span><span class="s2"> does not have any doors&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ID</span><span class="p">))</span>
+            <span class="k">if</span> <span class="s2">&quot;hiddendoors&quot;</span> <span class="ow">in</span> <span class="n">description</span><span class="p">:</span>
+                <span class="n">description</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+                    <span class="p">{</span> <span class="s2">&quot;hiddendoors&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">convert_door_dict</span><span class="p">(</span><span class="n">description</span><span class="p">[</span><span class="s2">&quot;hiddendoors&quot;</span><span class="p">])</span> <span class="p">}</span>
+                <span class="p">)</span>
+
+            <span class="c1"># here&#39;s where the work is done</span>
+            <span class="n">room</span><span class="o">.</span><span class="n">fill_info</span><span class="p">(</span><span class="o">**</span><span class="n">description</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="World.convert_door_dict"><a class="viewcode-back" href="../../source/textgame.world.html#textgame.world.World.convert_door_dict">[docs]</a>    <span class="k">def</span> <span class="nf">convert_door_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">doordict</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        take {dir: roomid} return {dir: roomobj}</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">true_doordict</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="nb">dir</span><span class="p">,</span><span class="n">ID</span> <span class="ow">in</span> <span class="n">doordict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">true_doordict</span><span class="p">[</span><span class="nb">dir</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">room</span><span class="p">(</span><span class="n">ID</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">true_doordict</span></div>
+
+
+<div class="viewcode-block" id="World.room"><a class="viewcode-back" href="../../source/textgame.world.html#textgame.world.World.room">[docs]</a>    <span class="k">def</span> <span class="nf">room</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ID</span><span class="p">):</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rooms</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">ID</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">result</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Room not found: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ID</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">result</span></div>
+
+
+<div class="viewcode-block" id="World.create_items"><a class="viewcode-back" href="../../source/textgame.world.html#textgame.world.World.create_items">[docs]</a>    <span class="k">def</span> <span class="nf">create_items</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">descriptions</span><span class="p">,</span> <span class="n">tag</span><span class="o">=</span><span class="s2">&quot;items&quot;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        create item objects based on descritions</span>
+<span class="sd">        tag can be items, weapons, monsters</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">ID</span><span class="p">,</span><span class="n">description</span> <span class="ow">in</span> <span class="n">descriptions</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">tag</span> <span class="o">==</span> <span class="s2">&quot;items&quot;</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">items</span><span class="p">[</span><span class="n">ID</span><span class="p">]</span> <span class="o">=</span> <span class="n">Item</span><span class="p">(</span><span class="o">**</span><span class="n">description</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">tag</span> <span class="o">==</span> <span class="s2">&quot;weapons&quot;</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">items</span><span class="p">[</span><span class="n">ID</span><span class="p">]</span> <span class="o">=</span> <span class="n">Weapon</span><span class="p">(</span><span class="o">**</span><span class="n">description</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">tag</span> <span class="o">==</span> <span class="s2">&quot;monsters&quot;</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">monsters</span><span class="p">[</span><span class="n">ID</span><span class="p">]</span> <span class="o">=</span> <span class="n">Monster</span><span class="p">(</span><span class="o">**</span><span class="n">description</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Created </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">tag</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="World.put_items_in_place"><a class="viewcode-back" href="../../source/textgame.world.html#textgame.world.World.put_items_in_place">[docs]</a>    <span class="k">def</span> <span class="nf">put_items_in_place</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        iterate over all items and add them to their initlocation</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">items</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+            <span class="n">initlocation</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rooms</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">item</span><span class="o">.</span><span class="n">initlocation</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">initlocation</span><span class="p">:</span>
+                <span class="n">initlocation</span><span class="o">.</span><span class="n">add_item</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Item </span><span class="si">{}</span><span class="s2">&#39;s initlocation (</span><span class="si">{}</span><span class="s2">) could not be found&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">item</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="nb">repr</span><span class="p">(</span><span class="n">item</span><span class="o">.</span><span class="n">initlocation</span><span class="p">)))</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Put items in place&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="World.put_monsters_in_place"><a class="viewcode-back" href="../../source/textgame.world.html#textgame.world.World.put_monsters_in_place">[docs]</a>    <span class="k">def</span> <span class="nf">put_monsters_in_place</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        iterate over all monsters and add them to their initlocation</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">monster</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">monsters</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+            <span class="n">initlocation</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rooms</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">monster</span><span class="o">.</span><span class="n">initlocation</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">initlocation</span><span class="p">:</span>
+                <span class="n">initlocation</span><span class="o">.</span><span class="n">add_monster</span><span class="p">(</span><span class="n">monster</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">monster</span><span class="o">.</span><span class="n">initlocation</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Monster </span><span class="si">{}</span><span class="s2">&#39;s initlocation (</span><span class="si">{}</span><span class="s2">) could not be found&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">monster</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="nb">repr</span><span class="p">(</span><span class="n">monster</span><span class="o">.</span><span class="n">initlocation</span><span class="p">)))</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Put monsters in place&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="World.set_room_restrictions"><a class="viewcode-back" href="../../source/textgame.world.html#textgame.world.World.set_room_restrictions">[docs]</a>    <span class="k">def</span> <span class="nf">set_room_restrictions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">restrictions</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">roomid</span><span class="p">,</span><span class="n">restriction</span> <span class="ow">in</span> <span class="n">restrictions</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="s2">&quot;func&quot;</span> <span class="ow">in</span> <span class="n">restriction</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;no &#39;func&#39; defined in restrictions for room </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">roomid</span><span class="p">))</span>
+                <span class="k">continue</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">room</span><span class="p">(</span><span class="n">roomid</span><span class="p">)</span><span class="o">.</span><span class="n">set_specials</span><span class="p">(</span><span class="o">**</span><span class="n">restriction</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="World.update"><a class="viewcode-back" href="../../source/textgame.world.html#textgame.world.World.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">player</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;upate world&#39;s status</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">time</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;time set to </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="p">))</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">manage_fight</span><span class="p">(</span><span class="n">player</span><span class="p">)</span>
+        <span class="n">msg</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">manage_daylight</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">msg</span></div>
+
+
+<div class="viewcode-block" id="World.manage_daylight"><a class="viewcode-back" href="../../source/textgame.world.html#textgame.world.World.manage_daylight">[docs]</a>    <span class="k">def</span> <span class="nf">manage_daylight</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">time</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">nighttime</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">daytime</span> <span class="o">==</span> <span class="s2">&quot;day&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">daytime</span> <span class="o">=</span> <span class="s2">&quot;night&quot;</span>
+            <span class="c1"># turn all rooms to always dark</span>
+            <span class="k">for</span> <span class="n">room</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">rooms</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+                <span class="n">room</span><span class="o">.</span><span class="n">dark</span><span class="p">[</span><span class="s2">&quot;always&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">return</span> <span class="s1">&#39;</span><span class="se">\n\n</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="n">INFO</span><span class="o">.</span><span class="n">NIGHT_COMES_IN</span>
+        <span class="k">return</span> <span class="s1">&#39;&#39;</span></div>
+
+
+<div class="viewcode-block" id="World.spawn_monster"><a class="viewcode-back" href="../../source/textgame.world.html#textgame.world.World.spawn_monster">[docs]</a>    <span class="k">def</span> <span class="nf">spawn_monster</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">location</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;randomly spawn a monster in location</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># remove singleencounters / save active monsters in room for later</span>
+        <span class="n">active_beast</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">for</span> <span class="nb">id</span><span class="p">,</span><span class="n">monster</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">location</span><span class="o">.</span><span class="n">monsters</span><span class="o">.</span><span class="n">items</span><span class="p">()):</span>
+            <span class="k">if</span> <span class="n">monster</span><span class="o">.</span><span class="n">status</span><span class="p">[</span><span class="s2">&quot;active&quot;</span><span class="p">]</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">monster</span><span class="o">.</span><span class="n">status</span><span class="p">[</span><span class="s2">&quot;singleencounter&quot;</span><span class="p">]:</span>
+                <span class="n">active_beast</span> <span class="o">=</span> <span class="n">monster</span>
+            <span class="k">elif</span> <span class="n">monster</span><span class="o">.</span><span class="n">status</span><span class="p">[</span><span class="s2">&quot;active&quot;</span><span class="p">]</span> <span class="ow">and</span> <span class="n">monster</span><span class="o">.</span><span class="n">status</span><span class="p">[</span><span class="s2">&quot;singleencounter&quot;</span><span class="p">]:</span>
+                <span class="c1"># remove monster from room and set active to False</span>
+                <span class="n">location</span><span class="o">.</span><span class="n">monsters</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="nb">id</span><span class="p">)</span><span class="o">.</span><span class="n">status</span><span class="p">[</span><span class="s2">&quot;active&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="c1"># only spawn new if room is empty</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">location</span><span class="o">.</span><span class="n">monsters</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">monster</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">monsters</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+                <span class="n">cond</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">()</span> <span class="o">&lt;</span> <span class="n">monster</span><span class="o">.</span><span class="n">spawn_prob</span> <span class="ow">and</span> \
+                    <span class="nb">any</span><span class="p">([</span><span class="n">r</span> <span class="ow">in</span> <span class="n">location</span><span class="o">.</span><span class="n">id</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">monster</span><span class="o">.</span><span class="n">spawns_in</span><span class="p">])</span> <span class="ow">and</span> \
+                    <span class="p">(</span><span class="n">monster</span><span class="o">.</span><span class="n">spawns_at</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">daytime</span> <span class="ow">or</span> <span class="n">monster</span><span class="o">.</span><span class="n">spawns_at</span> <span class="o">==</span> <span class="s2">&quot;always&quot;</span><span class="p">)</span> <span class="ow">and</span> \
+                    <span class="ow">not</span> <span class="n">monster</span><span class="o">.</span><span class="n">status</span><span class="p">[</span><span class="s2">&quot;active&quot;</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">cond</span><span class="p">:</span>
+                    <span class="n">location</span><span class="o">.</span><span class="n">add_monster</span><span class="p">(</span><span class="n">monster</span><span class="p">)</span>
+                    <span class="n">monster</span><span class="o">.</span><span class="n">status</span><span class="p">[</span><span class="s2">&quot;active&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+                    <span class="n">monster</span><span class="o">.</span><span class="n">history</span> <span class="o">=</span> <span class="mi">0</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Spawned </span><span class="si">{}</span><span class="s2"> in </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">monster</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">location</span><span class="o">.</span><span class="n">id</span><span class="p">))</span>
+                    <span class="k">break</span>   <span class="c1"># spawn no more</span>
+        <span class="k">elif</span> <span class="n">active_beast</span> <span class="ow">and</span> <span class="n">active_beast</span><span class="o">.</span><span class="n">status</span><span class="p">[</span><span class="s2">&quot;harmless&quot;</span><span class="p">]:</span>
+            <span class="c1"># TODO: implement behaviour of harmless monsters</span>
+            <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="World.manage_fight"><a class="viewcode-back" href="../../source/textgame.world.html#textgame.world.World.manage_fight">[docs]</a>    <span class="k">def</span> <span class="nf">manage_fight</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">player</span><span class="p">):</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="k">for</span> <span class="n">monsterid</span><span class="p">,</span><span class="n">monster</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">monsters</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">monster</span><span class="o">.</span><span class="n">status</span><span class="p">[</span><span class="s2">&quot;active&quot;</span><span class="p">]</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">monster</span><span class="o">.</span><span class="n">status</span><span class="p">[</span><span class="s2">&quot;harmless&quot;</span><span class="p">]:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;managing fight with </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">monsterid</span><span class="p">))</span>
+                <span class="n">player</span><span class="o">.</span><span class="n">status</span><span class="p">[</span><span class="s2">&quot;fighting&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="c1"># player dies if attacked in the dark</span>
+                <span class="k">if</span> <span class="n">player</span><span class="o">.</span><span class="n">location</span><span class="o">.</span><span class="n">dark</span><span class="p">[</span><span class="s2">&quot;now&quot;</span><span class="p">]:</span>
+                    <span class="n">player</span><span class="o">.</span><span class="n">status</span><span class="p">[</span><span class="s2">&quot;alive&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+                    <span class="k">return</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">+</span><span class="n">FIGHTING</span><span class="o">.</span><span class="n">DARK_DEATH</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">monster</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="n">monster</span><span class="o">.</span><span class="n">status</span><span class="p">[</span><span class="s2">&quot;alive&quot;</span><span class="p">]</span> <span class="ow">and</span> <span class="n">player</span><span class="o">.</span><span class="n">status</span><span class="p">[</span><span class="s2">&quot;alive&quot;</span><span class="p">]:</span>
+                    <span class="k">if</span> <span class="n">monster</span><span class="o">.</span><span class="n">status</span><span class="p">[</span><span class="s2">&quot;fighting&quot;</span><span class="p">]:</span>
+                        <span class="n">msg</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">+</span><span class="n">FIGHTING</span><span class="o">.</span><span class="n">SURVIVED_ATTACK</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">monster</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+                    <span class="k">elif</span> <span class="n">monster</span><span class="o">.</span><span class="n">history</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                        <span class="n">player</span><span class="o">.</span><span class="n">status</span><span class="p">[</span><span class="s2">&quot;alive&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+                        <span class="n">msg</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">+</span><span class="n">FIGHTING</span><span class="o">.</span><span class="n">IGNORE</span>
+                    <span class="k">elif</span> <span class="n">monster</span><span class="o">.</span><span class="n">history</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="n">msg</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">+</span><span class="n">FIGHTING</span><span class="o">.</span><span class="n">DEFEND_REMINDER</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">monster</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+
+                <span class="k">elif</span> <span class="ow">not</span> <span class="n">monster</span><span class="o">.</span><span class="n">status</span><span class="p">[</span><span class="s2">&quot;alive&quot;</span><span class="p">]:</span>
+                    <span class="n">monster</span><span class="o">.</span><span class="n">status</span><span class="p">[</span><span class="s2">&quot;active&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+                    <span class="n">player</span><span class="o">.</span><span class="n">status</span><span class="p">[</span><span class="s2">&quot;fighting&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+                    <span class="n">player</span><span class="o">.</span><span class="n">status</span><span class="p">[</span><span class="s2">&quot;trapped&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+                    <span class="c1"># move monster from monsters to items to make it takable</span>
+                    <span class="n">monster</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="n">monster</span><span class="o">.</span><span class="n">name</span>
+                    <span class="n">player</span><span class="o">.</span><span class="n">location</span><span class="o">.</span><span class="n">add_item</span><span class="p">(</span> <span class="n">player</span><span class="o">.</span><span class="n">location</span><span class="o">.</span><span class="n">monsters</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">monsterid</span><span class="p">)</span> <span class="p">)</span>
+                    <span class="n">msg</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">+</span><span class="n">FIGHTING</span><span class="o">.</span><span class="n">SUCCESS</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">monster</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">player</span><span class="o">.</span><span class="n">status</span><span class="p">[</span><span class="s2">&quot;alive&quot;</span><span class="p">]:</span>
+                    <span class="n">msg</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">+</span><span class="n">FIGHTING</span><span class="o">.</span><span class="n">LOSER</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">monster</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+
+                <span class="n">monster</span><span class="o">.</span><span class="n">history</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="n">monster</span><span class="o">.</span><span class="n">status</span><span class="p">[</span><span class="s2">&quot;fighting&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+
+                <span class="k">return</span> <span class="n">msg</span>
+        <span class="k">return</span> <span class="s1">&#39;&#39;</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, David Koch
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

@@ -1,0 +1,268 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>textgame.globals &mdash; textgame 0.2 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> textgame
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.2
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../textgame.html">textgame documentation</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">textgame</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>textgame.globals</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for textgame.globals</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">textgame.globals</span>
+<span class="sd">=====================</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">namedtuple</span>
+
+
+<span class="n">DIRECTIONS</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;north&quot;</span><span class="p">,</span> <span class="s2">&quot;west&quot;</span><span class="p">,</span> <span class="s2">&quot;south&quot;</span><span class="p">,</span> <span class="s2">&quot;east&quot;</span><span class="p">,</span> <span class="s2">&quot;up&quot;</span><span class="p">,</span> <span class="s2">&quot;down&quot;</span><span class="p">]</span>
+<span class="c1"># items that lighten rooms up</span>
+<span class="n">LIGHT</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;lamp&quot;</span><span class="p">,</span> <span class="s2">&quot;torch&quot;</span><span class="p">,</span> <span class="s2">&quot;candles&quot;</span><span class="p">]</span>
+
+
+<span class="n">MOVING</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s2">&quot;MOVING&quot;</span><span class="p">,</span> <span class="p">[])</span>
+<span class="n">MOVING</span><span class="o">.</span><span class="n">DEATH_BY_COWARDICE</span> <span class="o">=</span> <span class="s2">&quot;Coward! Running away from a fight is generally not a good idea. Your back doesn&#39;t defend itself.</span><span class="se">\n</span><span class="s2">&quot;</span>
+<span class="n">MOVING</span><span class="o">.</span><span class="n">FAIL_ALREADY_LOCKED</span> <span class="o">=</span> <span class="s2">&quot;The door is already locked!&quot;</span>
+<span class="n">MOVING</span><span class="o">.</span><span class="n">FAIL_CANT_GO</span> <span class="o">=</span> <span class="s2">&quot;You can&#39;t go in this direction.&quot;</span>
+<span class="n">MOVING</span><span class="o">.</span><span class="n">FAIL_DOOR_LOCKED</span> <span class="o">=</span> <span class="s2">&quot;The door is locked.&quot;</span>
+<span class="n">MOVING</span><span class="o">.</span><span class="n">FAIL_NO_DOOR</span> <span class="o">=</span> <span class="s2">&quot;There is no door in this direction.&quot;</span>
+<span class="n">MOVING</span><span class="o">.</span><span class="n">FAIL_NO_MEMORY</span> <span class="o">=</span> <span class="s2">&quot;I can&#39;t remember where you came from.&quot;</span>
+<span class="n">MOVING</span><span class="o">.</span><span class="n">FAIL_NO_WAY_BACK</span> <span class="o">=</span> <span class="s2">&quot;There is no direct way to go back.&quot;</span>
+<span class="n">MOVING</span><span class="o">.</span><span class="n">FAIL_NOT_DIRECTION</span> <span class="o">=</span> <span class="s2">&quot;That&#39;s not a direction.&quot;</span>
+<span class="n">MOVING</span><span class="o">.</span><span class="n">FAIL_TRAPPED</span> <span class="o">=</span> <span class="s2">&quot;You&#39;re trapped! You can&#39;t leave this room for now.&quot;</span>
+<span class="n">MOVING</span><span class="o">.</span><span class="n">FAIL_WHERE</span> <span class="o">=</span> <span class="s2">&quot;Tell me where to go!&quot;</span>
+<span class="n">MOVING</span><span class="o">.</span><span class="n">SUCC_DOOR_LOCKED</span> <span class="o">=</span> <span class="s2">&quot;The door is now locked!&quot;</span>
+
+
+<span class="n">DESCRIPTIONS</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s2">&quot;DESCRIPTIONS&quot;</span><span class="p">,</span> <span class="p">[])</span>
+<span class="n">DESCRIPTIONS</span><span class="o">.</span><span class="n">DARK_L</span> <span class="o">=</span> <span class="s2">&quot;It&#39;s pitch dark here. You can&#39;t see anything. Anytime soon, you&#39;ll probably get attacked by some night creature.&quot;</span>
+<span class="n">DESCRIPTIONS</span><span class="o">.</span><span class="n">DARK_S</span> <span class="o">=</span> <span class="s2">&quot;I can&#39;t see anything!&quot;</span>
+<span class="n">DESCRIPTIONS</span><span class="o">.</span><span class="n">NO_SOUND</span> <span class="o">=</span> <span class="s2">&quot;It&#39;s all quiet.&quot;</span>
+
+
+<span class="n">ACTION</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s2">&quot;ACTION&quot;</span><span class="p">,</span> <span class="p">[])</span>
+<span class="n">ACTION</span><span class="o">.</span><span class="n">OWN_ALREADY</span> <span class="o">=</span> <span class="s2">&quot;You already have it!&quot;</span>
+<span class="n">ACTION</span><span class="o">.</span><span class="n">WHICH_ITEM</span> <span class="o">=</span> <span class="s2">&quot;Please specify an item you want to </span><span class="si">{}</span><span class="s2">.&quot;</span>
+<span class="n">ACTION</span><span class="o">.</span><span class="n">SUCC_DROP</span> <span class="o">=</span> <span class="s2">&quot;Dropped.&quot;</span>
+<span class="n">ACTION</span><span class="o">.</span><span class="n">SUCC_TAKE</span> <span class="o">=</span> <span class="s2">&quot;You carry now a </span><span class="si">{}</span><span class="s2">.&quot;</span>
+<span class="n">ACTION</span><span class="o">.</span><span class="n">FAIL_DROP</span> <span class="o">=</span> <span class="s2">&quot;You don&#39;t have one.&quot;</span>
+<span class="n">ACTION</span><span class="o">.</span><span class="n">FAIL_TAKE</span> <span class="o">=</span> <span class="s2">&quot;You can&#39;t take that.&quot;</span>
+<span class="n">ACTION</span><span class="o">.</span><span class="n">NO_SUCH_ITEM</span> <span class="o">=</span> <span class="s2">&quot;I see no </span><span class="si">{}</span><span class="s2"> here.&quot;</span>
+<span class="n">DESCRIPTIONS</span><span class="o">.</span><span class="n">NOTHING_THERE</span> <span class="o">=</span> <span class="s2">&quot;There&#39;s nothing here.&quot;</span>
+<span class="n">ACTION</span><span class="o">.</span><span class="n">NO_INVENTORY</span> <span class="o">=</span> <span class="s2">&quot;You don&#39;t have anything with you.&quot;</span>
+<span class="n">ACTION</span><span class="o">.</span><span class="n">FAIL_OPENDIR</span> <span class="o">=</span> <span class="s2">&quot;I can only </span><span class="si">{0}</span><span class="s2"> doors if you tell me the direction. Eg. &#39;</span><span class="si">{0}</span><span class="s2"> west&#39;.&quot;</span>
+<span class="n">ACTION</span><span class="o">.</span><span class="n">FAIL_NO_KEY</span> <span class="o">=</span> <span class="s2">&quot;You have no keys!&quot;</span>
+<span class="n">ACTION</span><span class="o">.</span><span class="n">ALREADY_OPEN</span> <span class="o">=</span> <span class="s2">&quot;The door is already open.&quot;</span>
+<span class="n">ACTION</span><span class="o">.</span><span class="n">ALREADY_CLOSED</span> <span class="o">=</span> <span class="s2">&quot;The door is already closed.&quot;</span>
+<span class="n">ACTION</span><span class="o">.</span><span class="n">FAIL_OPEN</span> <span class="o">=</span> <span class="s2">&quot;None of your keys fit.&quot;</span>
+<span class="n">ACTION</span><span class="o">.</span><span class="n">NOW_OPEN</span> <span class="o">=</span> <span class="s2">&quot;You take the key and </span><span class="si">{}</span><span class="s2"> the door.&quot;</span>
+
+<span class="n">INFO</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s2">&quot;INFO&quot;</span><span class="p">,</span> <span class="p">[])</span>
+<span class="n">INFO</span><span class="o">.</span><span class="n">HINT_WARNING</span> <span class="o">=</span> <span class="s2">&quot;I have a hint for you, but it will cost you </span><span class="si">{}</span><span class="s2"> points. Do you want to hear it?&quot;</span>
+<span class="n">INFO</span><span class="o">.</span><span class="n">NIGHT_COMES_IN</span> <span class="o">=</span> <span class="s2">&quot;The sun has set. Night comes in.&quot;</span>
+<span class="n">INFO</span><span class="o">.</span><span class="n">NO_HINT</span> <span class="o">=</span> <span class="s2">&quot;I don&#39;t have any special hints for you.&quot;</span>
+<span class="n">INFO</span><span class="o">.</span><span class="n">NOT_UNDERSTOOD</span> <span class="o">=</span> <span class="s2">&quot;I don&#39;t understand that.&quot;</span>
+<span class="n">INFO</span><span class="o">.</span><span class="n">NOTHING</span> <span class="o">=</span> <span class="s2">&quot;Nothing happens.&quot;</span>
+<span class="n">INFO</span><span class="o">.</span><span class="n">SCORE</span> <span class="o">=</span> <span class="s2">&quot;Your score is </span><span class="si">{}</span><span class="s2">.&quot;</span>
+<span class="n">INFO</span><span class="o">.</span><span class="n">TOO_MANY_ARGUMENTS</span> <span class="o">=</span> <span class="s2">&quot;Please restrict your command to two words.&quot;</span>
+<span class="n">INFO</span><span class="o">.</span><span class="n">YES_NO</span> <span class="o">=</span> <span class="s2">&quot;Please answer yes or no.&quot;</span>
+
+
+<span class="n">FIGHTING</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s2">&quot;FIGHTING&quot;</span><span class="p">,</span> <span class="p">[])</span>
+<span class="n">FIGHTING</span><span class="o">.</span><span class="n">DARK_DEATH</span> <span class="o">=</span> <span class="s2">&quot;A </span><span class="si">{}</span><span class="s2"> certainly has better night vision than you do. At least this was a fast and painless death for you.&quot;</span>
+<span class="n">FIGHTING</span><span class="o">.</span><span class="n">ALREADY_DEAD</span> <span class="o">=</span> <span class="s2">&quot;The </span><span class="si">{}</span><span class="s2"> is already dead!&quot;</span>
+<span class="n">FIGHTING</span><span class="o">.</span><span class="n">NO_MONSTER</span> <span class="o">=</span> <span class="s2">&quot;There is no </span><span class="si">{}</span><span class="s2"> to attack.&quot;</span>
+<span class="n">FIGHTING</span><span class="o">.</span><span class="n">ATTACK</span> <span class="o">=</span> <span class="s2">&quot;You attack the beast.&quot;</span>
+<span class="n">FIGHTING</span><span class="o">.</span><span class="n">LAST_ATTACK</span> <span class="o">=</span> <span class="s2">&quot;For dear life you start one last attack against the fiend.&quot;</span>
+<span class="n">FIGHTING</span><span class="o">.</span><span class="n">DEATH</span> <span class="o">=</span> <span class="s2">&quot;Your enemy has gone fully berserk. Badly injured and somewhat aghast of your own inferiority in this fight, you crawl backwards, a last hopeless attempt in saving your life. Goodbye, blue sky.&quot;</span>
+<span class="n">FIGHTING</span><span class="o">.</span><span class="n">SURVIVED_ATTACK</span> <span class="o">=</span> <span class="s2">&quot;The </span><span class="si">{}</span><span class="s2"> has survived your attack and is very angry at you!&quot;</span>
+<span class="n">FIGHTING</span><span class="o">.</span><span class="n">IGNORE</span> <span class="o">=</span> <span class="s2">&quot;Ignoring such a dangerous beast is a really bad idea.&quot;</span>
+<span class="n">FIGHTING</span><span class="o">.</span><span class="n">DEFEND_REMINDER</span> <span class="o">=</span> <span class="s2">&quot;You must defend yourself! A </span><span class="si">{}</span><span class="s2"> is a serious threat to your life.&quot;</span>
+<span class="n">FIGHTING</span><span class="o">.</span><span class="n">SUCCESS</span> <span class="o">=</span> <span class="s2">&quot;You killed the </span><span class="si">{}</span><span class="s2">.&quot;</span>
+<span class="n">FIGHTING</span><span class="o">.</span><span class="n">LOSER</span> <span class="o">=</span> <span class="s2">&quot;You should consider working on your fighting technique. Your amateurish attempts didn&#39;t stop the </span><span class="si">{}</span><span class="s2"> from killing you.&quot;</span>
+<span class="n">FIGHTING</span><span class="o">.</span><span class="n">WHAT</span> <span class="o">=</span> <span class="s2">&quot;Attack what?&quot;</span>
+<span class="n">FIGHTING</span><span class="o">.</span><span class="n">ALREADY_GONE</span> <span class="o">=</span> <span class="s2">&quot;The </span><span class="si">{}</span><span class="s2"> is already gone.&quot;</span>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, David Koch
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

@@ -1,0 +1,290 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>textgame.world &mdash; textgame 0.2 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="prev" title="textgame.room" href="textgame.room.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> textgame
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.2
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../textgame.html">textgame documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="textgame.globals.html">textgame.globals</a></li>
+<li class="toctree-l2"><a class="reference internal" href="textgame.movable.html">textgame.movable</a></li>
+<li class="toctree-l2"><a class="reference internal" href="textgame.parser.html">textgame.parser</a></li>
+<li class="toctree-l2"><a class="reference internal" href="textgame.player.html">textgame.player</a></li>
+<li class="toctree-l2"><a class="reference internal" href="textgame.room.html">textgame.room</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">textgame.world</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">textgame</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../textgame.html">textgame documentation</a> &raquo;</li>
+        
+      <li>textgame.world</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/source/textgame.world.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <span class="target" id="module-textgame.world"></span><div class="section" id="textgame-world">
+<h1>textgame.world<a class="headerlink" href="#textgame-world" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="textgame.world.World">
+<em class="property">class </em><code class="sig-prename descclassname">textgame.world.</code><code class="sig-name descname">World</code><span class="sig-paren">(</span><em class="sig-param">rooms=None</em>, <em class="sig-param">items=None</em>, <em class="sig-param">weapons=None</em>, <em class="sig-param">monsters=None</em>, <em class="sig-param">seed=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/textgame/world.html#World"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#textgame.world.World" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>holds all rooms, items and monsters, is responsible for daylight and spawning</p>
+<dl class="method">
+<dt id="textgame.world.World.convert_door_dict">
+<code class="sig-name descname">convert_door_dict</code><span class="sig-paren">(</span><em class="sig-param">doordict</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/textgame/world.html#World.convert_door_dict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#textgame.world.World.convert_door_dict" title="Permalink to this definition">¶</a></dt>
+<dd><p>take {dir: roomid} return {dir: roomobj}</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="textgame.world.World.create_items">
+<code class="sig-name descname">create_items</code><span class="sig-paren">(</span><em class="sig-param">descriptions</em>, <em class="sig-param">tag='items'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/textgame/world.html#World.create_items"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#textgame.world.World.create_items" title="Permalink to this definition">¶</a></dt>
+<dd><p>create item objects based on descritions
+tag can be items, weapons, monsters</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="textgame.world.World.create_rooms">
+<code class="sig-name descname">create_rooms</code><span class="sig-paren">(</span><em class="sig-param">descriptions</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/textgame/world.html#World.create_rooms"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#textgame.world.World.create_rooms" title="Permalink to this definition">¶</a></dt>
+<dd><p>create Room objects based on descriptions
+this also sets up connections between the rooms (if given in descriptions)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="textgame.world.World.fill_room_infos">
+<code class="sig-name descname">fill_room_infos</code><span class="sig-paren">(</span><em class="sig-param">descriptions</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/textgame/world.html#World.fill_room_infos"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#textgame.world.World.fill_room_infos" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="textgame.world.World.manage_daylight">
+<code class="sig-name descname">manage_daylight</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/textgame/world.html#World.manage_daylight"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#textgame.world.World.manage_daylight" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="textgame.world.World.manage_fight">
+<code class="sig-name descname">manage_fight</code><span class="sig-paren">(</span><em class="sig-param">player</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/textgame/world.html#World.manage_fight"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#textgame.world.World.manage_fight" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="textgame.world.World.put_items_in_place">
+<code class="sig-name descname">put_items_in_place</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/textgame/world.html#World.put_items_in_place"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#textgame.world.World.put_items_in_place" title="Permalink to this definition">¶</a></dt>
+<dd><p>iterate over all items and add them to their initlocation</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="textgame.world.World.put_monsters_in_place">
+<code class="sig-name descname">put_monsters_in_place</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/textgame/world.html#World.put_monsters_in_place"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#textgame.world.World.put_monsters_in_place" title="Permalink to this definition">¶</a></dt>
+<dd><p>iterate over all monsters and add them to their initlocation</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="textgame.world.World.room">
+<code class="sig-name descname">room</code><span class="sig-paren">(</span><em class="sig-param">ID</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/textgame/world.html#World.room"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#textgame.world.World.room" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="textgame.world.World.set_room_restrictions">
+<code class="sig-name descname">set_room_restrictions</code><span class="sig-paren">(</span><em class="sig-param">restrictions</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/textgame/world.html#World.set_room_restrictions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#textgame.world.World.set_room_restrictions" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="textgame.world.World.spawn_monster">
+<code class="sig-name descname">spawn_monster</code><span class="sig-paren">(</span><em class="sig-param">location</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/textgame/world.html#World.spawn_monster"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#textgame.world.World.spawn_monster" title="Permalink to this definition">¶</a></dt>
+<dd><p>randomly spawn a monster in location</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="textgame.world.World.update">
+<code class="sig-name descname">update</code><span class="sig-paren">(</span><em class="sig-param">player</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/textgame/world.html#World.update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#textgame.world.World.update" title="Permalink to this definition">¶</a></dt>
+<dd><p>upate world’s status</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+      
+        <a href="textgame.room.html" class="btn btn-neutral float-left" title="textgame.room" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, David Koch
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

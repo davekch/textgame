@@ -1,0 +1,349 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>textgame.room &mdash; textgame 0.2 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> textgame
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.2
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../textgame.html">textgame documentation</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">textgame</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>textgame.room</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for textgame.room</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">textgame.room</span>
+<span class="sd">=====================</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;textgame.room&quot;</span><span class="p">)</span>
+<span class="n">logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">NullHandler</span><span class="p">())</span>
+
+<span class="kn">from</span> <span class="nn">textgame.globals</span> <span class="k">import</span> <span class="n">MOVING</span><span class="p">,</span> <span class="n">DESCRIPTIONS</span><span class="p">,</span> <span class="n">INFO</span><span class="p">,</span> <span class="n">DIRECTIONS</span><span class="p">,</span> <span class="n">LIGHT</span>
+
+
+<div class="viewcode-block" id="Room"><a class="viewcode-back" href="../../source/textgame.room.html#textgame.room.Room">[docs]</a><span class="k">class</span> <span class="nc">Room</span><span class="p">:</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ID</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="n">ID</span>   <span class="c1"># unique, similar rooms should have a common keyword in ID</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">doors</span> <span class="o">=</span> <span class="p">{</span><span class="nb">dir</span><span class="p">:</span> <span class="kc">None</span> <span class="k">for</span> <span class="nb">dir</span> <span class="ow">in</span> <span class="n">DIRECTIONS</span><span class="p">}</span>
+        <span class="c1"># dict that describes the locked/opened state of doors</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">locked</span> <span class="o">=</span> <span class="p">{</span><span class="nb">dir</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;closed&quot;</span><span class="p">:</span><span class="kc">False</span><span class="p">,</span> <span class="s2">&quot;key&quot;</span><span class="p">:</span><span class="kc">None</span><span class="p">}</span> <span class="k">for</span> <span class="nb">dir</span> <span class="ow">in</span> <span class="n">DIRECTIONS</span><span class="p">}</span>
+        <span class="c1"># description to print when going in this direction</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dir_descriptions</span> <span class="o">=</span> <span class="p">{</span><span class="nb">dir</span><span class="p">:</span> <span class="s2">&quot;&quot;</span> <span class="k">for</span> <span class="nb">dir</span> <span class="ow">in</span> <span class="n">DIRECTIONS</span><span class="p">}</span>
+        <span class="c1"># items that lie around in this room, format {ID: item}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">items</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="c1"># monsters that are in this room, format {ID: monster}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">monsters</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">visited</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hiddendoors</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="c1"># special_func gets called on Room.check_restrictions</span>
+        <span class="c1"># which is called when the player enters the room</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">special_func</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">special_args</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="c1"># initialize descriptive information</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fill_info</span><span class="p">()</span>
+
+
+<div class="viewcode-block" id="Room.fill_info"><a class="viewcode-back" href="../../source/textgame.room.html#textgame.room.Room.fill_info">[docs]</a>    <span class="k">def</span> <span class="nf">fill_info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">descript</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">sdescript</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>\
+                  <span class="n">dark</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sound</span><span class="o">=</span><span class="n">DESCRIPTIONS</span><span class="o">.</span><span class="n">NO_SOUND</span><span class="p">,</span>\
+                  <span class="n">hint</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">hint_value</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">errors</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>\
+                  <span class="n">doors</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">hiddendoors</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">locked</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dir_descriptions</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">description</span> <span class="o">=</span> <span class="n">descript</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">shortdescription</span> <span class="o">=</span> <span class="n">sdescript</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dark</span> <span class="o">=</span> <span class="n">dark</span> <span class="k">if</span> <span class="n">dark</span> <span class="k">else</span> <span class="p">{</span><span class="s2">&quot;now&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span> <span class="s2">&quot;always&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sound</span> <span class="o">=</span> <span class="n">sound</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hint</span> <span class="o">=</span> <span class="n">hint</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hint_value</span> <span class="o">=</span> <span class="n">hint_value</span>
+
+        <span class="c1"># errors is a dict that contains error messages that get printed if player</span>
+        <span class="c1"># tries to move to a direction where there is no door</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">errors</span> <span class="o">=</span> <span class="p">{</span><span class="nb">dir</span><span class="p">:</span> <span class="n">MOVING</span><span class="o">.</span><span class="n">FAIL_CANT_GO</span> <span class="k">for</span> <span class="nb">dir</span> <span class="ow">in</span> <span class="n">DIRECTIONS</span><span class="p">}</span>
+        <span class="k">if</span> <span class="n">errors</span><span class="p">:</span>
+            <span class="k">for</span> <span class="nb">dir</span> <span class="ow">in</span> <span class="n">errors</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">dir</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">DIRECTIONS</span><span class="p">:</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;In errors of room </span><span class="si">{}</span><span class="s2">: </span><span class="si">{}</span><span class="s2"> is not&quot;</span>
+                                   <span class="s2">&quot; a direction&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="nb">dir</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">errors</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">doors</span><span class="p">:</span>
+            <span class="k">for</span> <span class="nb">dir</span><span class="p">,</span><span class="n">room</span> <span class="ow">in</span> <span class="n">doors</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">add_connection</span><span class="p">(</span><span class="nb">dir</span><span class="p">,</span> <span class="n">room</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">hiddendoors</span><span class="p">:</span>
+            <span class="k">for</span> <span class="nb">dir</span><span class="p">,</span><span class="n">room</span> <span class="ow">in</span> <span class="n">hiddendoors</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">add_connection</span><span class="p">(</span><span class="nb">dir</span><span class="p">,</span> <span class="n">room</span><span class="p">,</span> <span class="n">hidden</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">locked</span><span class="p">:</span>
+            <span class="k">for</span> <span class="nb">dir</span><span class="p">,</span><span class="n">lock</span> <span class="ow">in</span> <span class="n">locked</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">if</span> <span class="s2">&quot;closed&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">lock</span> <span class="ow">or</span> <span class="s2">&quot;key&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">lock</span><span class="p">:</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;locked dict of room </span><span class="si">{}</span><span class="s2"> in direction </span><span class="si">{}</span><span class="s2"> is &quot;</span>
+                        <span class="s2">&quot;badly formatted&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="nb">dir</span><span class="p">))</span>
+                <span class="k">if</span> <span class="nb">dir</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">DIRECTIONS</span><span class="p">:</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;locked dict of room </span><span class="si">{}</span><span class="s2">: </span><span class="si">{}</span><span class="s2"> is not a direction&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="nb">dir</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">locked</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">locked</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">dir_descriptions</span><span class="p">:</span>
+            <span class="k">for</span> <span class="nb">dir</span> <span class="ow">in</span> <span class="n">dir_descriptions</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">dir</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">DIRECTIONS</span><span class="p">:</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;dir_descriptions dict of room </span><span class="si">{}</span><span class="s2">: </span><span class="si">{}</span><span class="s2"> is not a direction&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="nb">dir</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dir_descriptions</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">dir_descriptions</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Room.describe"><a class="viewcode-back" href="../../source/textgame.room.html#textgame.room.Room.describe">[docs]</a>    <span class="k">def</span> <span class="nf">describe</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">long</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="n">long</span> <span class="o">=</span> <span class="n">long</span> <span class="ow">or</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">visited</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dark</span><span class="p">[</span><span class="s2">&quot;now&quot;</span><span class="p">]:</span>
+            <span class="k">return</span> <span class="n">DESCRIPTIONS</span><span class="o">.</span><span class="n">DARK_L</span>
+        <span class="n">descript</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">description</span> <span class="k">if</span> <span class="n">long</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">shortdescription</span>
+        <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">items</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+            <span class="n">descript</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="n">item</span><span class="o">.</span><span class="n">describe</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">monster</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">monsters</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+            <span class="n">descript</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="n">monster</span><span class="o">.</span><span class="n">describe</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">descript</span></div>
+
+
+<div class="viewcode-block" id="Room.add_connection"><a class="viewcode-back" href="../../source/textgame.room.html#textgame.room.Room.add_connection">[docs]</a>    <span class="k">def</span> <span class="nf">add_connection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">dir</span><span class="p">,</span> <span class="n">room</span><span class="p">,</span> <span class="n">hidden</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">dir</span> <span class="ow">in</span> <span class="n">DIRECTIONS</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;You try to add a connection </span><span class="si">{}</span><span class="s2"> to </span><span class="si">{}</span><span class="s2"> &quot;</span>
+                <span class="s2">&quot;but this is not a direction&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">dir</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">))</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">hidden</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">doors</span><span class="p">[</span><span class="nb">dir</span><span class="p">]</span> <span class="o">=</span> <span class="n">room</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">hiddendoors</span><span class="p">[</span><span class="nb">dir</span><span class="p">]</span> <span class="o">=</span> <span class="n">room</span></div>
+
+
+<div class="viewcode-block" id="Room.visit"><a class="viewcode-back" href="../../source/textgame.room.html#textgame.room.Room.visit">[docs]</a>    <span class="k">def</span> <span class="nf">visit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">dark</span><span class="p">[</span><span class="s2">&quot;now&quot;</span><span class="p">]:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">visited</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span>
+        <span class="k">return</span> <span class="mi">0</span></div>
+
+
+<div class="viewcode-block" id="Room.get_hint"><a class="viewcode-back" href="../../source/textgame.room.html#textgame.room.Room.get_hint">[docs]</a>    <span class="k">def</span> <span class="nf">get_hint</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;return a tuple of warning and the actual hint</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">INFO</span><span class="o">.</span><span class="n">HINT_WARNING</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hint_value</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">hint</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Room.has_light"><a class="viewcode-back" href="../../source/textgame.room.html#textgame.room.Room.has_light">[docs]</a>    <span class="k">def</span> <span class="nf">has_light</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;returns true if there&#39;s anything inside room that lights it up</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">any</span><span class="p">([</span><span class="n">lamp</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">items</span> <span class="k">for</span> <span class="n">lamp</span> <span class="ow">in</span> <span class="n">LIGHT</span><span class="p">])</span></div>
+
+
+<div class="viewcode-block" id="Room.set_specials"><a class="viewcode-back" href="../../source/textgame.room.html#textgame.room.Room.set_specials">[docs]</a>    <span class="k">def</span> <span class="nf">set_specials</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">func</span><span class="p">,</span> <span class="o">**</span><span class="n">args</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">special_func</span> <span class="o">=</span> <span class="n">func</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">special_args</span> <span class="o">=</span> <span class="n">args</span> <span class="k">if</span> <span class="n">args</span> <span class="k">else</span> <span class="p">{}</span></div>
+
+
+<div class="viewcode-block" id="Room.check_restrictions"><a class="viewcode-back" href="../../source/textgame.room.html#textgame.room.Room.check_restrictions">[docs]</a>    <span class="k">def</span> <span class="nf">check_restrictions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">player</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;check if it&#39;s dark and call self.special_func</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dark</span><span class="p">[</span><span class="s2">&quot;now&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dark</span><span class="p">[</span><span class="s2">&quot;always&quot;</span><span class="p">]</span> <span class="ow">and</span> <span class="ow">not</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">has_light</span><span class="p">()</span> <span class="ow">or</span> <span class="n">player</span><span class="o">.</span><span class="n">has_light</span><span class="p">())</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">special_func</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">special_func</span><span class="p">(</span><span class="n">player</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">special_args</span><span class="p">)</span>
+        <span class="k">return</span> <span class="s2">&quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="Room.reveal_hiddendoors"><a class="viewcode-back" href="../../source/textgame.room.html#textgame.room.Room.reveal_hiddendoors">[docs]</a>    <span class="k">def</span> <span class="nf">reveal_hiddendoors</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;revealing hiddendoors in room </span><span class="si">{}</span><span class="s2"> to </span><span class="si">{}</span><span class="s2">&quot;</span>\
+            <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="nb">dir</span> <span class="k">for</span> <span class="nb">dir</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">hiddendoors</span><span class="p">])))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">doors</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hiddendoors</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Room.add_item"><a class="viewcode-back" href="../../source/textgame.room.html#textgame.room.Room.add_item">[docs]</a>    <span class="k">def</span> <span class="nf">add_item</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">item</span><span class="o">.</span><span class="n">id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">items</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">items</span><span class="p">[</span><span class="n">item</span><span class="o">.</span><span class="n">id</span><span class="p">]</span> <span class="o">=</span> <span class="n">item</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;You try to add item </span><span class="si">{}</span><span class="s2"> to room </span><span class="si">{}</span><span class="s2"> but &quot;</span>\
+                <span class="s2">&quot;it&#39;s already there&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">item</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="Room.add_monster"><a class="viewcode-back" href="../../source/textgame.room.html#textgame.room.Room.add_monster">[docs]</a>    <span class="k">def</span> <span class="nf">add_monster</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">monster</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">monster</span><span class="o">.</span><span class="n">id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">monsters</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">monsters</span><span class="p">[</span><span class="n">monster</span><span class="o">.</span><span class="n">id</span><span class="p">]</span> <span class="o">=</span> <span class="n">monster</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;You try to add monster </span><span class="si">{}</span><span class="s2"> to room </span><span class="si">{}</span><span class="s2"> but &quot;</span>\
+                <span class="s2">&quot;it&#39;s already there&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">monster</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">))</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, David Koch
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

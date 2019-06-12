@@ -1,0 +1,497 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>textgame.globals &mdash; textgame 0.2 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="textgame.movable" href="textgame.movable.html" />
+    <link rel="prev" title="textgame documentation" href="../textgame.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> textgame
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.2
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../textgame.html">textgame documentation</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">textgame.globals</a></li>
+<li class="toctree-l2"><a class="reference internal" href="textgame.movable.html">textgame.movable</a></li>
+<li class="toctree-l2"><a class="reference internal" href="textgame.parser.html">textgame.parser</a></li>
+<li class="toctree-l2"><a class="reference internal" href="textgame.player.html">textgame.player</a></li>
+<li class="toctree-l2"><a class="reference internal" href="textgame.room.html">textgame.room</a></li>
+<li class="toctree-l2"><a class="reference internal" href="textgame.world.html">textgame.world</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">textgame</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../textgame.html">textgame documentation</a> &raquo;</li>
+        
+      <li>textgame.globals</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/source/textgame.globals.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <span class="target" id="module-textgame.globals"></span><div class="section" id="textgame-globals">
+<h1>textgame.globals<a class="headerlink" href="#textgame-globals" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="textgame.globals.ACTION">
+<em class="property">class </em><code class="sig-prename descclassname">textgame.globals.</code><code class="sig-name descname">ACTION</code><a class="headerlink" href="#textgame.globals.ACTION" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></p>
+<dl class="attribute">
+<dt id="textgame.globals.ACTION.ALREADY_CLOSED">
+<code class="sig-name descname">ALREADY_CLOSED</code><em class="property"> = 'The door is already closed.'</em><a class="headerlink" href="#textgame.globals.ACTION.ALREADY_CLOSED" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="textgame.globals.ACTION.ALREADY_OPEN">
+<code class="sig-name descname">ALREADY_OPEN</code><em class="property"> = 'The door is already open.'</em><a class="headerlink" href="#textgame.globals.ACTION.ALREADY_OPEN" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="textgame.globals.ACTION.FAIL_DROP">
+<code class="sig-name descname">FAIL_DROP</code><em class="property"> = &quot;You don't have one.&quot;</em><a class="headerlink" href="#textgame.globals.ACTION.FAIL_DROP" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="textgame.globals.ACTION.FAIL_NO_KEY">
+<code class="sig-name descname">FAIL_NO_KEY</code><em class="property"> = 'You have no keys!'</em><a class="headerlink" href="#textgame.globals.ACTION.FAIL_NO_KEY" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="textgame.globals.ACTION.FAIL_OPEN">
+<code class="sig-name descname">FAIL_OPEN</code><em class="property"> = 'None of your keys fit.'</em><a class="headerlink" href="#textgame.globals.ACTION.FAIL_OPEN" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="textgame.globals.ACTION.FAIL_OPENDIR">
+<code class="sig-name descname">FAIL_OPENDIR</code><em class="property"> = &quot;I can only {0} doors if you tell me the direction. Eg. '{0} west'.&quot;</em><a class="headerlink" href="#textgame.globals.ACTION.FAIL_OPENDIR" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="textgame.globals.ACTION.FAIL_TAKE">
+<code class="sig-name descname">FAIL_TAKE</code><em class="property"> = &quot;You can't take that.&quot;</em><a class="headerlink" href="#textgame.globals.ACTION.FAIL_TAKE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="textgame.globals.ACTION.NOW_OPEN">
+<code class="sig-name descname">NOW_OPEN</code><em class="property"> = 'You take the key and {} the door.'</em><a class="headerlink" href="#textgame.globals.ACTION.NOW_OPEN" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="textgame.globals.ACTION.NO_INVENTORY">
+<code class="sig-name descname">NO_INVENTORY</code><em class="property"> = &quot;You don't have anything with you.&quot;</em><a class="headerlink" href="#textgame.globals.ACTION.NO_INVENTORY" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="textgame.globals.ACTION.NO_SUCH_ITEM">
+<code class="sig-name descname">NO_SUCH_ITEM</code><em class="property"> = 'I see no {} here.'</em><a class="headerlink" href="#textgame.globals.ACTION.NO_SUCH_ITEM" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="textgame.globals.ACTION.OWN_ALREADY">
+<code class="sig-name descname">OWN_ALREADY</code><em class="property"> = 'You already have it!'</em><a class="headerlink" href="#textgame.globals.ACTION.OWN_ALREADY" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="textgame.globals.ACTION.SUCC_DROP">
+<code class="sig-name descname">SUCC_DROP</code><em class="property"> = 'Dropped.'</em><a class="headerlink" href="#textgame.globals.ACTION.SUCC_DROP" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="textgame.globals.ACTION.SUCC_TAKE">
+<code class="sig-name descname">SUCC_TAKE</code><em class="property"> = 'You carry now a {}.'</em><a class="headerlink" href="#textgame.globals.ACTION.SUCC_TAKE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="textgame.globals.ACTION.WHICH_ITEM">
+<code class="sig-name descname">WHICH_ITEM</code><em class="property"> = 'Please specify an item you want to {}.'</em><a class="headerlink" href="#textgame.globals.ACTION.WHICH_ITEM" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="textgame.globals.DESCRIPTIONS">
+<em class="property">class </em><code class="sig-prename descclassname">textgame.globals.</code><code class="sig-name descname">DESCRIPTIONS</code><a class="headerlink" href="#textgame.globals.DESCRIPTIONS" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></p>
+<dl class="attribute">
+<dt id="textgame.globals.DESCRIPTIONS.DARK_L">
+<code class="sig-name descname">DARK_L</code><em class="property"> = &quot;It's pitch dark here. You can't see anything. Anytime soon, you'll probably get attacked by some night creature.&quot;</em><a class="headerlink" href="#textgame.globals.DESCRIPTIONS.DARK_L" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="textgame.globals.DESCRIPTIONS.DARK_S">
+<code class="sig-name descname">DARK_S</code><em class="property"> = &quot;I can't see anything!&quot;</em><a class="headerlink" href="#textgame.globals.DESCRIPTIONS.DARK_S" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="textgame.globals.DESCRIPTIONS.NOTHING_THERE">
+<code class="sig-name descname">NOTHING_THERE</code><em class="property"> = &quot;There's nothing here.&quot;</em><a class="headerlink" href="#textgame.globals.DESCRIPTIONS.NOTHING_THERE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="textgame.globals.DESCRIPTIONS.NO_SOUND">
+<code class="sig-name descname">NO_SOUND</code><em class="property"> = &quot;It's all quiet.&quot;</em><a class="headerlink" href="#textgame.globals.DESCRIPTIONS.NO_SOUND" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="textgame.globals.FIGHTING">
+<em class="property">class </em><code class="sig-prename descclassname">textgame.globals.</code><code class="sig-name descname">FIGHTING</code><a class="headerlink" href="#textgame.globals.FIGHTING" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></p>
+<dl class="attribute">
+<dt id="textgame.globals.FIGHTING.ALREADY_DEAD">
+<code class="sig-name descname">ALREADY_DEAD</code><em class="property"> = 'The {} is already dead!'</em><a class="headerlink" href="#textgame.globals.FIGHTING.ALREADY_DEAD" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="textgame.globals.FIGHTING.ALREADY_GONE">
+<code class="sig-name descname">ALREADY_GONE</code><em class="property"> = 'The {} is already gone.'</em><a class="headerlink" href="#textgame.globals.FIGHTING.ALREADY_GONE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="textgame.globals.FIGHTING.ATTACK">
+<code class="sig-name descname">ATTACK</code><em class="property"> = 'You attack the beast.'</em><a class="headerlink" href="#textgame.globals.FIGHTING.ATTACK" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="textgame.globals.FIGHTING.DARK_DEATH">
+<code class="sig-name descname">DARK_DEATH</code><em class="property"> = 'A {} certainly has better night vision than you do. At least this was a fast and painless death for you.'</em><a class="headerlink" href="#textgame.globals.FIGHTING.DARK_DEATH" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="textgame.globals.FIGHTING.DEATH">
+<code class="sig-name descname">DEATH</code><em class="property"> = 'Your enemy has gone fully berserk. Badly injured and somewhat aghast of your own inferiority in this fight, you crawl backwards, a last hopeless attempt in saving your life. Goodbye, blue sky.'</em><a class="headerlink" href="#textgame.globals.FIGHTING.DEATH" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="textgame.globals.FIGHTING.DEFEND_REMINDER">
+<code class="sig-name descname">DEFEND_REMINDER</code><em class="property"> = 'You must defend yourself! A {} is a serious threat to your life.'</em><a class="headerlink" href="#textgame.globals.FIGHTING.DEFEND_REMINDER" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="textgame.globals.FIGHTING.IGNORE">
+<code class="sig-name descname">IGNORE</code><em class="property"> = 'Ignoring such a dangerous beast is a really bad idea.'</em><a class="headerlink" href="#textgame.globals.FIGHTING.IGNORE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="textgame.globals.FIGHTING.LAST_ATTACK">
+<code class="sig-name descname">LAST_ATTACK</code><em class="property"> = 'For dear life you start one last attack against the fiend.'</em><a class="headerlink" href="#textgame.globals.FIGHTING.LAST_ATTACK" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="textgame.globals.FIGHTING.LOSER">
+<code class="sig-name descname">LOSER</code><em class="property"> = &quot;You should consider working on your fighting technique. Your amateurish attempts didn't stop the {} from killing you.&quot;</em><a class="headerlink" href="#textgame.globals.FIGHTING.LOSER" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="textgame.globals.FIGHTING.NO_MONSTER">
+<code class="sig-name descname">NO_MONSTER</code><em class="property"> = 'There is no {} to attack.'</em><a class="headerlink" href="#textgame.globals.FIGHTING.NO_MONSTER" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="textgame.globals.FIGHTING.SUCCESS">
+<code class="sig-name descname">SUCCESS</code><em class="property"> = 'You killed the {}.'</em><a class="headerlink" href="#textgame.globals.FIGHTING.SUCCESS" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="textgame.globals.FIGHTING.SURVIVED_ATTACK">
+<code class="sig-name descname">SURVIVED_ATTACK</code><em class="property"> = 'The {} has survived your attack and is very angry at you!'</em><a class="headerlink" href="#textgame.globals.FIGHTING.SURVIVED_ATTACK" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="textgame.globals.FIGHTING.WHAT">
+<code class="sig-name descname">WHAT</code><em class="property"> = 'Attack what?'</em><a class="headerlink" href="#textgame.globals.FIGHTING.WHAT" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="textgame.globals.INFO">
+<em class="property">class </em><code class="sig-prename descclassname">textgame.globals.</code><code class="sig-name descname">INFO</code><a class="headerlink" href="#textgame.globals.INFO" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></p>
+<dl class="attribute">
+<dt id="textgame.globals.INFO.HINT_WARNING">
+<code class="sig-name descname">HINT_WARNING</code><em class="property"> = 'I have a hint for you, but it will cost you {} points. Do you want to hear it?'</em><a class="headerlink" href="#textgame.globals.INFO.HINT_WARNING" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="textgame.globals.INFO.NIGHT_COMES_IN">
+<code class="sig-name descname">NIGHT_COMES_IN</code><em class="property"> = 'The sun has set. Night comes in.'</em><a class="headerlink" href="#textgame.globals.INFO.NIGHT_COMES_IN" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="textgame.globals.INFO.NOTHING">
+<code class="sig-name descname">NOTHING</code><em class="property"> = 'Nothing happens.'</em><a class="headerlink" href="#textgame.globals.INFO.NOTHING" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="textgame.globals.INFO.NOT_UNDERSTOOD">
+<code class="sig-name descname">NOT_UNDERSTOOD</code><em class="property"> = &quot;I don't understand that.&quot;</em><a class="headerlink" href="#textgame.globals.INFO.NOT_UNDERSTOOD" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="textgame.globals.INFO.NO_HINT">
+<code class="sig-name descname">NO_HINT</code><em class="property"> = &quot;I don't have any special hints for you.&quot;</em><a class="headerlink" href="#textgame.globals.INFO.NO_HINT" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="textgame.globals.INFO.SCORE">
+<code class="sig-name descname">SCORE</code><em class="property"> = 'Your score is {}.'</em><a class="headerlink" href="#textgame.globals.INFO.SCORE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="textgame.globals.INFO.TOO_MANY_ARGUMENTS">
+<code class="sig-name descname">TOO_MANY_ARGUMENTS</code><em class="property"> = 'Please restrict your command to two words.'</em><a class="headerlink" href="#textgame.globals.INFO.TOO_MANY_ARGUMENTS" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="textgame.globals.INFO.YES_NO">
+<code class="sig-name descname">YES_NO</code><em class="property"> = 'Please answer yes or no.'</em><a class="headerlink" href="#textgame.globals.INFO.YES_NO" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="textgame.globals.MOVING">
+<em class="property">class </em><code class="sig-prename descclassname">textgame.globals.</code><code class="sig-name descname">MOVING</code><a class="headerlink" href="#textgame.globals.MOVING" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></p>
+<dl class="attribute">
+<dt id="textgame.globals.MOVING.DEATH_BY_COWARDICE">
+<code class="sig-name descname">DEATH_BY_COWARDICE</code><em class="property"> = &quot;Coward! Running away from a fight is generally not a good idea. Your back doesn't defend itself.\n&quot;</em><a class="headerlink" href="#textgame.globals.MOVING.DEATH_BY_COWARDICE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="textgame.globals.MOVING.FAIL_ALREADY_LOCKED">
+<code class="sig-name descname">FAIL_ALREADY_LOCKED</code><em class="property"> = 'The door is already locked!'</em><a class="headerlink" href="#textgame.globals.MOVING.FAIL_ALREADY_LOCKED" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="textgame.globals.MOVING.FAIL_CANT_GO">
+<code class="sig-name descname">FAIL_CANT_GO</code><em class="property"> = &quot;You can't go in this direction.&quot;</em><a class="headerlink" href="#textgame.globals.MOVING.FAIL_CANT_GO" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="textgame.globals.MOVING.FAIL_DOOR_LOCKED">
+<code class="sig-name descname">FAIL_DOOR_LOCKED</code><em class="property"> = 'The door is locked.'</em><a class="headerlink" href="#textgame.globals.MOVING.FAIL_DOOR_LOCKED" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="textgame.globals.MOVING.FAIL_NOT_DIRECTION">
+<code class="sig-name descname">FAIL_NOT_DIRECTION</code><em class="property"> = &quot;That's not a direction.&quot;</em><a class="headerlink" href="#textgame.globals.MOVING.FAIL_NOT_DIRECTION" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="textgame.globals.MOVING.FAIL_NO_DOOR">
+<code class="sig-name descname">FAIL_NO_DOOR</code><em class="property"> = 'There is no door in this direction.'</em><a class="headerlink" href="#textgame.globals.MOVING.FAIL_NO_DOOR" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="textgame.globals.MOVING.FAIL_NO_MEMORY">
+<code class="sig-name descname">FAIL_NO_MEMORY</code><em class="property"> = &quot;I can't remember where you came from.&quot;</em><a class="headerlink" href="#textgame.globals.MOVING.FAIL_NO_MEMORY" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="textgame.globals.MOVING.FAIL_NO_WAY_BACK">
+<code class="sig-name descname">FAIL_NO_WAY_BACK</code><em class="property"> = 'There is no direct way to go back.'</em><a class="headerlink" href="#textgame.globals.MOVING.FAIL_NO_WAY_BACK" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="textgame.globals.MOVING.FAIL_TRAPPED">
+<code class="sig-name descname">FAIL_TRAPPED</code><em class="property"> = &quot;You're trapped! You can't leave this room for now.&quot;</em><a class="headerlink" href="#textgame.globals.MOVING.FAIL_TRAPPED" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="textgame.globals.MOVING.FAIL_WHERE">
+<code class="sig-name descname">FAIL_WHERE</code><em class="property"> = 'Tell me where to go!'</em><a class="headerlink" href="#textgame.globals.MOVING.FAIL_WHERE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="textgame.globals.MOVING.SUCC_DOOR_LOCKED">
+<code class="sig-name descname">SUCC_DOOR_LOCKED</code><em class="property"> = 'The door is now locked!'</em><a class="headerlink" href="#textgame.globals.MOVING.SUCC_DOOR_LOCKED" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="textgame.movable.html" class="btn btn-neutral float-right" title="textgame.movable" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="../textgame.html" class="btn btn-neutral float-left" title="textgame documentation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, David Koch
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
