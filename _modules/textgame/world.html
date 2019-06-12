@@ -152,6 +152,31 @@
 <span class="sd">textgame.world</span>
 <span class="sd">=====================</span>
 
+<span class="sd">This module contains only one class, :class:`textgame.world.World` that</span>
+<span class="sd">holds all rooms, items and monsters, is responsible for spawning</span>
+<span class="sd">monsters randomly in the rooms and managing daylight.</span>
+<span class="sd">At initialization you can pass a dict to :class:`textgame.world.World` that&#39;s</span>
+<span class="sd">formatted like this:</span>
+
+<span class="sd">.. code-block:: JSON</span>
+
+<span class="sd">   {</span>
+<span class="sd">    &quot;room_id1&quot;: {</span>
+<span class="sd">        &quot;descript&quot;: &quot;You&#39;re in the great room.&quot;,</span>
+<span class="sd">        &quot;doors&quot;: {&quot;south&quot;: &quot;room_id2&quot;}</span>
+<span class="sd">    },</span>
+<span class="sd">    &quot;room_id2&quot;: {</span>
+<span class="sd">        &quot;descript&quot;: &quot;You&#39;re in the small room.&quot;,</span>
+<span class="sd">        &quot;doors&quot;: {&quot;north&quot;: &quot;room_id1&quot;}</span>
+<span class="sd">    }</span>
+<span class="sd">   }</span>
+
+<span class="sd">The items inside the dict automatically get converted to :class:`textgame.room.Room` objects</span>
+<span class="sd">and linked to each other according to the ``doors`` dict.</span>
+<span class="sd">Every argument of :func:`textgame.room.Room.fill_info` can be put as a key-value</span>
+<span class="sd">pair inside this dict.</span>
+
+<span class="sd">The same is true for items, weapons and monsters, see the example.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="kn">import</span> <span class="nn">logging</span>
@@ -167,7 +192,12 @@
 
 <div class="viewcode-block" id="World"><a class="viewcode-back" href="../../source/textgame.world.html#textgame.world.World">[docs]</a><span class="k">class</span> <span class="nc">World</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    holds all rooms, items and monsters, is responsible for daylight and spawning</span>
+<span class="sd">    :param rooms: dict describing all rooms (see above)</span>
+<span class="sd">    :param items: dict describing all items</span>
+<span class="sd">    :param weapons: dict describing all weapons</span>
+<span class="sd">    :param monsters: you guessed it</span>
+<span class="sd">    :param seed: seed for the random number generator. If ``None``, a random seed is taken</span>
+<span class="sd">    :type seed: int</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rooms</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">items</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">weapons</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">monsters</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -200,8 +230,8 @@
 
 <div class="viewcode-block" id="World.create_rooms"><a class="viewcode-back" href="../../source/textgame.world.html#textgame.world.World.create_rooms">[docs]</a>    <span class="k">def</span> <span class="nf">create_rooms</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">descriptions</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        create Room objects based on descriptions</span>
-<span class="sd">        this also sets up connections between the rooms (if given in descriptions)</span>
+<span class="sd">        create :class:`textgame.room.Room` objects based on description-dict (see above).</span>
+<span class="sd">        This gets called on initialization if ``rooms`` was provided.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">ID</span> <span class="ow">in</span> <span class="n">descriptions</span><span class="p">:</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">ID</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">rooms</span><span class="p">:</span>
@@ -211,11 +241,11 @@
                 <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;You&#39;re trying to add a room with ID </span><span class="si">{}</span><span class="s2">&quot;</span>
                     <span class="s2">&quot; but it&#39;s already there&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ID</span><span class="p">))</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Created rooms&quot;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">fill_room_infos</span><span class="p">(</span><span class="n">descriptions</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_fill_room_infos</span><span class="p">(</span><span class="n">descriptions</span><span class="p">)</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Added room descriptions&quot;</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="World.fill_room_infos"><a class="viewcode-back" href="../../source/textgame.world.html#textgame.world.World.fill_room_infos">[docs]</a>    <span class="k">def</span> <span class="nf">fill_room_infos</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">descriptions</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_fill_room_infos</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">descriptions</span><span class="p">):</span>
         <span class="k">for</span> <span class="n">ID</span><span class="p">,</span><span class="n">room</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">rooms</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="n">description</span> <span class="o">=</span> <span class="n">descriptions</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">ID</span><span class="p">)</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">description</span><span class="p">:</span>
@@ -225,30 +255,37 @@
             <span class="c1"># contain the actual room objects instead of their names</span>
             <span class="k">if</span> <span class="s2">&quot;doors&quot;</span> <span class="ow">in</span> <span class="n">description</span><span class="p">:</span>
                 <span class="n">description</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
-                    <span class="p">{</span> <span class="s2">&quot;doors&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">convert_door_dict</span><span class="p">(</span><span class="n">description</span><span class="p">[</span><span class="s2">&quot;doors&quot;</span><span class="p">])</span> <span class="p">}</span>
+                    <span class="p">{</span> <span class="s2">&quot;doors&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_convert_door_dict</span><span class="p">(</span><span class="n">description</span><span class="p">[</span><span class="s2">&quot;doors&quot;</span><span class="p">])</span> <span class="p">}</span>
                 <span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Room </span><span class="si">{}</span><span class="s2"> does not have any doors&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ID</span><span class="p">))</span>
             <span class="k">if</span> <span class="s2">&quot;hiddendoors&quot;</span> <span class="ow">in</span> <span class="n">description</span><span class="p">:</span>
                 <span class="n">description</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
-                    <span class="p">{</span> <span class="s2">&quot;hiddendoors&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">convert_door_dict</span><span class="p">(</span><span class="n">description</span><span class="p">[</span><span class="s2">&quot;hiddendoors&quot;</span><span class="p">])</span> <span class="p">}</span>
+                    <span class="p">{</span> <span class="s2">&quot;hiddendoors&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_convert_door_dict</span><span class="p">(</span><span class="n">description</span><span class="p">[</span><span class="s2">&quot;hiddendoors&quot;</span><span class="p">])</span> <span class="p">}</span>
                 <span class="p">)</span>
 
             <span class="c1"># here&#39;s where the work is done</span>
-            <span class="n">room</span><span class="o">.</span><span class="n">fill_info</span><span class="p">(</span><span class="o">**</span><span class="n">description</span><span class="p">)</span></div>
+            <span class="n">room</span><span class="o">.</span><span class="n">fill_info</span><span class="p">(</span><span class="o">**</span><span class="n">description</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="World.convert_door_dict"><a class="viewcode-back" href="../../source/textgame.world.html#textgame.world.World.convert_door_dict">[docs]</a>    <span class="k">def</span> <span class="nf">convert_door_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">doordict</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_convert_door_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">doordict</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        take {dir: roomid} return {dir: roomobj}</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">true_doordict</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="k">for</span> <span class="nb">dir</span><span class="p">,</span><span class="n">ID</span> <span class="ow">in</span> <span class="n">doordict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="n">true_doordict</span><span class="p">[</span><span class="nb">dir</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">room</span><span class="p">(</span><span class="n">ID</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">true_doordict</span></div>
+        <span class="k">return</span> <span class="n">true_doordict</span>
 
 
 <div class="viewcode-block" id="World.room"><a class="viewcode-back" href="../../source/textgame.world.html#textgame.world.World.room">[docs]</a>    <span class="k">def</span> <span class="nf">room</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ID</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;get room by ID.</span>
+<span class="sd">        If the room is not found, the logger prints an error</span>
+
+<span class="sd">        :param ID: room ID</span>
+
+<span class="sd">        :rtype: :class:`textgame.room.Room` or ``None``</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rooms</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">ID</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">result</span><span class="p">:</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Room not found: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ID</span><span class="p">))</span>
@@ -257,8 +294,12 @@
 
 <div class="viewcode-block" id="World.create_items"><a class="viewcode-back" href="../../source/textgame.world.html#textgame.world.World.create_items">[docs]</a>    <span class="k">def</span> <span class="nf">create_items</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">descriptions</span><span class="p">,</span> <span class="n">tag</span><span class="o">=</span><span class="s2">&quot;items&quot;</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        create item objects based on descritions</span>
-<span class="sd">        tag can be items, weapons, monsters</span>
+<span class="sd">        create :mod:`textgame.movable` ``[Weapon,Item,Monster]`` objects based on description-dict (see above).</span>
+<span class="sd">        This gets called on initialization if ``weapons,items,monsters`` was provided.</span>
+
+<span class="sd">        :param descriptions:</span>
+<span class="sd">        :type descriptions: dict</span>
+<span class="sd">        :param tag: can be &#39;items&#39;, &#39;monsters&#39;, &#39;weapons&#39;</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">ID</span><span class="p">,</span><span class="n">description</span> <span class="ow">in</span> <span class="n">descriptions</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="k">if</span> <span class="n">tag</span> <span class="o">==</span> <span class="s2">&quot;items&quot;</span><span class="p">:</span>
@@ -272,7 +313,9 @@
 
 <div class="viewcode-block" id="World.put_items_in_place"><a class="viewcode-back" href="../../source/textgame.world.html#textgame.world.World.put_items_in_place">[docs]</a>    <span class="k">def</span> <span class="nf">put_items_in_place</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        iterate over all items and add them to their initlocation</span>
+<span class="sd">        iterate over all items, see if their ``initlocation`` points to a room</span>
+<span class="sd">        in this world and add it there.</span>
+<span class="sd">        This is done automatically if the items are passed at initialization</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">items</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
             <span class="n">initlocation</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rooms</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">item</span><span class="o">.</span><span class="n">initlocation</span><span class="p">)</span>
@@ -285,7 +328,9 @@
 
 <div class="viewcode-block" id="World.put_monsters_in_place"><a class="viewcode-back" href="../../source/textgame.world.html#textgame.world.World.put_monsters_in_place">[docs]</a>    <span class="k">def</span> <span class="nf">put_monsters_in_place</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        iterate over all monsters and add them to their initlocation</span>
+<span class="sd">        iterate over all monsters, see if their ``initlocation`` points to a room</span>
+<span class="sd">        in this world and add it there.</span>
+<span class="sd">        This is done automatically if the monsters are passed at initialization</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">monster</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">monsters</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
             <span class="n">initlocation</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rooms</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">monster</span><span class="o">.</span><span class="n">initlocation</span><span class="p">)</span>
@@ -297,6 +342,19 @@
 
 
 <div class="viewcode-block" id="World.set_room_restrictions"><a class="viewcode-back" href="../../source/textgame.world.html#textgame.world.World.set_room_restrictions">[docs]</a>    <span class="k">def</span> <span class="nf">set_room_restrictions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">restrictions</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        takes a dict of the following form:</span>
+
+<span class="sd">        .. code-block:: python</span>
+
+<span class="sd">           {</span>
+<span class="sd">            &quot;room_ID&quot;: {&quot;func&quot;: my_func}</span>
+<span class="sd">           }</span>
+
+<span class="sd">        for every ``room_ID``, find the corresponding room and call</span>
+<span class="sd">        ``set_specials`` with the mapped dict on it.</span>
+<span class="sd">        See :func:`textgame.room.Room.set_specials` for further reference.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">roomid</span><span class="p">,</span><span class="n">restriction</span> <span class="ow">in</span> <span class="n">restrictions</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="s2">&quot;func&quot;</span> <span class="ow">in</span> <span class="n">restriction</span><span class="p">:</span>
                 <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;no &#39;func&#39; defined in restrictions for room </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">roomid</span><span class="p">))</span>
@@ -305,7 +363,11 @@
 
 
 <div class="viewcode-block" id="World.update"><a class="viewcode-back" href="../../source/textgame.world.html#textgame.world.World.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">player</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;upate world&#39;s status</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        increase the time, call :func:`textgame.world.World.manage_fight` and</span>
+<span class="sd">        :func:`textgame.world.World.manage_daylight`</span>
+
+<span class="sd">        :rtype: output of ``manage_fight`` and ``manage_daylight`` (str)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">time</span> <span class="o">+=</span> <span class="mi">1</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;time set to </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="p">))</span>
@@ -315,6 +377,11 @@
 
 
 <div class="viewcode-block" id="World.manage_daylight"><a class="viewcode-back" href="../../source/textgame.world.html#textgame.world.World.manage_daylight">[docs]</a>    <span class="k">def</span> <span class="nf">manage_daylight</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        check if it&#39;s nighttime and turn all rooms dark if yes</span>
+
+<span class="sd">        :rtype: a message that night came in or an empty string</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">time</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">nighttime</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">daytime</span> <span class="o">==</span> <span class="s2">&quot;day&quot;</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">daytime</span> <span class="o">=</span> <span class="s2">&quot;night&quot;</span>
             <span class="c1"># turn all rooms to always dark</span>
@@ -326,6 +393,16 @@
 
 <div class="viewcode-block" id="World.spawn_monster"><a class="viewcode-back" href="../../source/textgame.world.html#textgame.world.World.spawn_monster">[docs]</a>    <span class="k">def</span> <span class="nf">spawn_monster</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">location</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;randomly spawn a monster in location</span>
+
+<span class="sd">        the condition for a monster to spawn is:</span>
+
+<span class="sd">        - no other monsters in this room</span>
+<span class="sd">        - random number must be smaller than monster&#39;s ``spawn_prob``</span>
+<span class="sd">        - at least one of the strings in monster&#39;s ``spawns_in`` list must be contained in the location&#39;s ID</span>
+<span class="sd">        - monster&#39;s ``spawns_at`` must be equal to the current daytime or &#39;always&#39;</span>
+<span class="sd">        - monster must not be active already</span>
+
+<span class="sd">        :param location: :class:`textgame.room.Room` in which a monster should spawn</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># remove singleencounters / save active monsters in room for later</span>
         <span class="n">active_beast</span> <span class="o">=</span> <span class="kc">None</span>
@@ -355,6 +432,13 @@
 
 
 <div class="viewcode-block" id="World.manage_fight"><a class="viewcode-back" href="../../source/textgame.world.html#textgame.world.World.manage_fight">[docs]</a>    <span class="k">def</span> <span class="nf">manage_fight</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">player</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        if there are active, harmful monsters around, this method checks if the player is</span>
+<span class="sd">        fighting them and kills the player / the monster, depending on random numbers</span>
+<span class="sd">        and the monster&#39;s strenght</span>
+
+<span class="sd">        :rtype: string describing the status of the fight</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">msg</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
         <span class="k">for</span> <span class="n">monsterid</span><span class="p">,</span><span class="n">monster</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">monsters</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="k">if</span> <span class="n">monster</span><span class="o">.</span><span class="n">status</span><span class="p">[</span><span class="s2">&quot;active&quot;</span><span class="p">]</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">monster</span><span class="o">.</span><span class="n">status</span><span class="p">[</span><span class="s2">&quot;harmless&quot;</span><span class="p">]:</span>
