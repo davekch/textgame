@@ -27,6 +27,9 @@ Every argument of :func:`textgame.room.Room.fill_info` can be put as a key-value
 pair inside this dict.
 
 The same is true for items, weapons and monsters, see the example.
+
+World has a member called ``storage_room`` of type :class:`textgame.room.Room` that
+can be used to put stuff inside that should not be visible for the player.
 """
 
 import logging
