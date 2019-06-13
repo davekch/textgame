@@ -152,6 +152,14 @@
 <span class="sd">textgame.player</span>
 <span class="sd">=====================</span>
 
+<span class="sd">This module contains a class :class:`textgame.player.Player` that is used to define</span>
+<span class="sd">what a player is able to do in the game. Every of its methods that get called by</span>
+<span class="sd">:class:`textgame.parser.Parser` must take a noun (string) as an argument and return</span>
+<span class="sd">either a string that describes the action or a :class:`textgame.parser.EnterYesNoLoop`.</span>
+<span class="sd">For convenience, this module provides wrappers for Player methods:</span>
+
+<span class="sd">- :func:`textgame.player.player_method`</span>
+<span class="sd">- :func:`textgame.player.action_method`</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="kn">from</span> <span class="nn">inspect</span> <span class="k">import</span> <span class="n">signature</span>
@@ -167,9 +175,9 @@
 
 
 <div class="viewcode-block" id="player_method"><a class="viewcode-back" href="../../source/textgame.player.html#textgame.player.player_method">[docs]</a><span class="k">def</span> <span class="nf">player_method</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    wrapper for player methods</span>
-<span class="sd">    player methods that are mapped to verbs must take a noun as an argument</span>
+    <span class="sd">&quot;&quot;&quot;wrapper for player methods</span>
+
+<span class="sd">    checks if the method has the right signature, adds a dummy argument if the method doesn&#39;t care about nouns. Throws :class:`TypeError` if there are too many arguments.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">func</span> <span class="o">=</span> <span class="n">f</span>
 
@@ -180,6 +188,10 @@
         <span class="k">def</span> <span class="nf">_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">noun</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">f</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
         <span class="n">func</span> <span class="o">=</span> <span class="n">_f</span>
+        <span class="c1"># preserve (but change) docstring</span>
+        <span class="n">func</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="s2">&quot;decorated by :func:`textgame.player.player_method`</span><span class="se">\n\n</span><span class="s2">&quot;</span>\
+            <span class="o">+</span> <span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="vm">__doc__</span> <span class="k">if</span> <span class="n">f</span><span class="o">.</span><span class="vm">__doc__</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+
     <span class="k">elif</span> <span class="n">n_args</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Action methods can&#39;t have more than 2 arguments&quot;</span><span class="p">)</span>
 
@@ -187,9 +199,14 @@
 
 
 <div class="viewcode-block" id="action_method"><a class="viewcode-back" href="../../source/textgame.player.html#textgame.player.action_method">[docs]</a><span class="k">def</span> <span class="nf">action_method</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    player_method that appends world.update (time passing, daylight handling ...)</span>
-<span class="sd">    to the passed function</span>
+    <span class="sd">&quot;&quot;&quot;wrapper for player methods</span>
+
+<span class="sd">    does the same as :func:`textgame.player.player_method` plus it adds to the return</span>
+<span class="sd">    value of the original function the output of :func:`textgame.world.World.update`.</span>
+<span class="sd">    This way it is guaranteed that time passes and fights get managed when the player</span>
+<span class="sd">    does something.</span>
+
+<span class="sd">    Also, this saves the undecorated function in a new attribute ``f.undecorated``.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">func</span> <span class="o">=</span> <span class="n">player_method</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
 
@@ -206,14 +223,21 @@
     <span class="c1"># in this case nested decorations lead to bugs bc of multiple calls</span>
     <span class="c1"># on world.update</span>
     <span class="n">_f</span><span class="o">.</span><span class="n">undecorated</span> <span class="o">=</span> <span class="n">f</span>
+    <span class="c1"># preserve (but change) docstring</span>
+    <span class="n">_f</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="s2">&quot;decorated by :func:`textgame.player.action_method`</span><span class="se">\n\n</span><span class="s2">&quot;</span>\
+        <span class="o">+</span> <span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="vm">__doc__</span> <span class="k">if</span> <span class="n">f</span><span class="o">.</span><span class="vm">__doc__</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+
     <span class="k">return</span> <span class="n">_f</span></div>
 
 
 
 <div class="viewcode-block" id="Player"><a class="viewcode-back" href="../../source/textgame.player.html#textgame.player.Player">[docs]</a><span class="k">class</span> <span class="nc">Player</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    class to represent the player of the game</span>
-<span class="sd">    does all the stuff like take drop kill listen ...</span>
+    <span class="sd">&quot;&quot;&quot;class to represent the player of the game</span>
+
+<span class="sd">    - holds an instance of :class:`textgame.world.World` so that its methods can have the widest possible impact on the game</span>
+<span class="sd">    - ``self.location`` contains the room the player is currently in, ``self.oldlocation`` contains the previous location</span>
+<span class="sd">    - ``self.inventory`` is a dict mapping the item&#39;s IDs to the items the player is carrying</span>
+<span class="sd">    - ``self.status`` tracks the player&#39;s status: ``{&quot;alive&quot;: True, &quot;fighting&quot;: False, &quot;trapped&quot;: False}``</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">world</span><span class="p">,</span> <span class="n">initlocation</span><span class="p">):</span>
@@ -235,6 +259,11 @@
 
 <div class="viewcode-block" id="Player.go"><a class="viewcode-back" href="../../source/textgame.player.html#textgame.player.Player.go">[docs]</a>    <span class="nd">@action_method</span>
     <span class="k">def</span> <span class="nf">go</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">direction</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        change location to the room in the direction ``noun``. ``noun`` can be</span>
+<span class="sd">        in :class:`textgame.globals.DIRECTIONS` or &#39;back&#39;. On different inputs, return</span>
+<span class="sd">        :class:`textgame.globals.MOVING.FAIL_NOT_DIRECTION`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">direction</span> <span class="o">==</span> <span class="s2">&quot;back&quot;</span><span class="p">:</span>
             <span class="k">return</span>  <span class="bp">self</span><span class="o">.</span><span class="n">goback</span><span class="p">()</span>
         <span class="k">elif</span> <span class="ow">not</span> <span class="n">direction</span><span class="p">:</span>
@@ -280,6 +309,9 @@
 
 
 <div class="viewcode-block" id="Player.goback"><a class="viewcode-back" href="../../source/textgame.player.html#textgame.player.Player.goback">[docs]</a>    <span class="k">def</span> <span class="nf">goback</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        change location to previous location if there&#39;s a connection</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">oldlocation</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">location</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">MOVING</span><span class="o">.</span><span class="n">FAIL_NO_MEMORY</span>
         <span class="c1"># maybe there&#39;s no connection to oldlocation</span>
@@ -296,13 +328,21 @@
 
 <div class="viewcode-block" id="Player.close"><a class="viewcode-back" href="../../source/textgame.player.html#textgame.player.Player.close">[docs]</a>    <span class="nd">@action_method</span>
     <span class="k">def</span> <span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">direction</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">close_or_lock</span><span class="p">(</span><span class="s2">&quot;lock&quot;</span><span class="p">,</span> <span class="n">direction</span><span class="p">)</span></div>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        lock the door in direction ``noun`` if player has a key in inventory</span>
+<span class="sd">        that fits</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_close_or_lock</span><span class="p">(</span><span class="s2">&quot;lock&quot;</span><span class="p">,</span> <span class="n">direction</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Player.open"><a class="viewcode-back" href="../../source/textgame.player.html#textgame.player.Player.open">[docs]</a>    <span class="nd">@action_method</span>
     <span class="k">def</span> <span class="nf">open</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">direction</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">close_or_lock</span><span class="p">(</span><span class="s2">&quot;open&quot;</span><span class="p">,</span> <span class="n">direction</span><span class="p">)</span></div>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        open the door in direction ``noun`` if player has a key in inventory</span>
+<span class="sd">        that fits</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_close_or_lock</span><span class="p">(</span><span class="s2">&quot;open&quot;</span><span class="p">,</span> <span class="n">direction</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="Player.close_or_lock"><a class="viewcode-back" href="../../source/textgame.player.html#textgame.player.Player.close_or_lock">[docs]</a>    <span class="k">def</span> <span class="nf">close_or_lock</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">action</span><span class="p">,</span> <span class="n">direction</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_close_or_lock</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">action</span><span class="p">,</span> <span class="n">direction</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">direction</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">DIRECTIONS</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">ACTION</span><span class="o">.</span><span class="n">FAIL_OPENDIR</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">action</span><span class="p">)</span>
         <span class="c1"># check if there&#39;s a door</span>
@@ -323,11 +363,16 @@
                     <span class="bp">self</span><span class="o">.</span><span class="n">location</span><span class="o">.</span><span class="n">locked</span><span class="p">[</span><span class="n">direction</span><span class="p">][</span><span class="s2">&quot;closed&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">action</span> <span class="o">==</span> <span class="s2">&quot;lock&quot;</span><span class="p">)</span>
                     <span class="k">return</span> <span class="n">ACTION</span><span class="o">.</span><span class="n">NOW_OPEN</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">action</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">ACTION</span><span class="o">.</span><span class="n">FAIL_OPEN</span>
-        <span class="k">return</span> <span class="n">ACTION</span><span class="o">.</span><span class="n">FAIL_NO_KEY</span></div>
+        <span class="k">return</span> <span class="n">ACTION</span><span class="o">.</span><span class="n">FAIL_NO_KEY</span>
 
 
 <div class="viewcode-block" id="Player.take"><a class="viewcode-back" href="../../source/textgame.player.html#textgame.player.Player.take">[docs]</a>    <span class="nd">@action_method</span>
     <span class="k">def</span> <span class="nf">take</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">itemid</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        see if something with the ID ``noun`` is in the items of the current</span>
+<span class="sd">        location. If yes and if it&#39;s takable and not dark, remove it from location</span>
+<span class="sd">        and add it to inventory</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">itemid</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">ACTION</span><span class="o">.</span><span class="n">WHICH_ITEM</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">&quot;take&quot;</span><span class="p">)</span>
         <span class="k">elif</span> <span class="n">itemid</span> <span class="o">==</span> <span class="s2">&quot;all&quot;</span><span class="p">:</span>
@@ -351,6 +396,9 @@
 
 
 <div class="viewcode-block" id="Player.takeall"><a class="viewcode-back" href="../../source/textgame.player.html#textgame.player.Player.takeall">[docs]</a>    <span class="k">def</span> <span class="nf">takeall</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        move all items in the current location to inventory</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">location</span><span class="o">.</span><span class="n">items</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">DESCRIPTIONS</span><span class="o">.</span><span class="n">NOTHING_THERE</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">location</span><span class="o">.</span><span class="n">dark</span><span class="p">[</span><span class="s2">&quot;now&quot;</span><span class="p">]:</span>
@@ -363,6 +411,9 @@
 
 <div class="viewcode-block" id="Player.list_inventory"><a class="viewcode-back" href="../../source/textgame.player.html#textgame.player.Player.list_inventory">[docs]</a>    <span class="nd">@action_method</span>
     <span class="k">def</span> <span class="nf">list_inventory</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        return a pretty formatted list of what&#39;s inside inventory</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">inventory</span><span class="p">:</span>
             <span class="n">response</span> <span class="o">=</span> <span class="s2">&quot;You are now carrying:</span><span class="se">\n</span><span class="s2"> A &quot;</span>
             <span class="n">response</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1"> A &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">inventory</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
@@ -372,6 +423,10 @@
 
 <div class="viewcode-block" id="Player.drop"><a class="viewcode-back" href="../../source/textgame.player.html#textgame.player.Player.drop">[docs]</a>    <span class="nd">@action_method</span>
     <span class="k">def</span> <span class="nf">drop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">itemid</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        see if something with the ID ``noun`` is in the inventory. If yes, remove</span>
+<span class="sd">        it from inventory and add it to location</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">itemid</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">ACTION</span><span class="o">.</span><span class="n">WHICH_ITEM</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">&quot;drop&quot;</span><span class="p">)</span>
 
@@ -386,6 +441,9 @@
 
 
 <div class="viewcode-block" id="Player.dropall"><a class="viewcode-back" href="../../source/textgame.player.html#textgame.player.Player.dropall">[docs]</a>    <span class="k">def</span> <span class="nf">dropall</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        move all items in the inventory to current location</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">inventory</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">ACTION</span><span class="o">.</span><span class="n">NO_INVENTORY</span>
         <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">inventory</span><span class="o">.</span><span class="n">keys</span><span class="p">()):</span>
@@ -396,6 +454,12 @@
 
 <div class="viewcode-block" id="Player.attack"><a class="viewcode-back" href="../../source/textgame.player.html#textgame.player.Player.attack">[docs]</a>    <span class="nd">@action_method</span>
     <span class="k">def</span> <span class="nf">attack</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">monstername</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        kill a monster based on randomness, the monster&#39;s strength and on how</span>
+<span class="sd">        long the fight has been going already. Die if killing fails too often.</span>
+
+<span class="sd">        If the history of the monster is -1, the monster&#39;s ``ignoretext`` gets returned.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">monstername</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">FIGHTING</span><span class="o">.</span><span class="n">WHAT</span>
         <span class="n">monsters</span> <span class="o">=</span> <span class="p">[</span><span class="n">m</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">location</span><span class="o">.</span><span class="n">monsters</span><span class="o">.</span><span class="n">values</span><span class="p">()</span> <span class="k">if</span> <span class="n">m</span><span class="o">.</span><span class="n">name</span><span class="o">==</span><span class="n">monstername</span><span class="p">]</span>
@@ -436,11 +500,18 @@
 
 
 <div class="viewcode-block" id="Player.forget"><a class="viewcode-back" href="../../source/textgame.player.html#textgame.player.Player.forget">[docs]</a>    <span class="k">def</span> <span class="nf">forget</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        set old location to current location</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">oldlocation</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">location</span></div>
 
 
 <div class="viewcode-block" id="Player.look"><a class="viewcode-back" href="../../source/textgame.player.html#textgame.player.Player.look">[docs]</a>    <span class="nd">@action_method</span>
     <span class="k">def</span> <span class="nf">look</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        get the long description of the current location.</span>
+<span class="sd">        Also spawn monsters and check check_restrictions (see :func:`textgame.room.Room.check_restrictions`)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># spawn monsters before describing the room</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">world</span><span class="o">.</span><span class="n">spawn_monster</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">location</span><span class="p">)</span>
         <span class="c1"># check if room is dark etc, plus extrawürste</span>
@@ -451,6 +522,9 @@
 
 <div class="viewcode-block" id="Player.listen"><a class="viewcode-back" href="../../source/textgame.player.html#textgame.player.Player.listen">[docs]</a>    <span class="nd">@action_method</span>
     <span class="k">def</span> <span class="nf">listen</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        get the current room&#39;s sound</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">location</span><span class="o">.</span><span class="n">sound</span></div>
 
 
@@ -465,8 +539,8 @@
     <span class="k">def</span> <span class="nf">ask_hint</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        ask for a hint in the current location,</span>
-<span class="sd">        if there is one, trigger yes/no conversation if the hint should really</span>
-<span class="sd">        be displayed</span>
+<span class="sd">        if there is one, return :class:`textgame.parser.EnterYesNoLoop` if the hint</span>
+<span class="sd">        should really be displayed</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">warning</span><span class="p">,</span> <span class="n">hint</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">location</span><span class="o">.</span><span class="n">get_hint</span><span class="p">()</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">hint</span><span class="p">:</span>

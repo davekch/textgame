@@ -187,7 +187,7 @@ all the player’s money gets stolen if he/she enters <code class="docutils lite
     <span class="k">if</span> <span class="s2">&quot;money&quot;</span> <span class="ow">in</span> <span class="n">player</span><span class="o">.</span><span class="n">inventory</span><span class="p">:</span>
         <span class="c1"># don&#39;t delete the money, better store it in</span>
         <span class="c1"># the storage room (see :class:`textgame.world.World`)</span>
-        <span class="n">player</span><span class="o">.</span><span class="n">world</span><span class="o">.</span><span class="n">add_item</span><span class="p">(</span> <span class="n">player</span><span class="o">.</span><span class="n">inventory</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;money&quot;</span><span class="p">)</span> <span class="p">)</span>
+        <span class="n">player</span><span class="o">.</span><span class="n">world</span><span class="o">.</span><span class="n">storage_room</span><span class="o">.</span><span class="n">add_item</span><span class="p">(</span> <span class="n">player</span><span class="o">.</span><span class="n">inventory</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;money&quot;</span><span class="p">)</span> <span class="p">)</span>
         <span class="k">return</span> <span class="s2">&quot;Someone just stole all your money.&quot;</span>
      <span class="c1"># be sure to return a string</span>
      <span class="k">return</span> <span class="s2">&quot;&quot;</span>

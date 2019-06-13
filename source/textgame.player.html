@@ -163,56 +163,86 @@
             
   <span class="target" id="module-textgame.player"></span><div class="section" id="textgame-player">
 <h1>textgame.player<a class="headerlink" href="#textgame-player" title="Permalink to this headline">¶</a></h1>
+<p>This module contains a class <a class="reference internal" href="#textgame.player.Player" title="textgame.player.Player"><code class="xref py py-class docutils literal notranslate"><span class="pre">textgame.player.Player</span></code></a> that is used to define
+what a player is able to do in the game. Every of its methods that get called by
+<a class="reference internal" href="textgame.parser.html#textgame.parser.Parser" title="textgame.parser.Parser"><code class="xref py py-class docutils literal notranslate"><span class="pre">textgame.parser.Parser</span></code></a> must take a noun (string) as an argument and return
+either a string that describes the action or a <a class="reference internal" href="textgame.parser.html#textgame.parser.EnterYesNoLoop" title="textgame.parser.EnterYesNoLoop"><code class="xref py py-class docutils literal notranslate"><span class="pre">textgame.parser.EnterYesNoLoop</span></code></a>.
+For convenience, this module provides wrappers for Player methods:</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="#textgame.player.player_method" title="textgame.player.player_method"><code class="xref py py-func docutils literal notranslate"><span class="pre">textgame.player.player_method()</span></code></a></p></li>
+<li><p><a class="reference internal" href="#textgame.player.action_method" title="textgame.player.action_method"><code class="xref py py-func docutils literal notranslate"><span class="pre">textgame.player.action_method()</span></code></a></p></li>
+</ul>
 <dl class="class">
 <dt id="textgame.player.Player">
 <em class="property">class </em><code class="sig-prename descclassname">textgame.player.</code><code class="sig-name descname">Player</code><span class="sig-paren">(</span><em class="sig-param">world</em>, <em class="sig-param">initlocation</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/textgame/player.html#Player"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#textgame.player.Player" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>class to represent the player of the game
-does all the stuff like take drop kill listen …</p>
+<p>class to represent the player of the game</p>
+<ul class="simple">
+<li><p>holds an instance of <a class="reference internal" href="textgame.world.html#textgame.world.World" title="textgame.world.World"><code class="xref py py-class docutils literal notranslate"><span class="pre">textgame.world.World</span></code></a> so that its methods can have the widest possible impact on the game</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">self.location</span></code> contains the room the player is currently in, <code class="docutils literal notranslate"><span class="pre">self.oldlocation</span></code> contains the previous location</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">self.inventory</span></code> is a dict mapping the item’s IDs to the items the player is carrying</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">self.status</span></code> tracks the player’s status: <code class="docutils literal notranslate"><span class="pre">{&quot;alive&quot;:</span> <span class="pre">True,</span> <span class="pre">&quot;fighting&quot;:</span> <span class="pre">False,</span> <span class="pre">&quot;trapped&quot;:</span> <span class="pre">False}</span></code></p></li>
+</ul>
 <dl class="method">
 <dt id="textgame.player.Player.ask_hint">
 <code class="sig-name descname">ask_hint</code><span class="sig-paren">(</span><em class="sig-param">noun</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/textgame/player.html#Player.ask_hint"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#textgame.player.Player.ask_hint" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>decorated by <a class="reference internal" href="#textgame.player.player_method" title="textgame.player.player_method"><code class="xref py py-func docutils literal notranslate"><span class="pre">textgame.player.player_method()</span></code></a></p>
+<p>ask for a hint in the current location,
+if there is one, return <a class="reference internal" href="textgame.parser.html#textgame.parser.EnterYesNoLoop" title="textgame.parser.EnterYesNoLoop"><code class="xref py py-class docutils literal notranslate"><span class="pre">textgame.parser.EnterYesNoLoop</span></code></a> if the hint
+should really be displayed</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="textgame.player.Player.attack">
 <code class="sig-name descname">attack</code><span class="sig-paren">(</span><em class="sig-param">noun</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/textgame/player.html#Player.attack"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#textgame.player.Player.attack" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>decorated by <a class="reference internal" href="#textgame.player.action_method" title="textgame.player.action_method"><code class="xref py py-func docutils literal notranslate"><span class="pre">textgame.player.action_method()</span></code></a></p>
+<p>kill a monster based on randomness, the monster’s strength and on how
+long the fight has been going already. Die if killing fails too often.</p>
+<p>If the history of the monster is -1, the monster’s <code class="docutils literal notranslate"><span class="pre">ignoretext</span></code> gets returned.</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="textgame.player.Player.close">
 <code class="sig-name descname">close</code><span class="sig-paren">(</span><em class="sig-param">noun</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/textgame/player.html#Player.close"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#textgame.player.Player.close" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="textgame.player.Player.close_or_lock">
-<code class="sig-name descname">close_or_lock</code><span class="sig-paren">(</span><em class="sig-param">action</em>, <em class="sig-param">direction</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/textgame/player.html#Player.close_or_lock"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#textgame.player.Player.close_or_lock" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>decorated by <a class="reference internal" href="#textgame.player.action_method" title="textgame.player.action_method"><code class="xref py py-func docutils literal notranslate"><span class="pre">textgame.player.action_method()</span></code></a></p>
+<p>lock the door in direction <code class="docutils literal notranslate"><span class="pre">noun</span></code> if player has a key in inventory
+that fits</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="textgame.player.Player.drop">
 <code class="sig-name descname">drop</code><span class="sig-paren">(</span><em class="sig-param">noun</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/textgame/player.html#Player.drop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#textgame.player.Player.drop" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>decorated by <a class="reference internal" href="#textgame.player.action_method" title="textgame.player.action_method"><code class="xref py py-func docutils literal notranslate"><span class="pre">textgame.player.action_method()</span></code></a></p>
+<p>see if something with the ID <code class="docutils literal notranslate"><span class="pre">noun</span></code> is in the inventory. If yes, remove
+it from inventory and add it to location</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="textgame.player.Player.dropall">
 <code class="sig-name descname">dropall</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/textgame/player.html#Player.dropall"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#textgame.player.Player.dropall" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>move all items in the inventory to current location</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="textgame.player.Player.forget">
 <code class="sig-name descname">forget</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/textgame/player.html#Player.forget"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#textgame.player.Player.forget" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>set old location to current location</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="textgame.player.Player.go">
 <code class="sig-name descname">go</code><span class="sig-paren">(</span><em class="sig-param">noun</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/textgame/player.html#Player.go"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#textgame.player.Player.go" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>decorated by <a class="reference internal" href="#textgame.player.action_method" title="textgame.player.action_method"><code class="xref py py-func docutils literal notranslate"><span class="pre">textgame.player.action_method()</span></code></a></p>
+<p>change location to the room in the direction <code class="docutils literal notranslate"><span class="pre">noun</span></code>. <code class="docutils literal notranslate"><span class="pre">noun</span></code> can be
+in <code class="xref py py-class docutils literal notranslate"><span class="pre">textgame.globals.DIRECTIONS</span></code> or ‘back’. On different inputs, return
+<a class="reference internal" href="textgame.globals.html#textgame.globals.MOVING.FAIL_NOT_DIRECTION" title="textgame.globals.MOVING.FAIL_NOT_DIRECTION"><code class="xref py py-class docutils literal notranslate"><span class="pre">textgame.globals.MOVING.FAIL_NOT_DIRECTION</span></code></a></p>
+</dd></dl>
 
 <dl class="method">
 <dt id="textgame.player.Player.goback">
 <code class="sig-name descname">goback</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/textgame/player.html#Player.goback"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#textgame.player.Player.goback" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>change location to previous location if there’s a connection</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="textgame.player.Player.has_light">
@@ -223,52 +253,72 @@ does all the stuff like take drop kill listen …</p>
 <dl class="method">
 <dt id="textgame.player.Player.list_inventory">
 <code class="sig-name descname">list_inventory</code><span class="sig-paren">(</span><em class="sig-param">noun</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/textgame/player.html#Player.list_inventory"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#textgame.player.Player.list_inventory" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>decorated by <a class="reference internal" href="#textgame.player.action_method" title="textgame.player.action_method"><code class="xref py py-func docutils literal notranslate"><span class="pre">textgame.player.action_method()</span></code></a></p>
+<p>return a pretty formatted list of what’s inside inventory</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="textgame.player.Player.listen">
 <code class="sig-name descname">listen</code><span class="sig-paren">(</span><em class="sig-param">noun</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/textgame/player.html#Player.listen"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#textgame.player.Player.listen" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>decorated by <a class="reference internal" href="#textgame.player.action_method" title="textgame.player.action_method"><code class="xref py py-func docutils literal notranslate"><span class="pre">textgame.player.action_method()</span></code></a></p>
+<p>get the current room’s sound</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="textgame.player.Player.look">
 <code class="sig-name descname">look</code><span class="sig-paren">(</span><em class="sig-param">noun</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/textgame/player.html#Player.look"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#textgame.player.Player.look" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>decorated by <a class="reference internal" href="#textgame.player.action_method" title="textgame.player.action_method"><code class="xref py py-func docutils literal notranslate"><span class="pre">textgame.player.action_method()</span></code></a></p>
+<p>get the long description of the current location.
+Also spawn monsters and check check_restrictions (see <a class="reference internal" href="textgame.room.html#textgame.room.Room.check_restrictions" title="textgame.room.Room.check_restrictions"><code class="xref py py-func docutils literal notranslate"><span class="pre">textgame.room.Room.check_restrictions()</span></code></a>)</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="textgame.player.Player.open">
 <code class="sig-name descname">open</code><span class="sig-paren">(</span><em class="sig-param">noun</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/textgame/player.html#Player.open"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#textgame.player.Player.open" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>decorated by <a class="reference internal" href="#textgame.player.action_method" title="textgame.player.action_method"><code class="xref py py-func docutils literal notranslate"><span class="pre">textgame.player.action_method()</span></code></a></p>
+<p>open the door in direction <code class="docutils literal notranslate"><span class="pre">noun</span></code> if player has a key in inventory
+that fits</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="textgame.player.Player.show_score">
 <code class="sig-name descname">show_score</code><span class="sig-paren">(</span><em class="sig-param">noun</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/textgame/player.html#Player.show_score"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#textgame.player.Player.show_score" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>decorated by <a class="reference internal" href="#textgame.player.action_method" title="textgame.player.action_method"><code class="xref py py-func docutils literal notranslate"><span class="pre">textgame.player.action_method()</span></code></a></p>
+</dd></dl>
 
 <dl class="method">
 <dt id="textgame.player.Player.take">
 <code class="sig-name descname">take</code><span class="sig-paren">(</span><em class="sig-param">noun</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/textgame/player.html#Player.take"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#textgame.player.Player.take" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>decorated by <a class="reference internal" href="#textgame.player.action_method" title="textgame.player.action_method"><code class="xref py py-func docutils literal notranslate"><span class="pre">textgame.player.action_method()</span></code></a></p>
+<p>see if something with the ID <code class="docutils literal notranslate"><span class="pre">noun</span></code> is in the items of the current
+location. If yes and if it’s takable and not dark, remove it from location
+and add it to inventory</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="textgame.player.Player.takeall">
 <code class="sig-name descname">takeall</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/textgame/player.html#Player.takeall"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#textgame.player.Player.takeall" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>move all items in the current location to inventory</p>
+</dd></dl>
 
 </dd></dl>
 
 <dl class="function">
 <dt id="textgame.player.action_method">
 <code class="sig-prename descclassname">textgame.player.</code><code class="sig-name descname">action_method</code><span class="sig-paren">(</span><em class="sig-param">f</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/textgame/player.html#action_method"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#textgame.player.action_method" title="Permalink to this definition">¶</a></dt>
-<dd><p>player_method that appends world.update (time passing, daylight handling …)
-to the passed function</p>
+<dd><p>wrapper for player methods</p>
+<p>does the same as <a class="reference internal" href="#textgame.player.player_method" title="textgame.player.player_method"><code class="xref py py-func docutils literal notranslate"><span class="pre">textgame.player.player_method()</span></code></a> plus it adds to the return
+value of the original function the output of <a class="reference internal" href="textgame.world.html#textgame.world.World.update" title="textgame.world.World.update"><code class="xref py py-func docutils literal notranslate"><span class="pre">textgame.world.World.update()</span></code></a>.
+This way it is guaranteed that time passes and fights get managed when the player
+does something.</p>
+<p>Also, this saves the undecorated function in a new attribute <code class="docutils literal notranslate"><span class="pre">f.undecorated</span></code>.</p>
 </dd></dl>
 
 <dl class="function">
 <dt id="textgame.player.player_method">
 <code class="sig-prename descclassname">textgame.player.</code><code class="sig-name descname">player_method</code><span class="sig-paren">(</span><em class="sig-param">f</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/textgame/player.html#player_method"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#textgame.player.player_method" title="Permalink to this definition">¶</a></dt>
-<dd><p>wrapper for player methods
-player methods that are mapped to verbs must take a noun as an argument</p>
+<dd><p>wrapper for player methods</p>
+<p>checks if the method has the right signature, adds a dummy argument if the method doesn’t care about nouns. Throws <code class="xref py py-class docutils literal notranslate"><span class="pre">TypeError</span></code> if there are too many arguments.</p>
 </dd></dl>
 
 </div>

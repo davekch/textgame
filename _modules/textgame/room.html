@@ -183,7 +183,7 @@
 <span class="sd">       if &quot;money&quot; in player.inventory:</span>
 <span class="sd">           # don&#39;t delete the money, better store it in</span>
 <span class="sd">           # the storage room (see :class:`textgame.world.World`)</span>
-<span class="sd">           player.world.add_item( player.inventory.pop(&quot;money&quot;) )</span>
+<span class="sd">           player.world.storage_room.add_item( player.inventory.pop(&quot;money&quot;) )</span>
 <span class="sd">           return &quot;Someone just stole all your money.&quot;</span>
 <span class="sd">        # be sure to return a string</span>
 <span class="sd">        return &quot;&quot;</span>
