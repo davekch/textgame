@@ -152,6 +152,43 @@
 <span class="sd">textgame.room</span>
 <span class="sd">=====================</span>
 
+<span class="sd">This module contains only one class, :class:`textgame.room.Room`, that represents</span>
+<span class="sd">a single room and its connections to other rooms.</span>
+
+<span class="sd">You can create one like so</span>
+
+<span class="sd">.. code-block:: python</span>
+
+<span class="sd">   myroom1 = textgame.room.Room(&quot;room_01&quot;)</span>
+<span class="sd">   myroom2 = textgame.room.Room(&quot;room_02&quot;)</span>
+<span class="sd">   # add some information</span>
+<span class="sd">   myroom1.fill_info(</span>
+<span class="sd">       doors={&quot;north&quot;: myroom2},</span>
+<span class="sd">       descript=&quot;You are at a beach stretching from north to south.&quot;,</span>
+<span class="sd">       sdescript=&quot;You&#39;re at the beach.&quot;</span>
+<span class="sd">   )</span>
+
+<span class="sd">See :func:`textgame.room.Room.fill_info` for more. It is also possible for a room to</span>
+<span class="sd">have a connection to itself.</span>
+
+<span class="sd">``Room`` has a method :func:`textgame.room.Room.check_restrictions` that checks if</span>
+<span class="sd">it&#39;s dark inside the room and calls a ``special_func``. You can specify the ``special_func``</span>
+<span class="sd">to do whatever you wish should happen when a player enters this room. Say for example,</span>
+<span class="sd">all the player&#39;s money gets stolen if he/she enters ``myroom2``:</span>
+
+<span class="sd">.. code-block:: python</span>
+
+<span class="sd">   # NOTE: the first argument must be the player</span>
+<span class="sd">   def steal_money(player):</span>
+<span class="sd">       if &quot;money&quot; in player.inventory:</span>
+<span class="sd">           # don&#39;t delete the money, better store it in</span>
+<span class="sd">           # the storage room (see :class:`textgame.world.World`)</span>
+<span class="sd">           player.world.add_item( player.inventory.pop(&quot;money&quot;) )</span>
+<span class="sd">           return &quot;Someone just stole all your money.&quot;</span>
+<span class="sd">        # be sure to return a string</span>
+<span class="sd">        return &quot;&quot;</span>
+
+<span class="sd">    myroom2.set_specials(steal_money)</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="kn">import</span> <span class="nn">logging</span>
@@ -162,6 +199,10 @@
 
 
 <div class="viewcode-block" id="Room"><a class="viewcode-back" href="../../source/textgame.room.html#textgame.room.Room">[docs]</a><span class="k">class</span> <span class="nc">Room</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    :param ID: unique identifier</span>
+<span class="sd">    :type ID: str</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ID</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="n">ID</span>   <span class="c1"># unique, similar rooms should have a common keyword in ID</span>
@@ -188,6 +229,23 @@
                   <span class="n">dark</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sound</span><span class="o">=</span><span class="n">DESCRIPTIONS</span><span class="o">.</span><span class="n">NO_SOUND</span><span class="p">,</span>\
                   <span class="n">hint</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">hint_value</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">errors</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>\
                   <span class="n">doors</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">hiddendoors</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">locked</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dir_descriptions</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;add all the descriptive information</span>
+
+<span class="sd">        :param descript: string describing the room</span>
+<span class="sd">        :param sdescript: string describing the room, but shorter</span>
+<span class="sd">        :param value: how much player&#39;s score increases on first visit</span>
+<span class="sd">        :type value: int or float</span>
+<span class="sd">        :param dark: dict specifying if the room is dark. Sould be formatted like ``{&quot;now&quot;: &lt;bool&gt;, &quot;always&quot;: &lt;bool&gt;}``</span>
+<span class="sd">        :param sound: string describing the sound in this room</span>
+<span class="sd">        :param hint: string giving a hint on what to do in this room</span>
+<span class="sd">        :param hint_value: how much score this hint costs</span>
+<span class="sd">        :type hint_value: int or float</span>
+<span class="sd">        :param errors: dict mapping directions to error messages that get printet if player tries to go in this direction eg ``{&quot;north&quot;:&quot;Something blocks the way.&quot;}``</span>
+<span class="sd">        :param doors: dict mapping directions to rooms</span>
+<span class="sd">        :param hiddendoors: dict mapping directions to rooms but it&#39;s not possible to use these connections via :func:`textgame.player.Player.go`</span>
+<span class="sd">        :param locked: dict mapping directions to the state of the connections, eg ``{&quot;north&quot;: {&quot;locked&quot;:True, &quot;key&quot;:123}}`` see examples</span>
+<span class="sd">        :param dir_descriptions: dict mapping directions to descriptive messages about going in this directions, eg ``{&quot;up&quot;: &quot;You spread your wings and start to fly.&quot;}``</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">description</span> <span class="o">=</span> <span class="n">descript</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">shortdescription</span> <span class="o">=</span> <span class="n">sdescript</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">value</span>
@@ -231,6 +289,10 @@
 
 
 <div class="viewcode-block" id="Room.describe"><a class="viewcode-back" href="../../source/textgame.room.html#textgame.room.Room.describe">[docs]</a>    <span class="k">def</span> <span class="nf">describe</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">long</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        return the description (``long=True``) or short description (``long=False``)</span>
+<span class="sd">        of the room or :class:`textgame.globals.DESCRIPTIONS.DARK_L` if the room is dark</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">long</span> <span class="o">=</span> <span class="n">long</span> <span class="ow">or</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">visited</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dark</span><span class="p">[</span><span class="s2">&quot;now&quot;</span><span class="p">]:</span>
             <span class="k">return</span> <span class="n">DESCRIPTIONS</span><span class="o">.</span><span class="n">DARK_L</span>
@@ -243,6 +305,12 @@
 
 
 <div class="viewcode-block" id="Room.add_connection"><a class="viewcode-back" href="../../source/textgame.room.html#textgame.room.Room.add_connection">[docs]</a>    <span class="k">def</span> <span class="nf">add_connection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">dir</span><span class="p">,</span> <span class="n">room</span><span class="p">,</span> <span class="n">hidden</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;add a single connection to the room</span>
+
+<span class="sd">        :param dir: direction, must be in :class:`textgame.globals.DIRECTIONS`</span>
+<span class="sd">        :param room: :class:`textgame.room.Room` object</span>
+<span class="sd">        :param hidden: specify if the connection is hidden</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">dir</span> <span class="ow">in</span> <span class="n">DIRECTIONS</span><span class="p">:</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;You try to add a connection </span><span class="si">{}</span><span class="s2"> to </span><span class="si">{}</span><span class="s2"> &quot;</span>
                 <span class="s2">&quot;but this is not a direction&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">dir</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">))</span>
@@ -253,6 +321,8 @@
 
 
 <div class="viewcode-block" id="Room.visit"><a class="viewcode-back" href="../../source/textgame.room.html#textgame.room.Room.visit">[docs]</a>    <span class="k">def</span> <span class="nf">visit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;mark this room as visited if it&#39;s not dark and return its value</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">dark</span><span class="p">[</span><span class="s2">&quot;now&quot;</span><span class="p">]:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">visited</span> <span class="o">=</span> <span class="kc">True</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span>
@@ -260,7 +330,7 @@
 
 
 <div class="viewcode-block" id="Room.get_hint"><a class="viewcode-back" href="../../source/textgame.room.html#textgame.room.Room.get_hint">[docs]</a>    <span class="k">def</span> <span class="nf">get_hint</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;return a tuple of warning and the actual hint</span>
+        <span class="sd">&quot;&quot;&quot;return a tuple of warning and the actual hint (``(str,str)``)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="p">(</span><span class="n">INFO</span><span class="o">.</span><span class="n">HINT_WARNING</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hint_value</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">hint</span><span class="p">)</span></div>
 
@@ -271,13 +341,21 @@
         <span class="k">return</span> <span class="nb">any</span><span class="p">([</span><span class="n">lamp</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">items</span> <span class="k">for</span> <span class="n">lamp</span> <span class="ow">in</span> <span class="n">LIGHT</span><span class="p">])</span></div>
 
 
-<div class="viewcode-block" id="Room.set_specials"><a class="viewcode-back" href="../../source/textgame.room.html#textgame.room.Room.set_specials">[docs]</a>    <span class="k">def</span> <span class="nf">set_specials</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">func</span><span class="p">,</span> <span class="o">**</span><span class="n">args</span><span class="p">):</span>
+<div class="viewcode-block" id="Room.set_specials"><a class="viewcode-back" href="../../source/textgame.room.html#textgame.room.Room.set_specials">[docs]</a>    <span class="k">def</span> <span class="nf">set_specials</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">func</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;set a custom function that gets called in :func:`textgame.room.Room.check_restrictions`</span>
+
+<span class="sd">        :param func: function that takes a :class:`textgame.player.Player` object as first argument. Must return a string!</span>
+<span class="sd">        :param kwargs: optional keyword arguments for ``func``</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">special_func</span> <span class="o">=</span> <span class="n">func</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">special_args</span> <span class="o">=</span> <span class="n">args</span> <span class="k">if</span> <span class="n">args</span> <span class="k">else</span> <span class="p">{}</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">special_args</span> <span class="o">=</span> <span class="n">kwargs</span> <span class="k">if</span> <span class="n">kwargs</span> <span class="k">else</span> <span class="p">{}</span></div>
 
 
 <div class="viewcode-block" id="Room.check_restrictions"><a class="viewcode-back" href="../../source/textgame.room.html#textgame.room.Room.check_restrictions">[docs]</a>    <span class="k">def</span> <span class="nf">check_restrictions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">player</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;check if it&#39;s dark and call self.special_func</span>
+        <span class="sd">&quot;&quot;&quot;check if it&#39;s dark and call the function set by :func:`textgame.room.Room.set_specials`</span>
+
+<span class="sd">        :param player: :class:`textgame.player.Player` object</span>
+<span class="sd">        :returns: empty string or the string returned by the special function</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">dark</span><span class="p">[</span><span class="s2">&quot;now&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dark</span><span class="p">[</span><span class="s2">&quot;always&quot;</span><span class="p">]</span> <span class="ow">and</span> <span class="ow">not</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">has_light</span><span class="p">()</span> <span class="ow">or</span> <span class="n">player</span><span class="o">.</span><span class="n">has_light</span><span class="p">())</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">special_func</span><span class="p">:</span>
@@ -286,12 +364,16 @@
 
 
 <div class="viewcode-block" id="Room.reveal_hiddendoors"><a class="viewcode-back" href="../../source/textgame.room.html#textgame.room.Room.reveal_hiddendoors">[docs]</a>    <span class="k">def</span> <span class="nf">reveal_hiddendoors</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;add all hidden connections to visible connections</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;revealing hiddendoors in room </span><span class="si">{}</span><span class="s2"> to </span><span class="si">{}</span><span class="s2">&quot;</span>\
             <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="nb">dir</span> <span class="k">for</span> <span class="nb">dir</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">hiddendoors</span><span class="p">])))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">doors</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hiddendoors</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="Room.add_item"><a class="viewcode-back" href="../../source/textgame.room.html#textgame.room.Room.add_item">[docs]</a>    <span class="k">def</span> <span class="nf">add_item</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;put an item inside the room</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">item</span><span class="o">.</span><span class="n">id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">items</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">items</span><span class="p">[</span><span class="n">item</span><span class="o">.</span><span class="n">id</span><span class="p">]</span> <span class="o">=</span> <span class="n">item</span>
         <span class="k">else</span><span class="p">:</span>
@@ -300,6 +382,8 @@
 
 
 <div class="viewcode-block" id="Room.add_monster"><a class="viewcode-back" href="../../source/textgame.room.html#textgame.room.Room.add_monster">[docs]</a>    <span class="k">def</span> <span class="nf">add_monster</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">monster</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;put a monster inside the room</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">monster</span><span class="o">.</span><span class="n">id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">monsters</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">monsters</span><span class="p">[</span><span class="n">monster</span><span class="o">.</span><span class="n">id</span><span class="p">]</span> <span class="o">=</span> <span class="n">monster</span>
         <span class="k">else</span><span class="p">:</span>

@@ -163,45 +163,123 @@
             
   <span class="target" id="module-textgame.room"></span><div class="section" id="textgame-room">
 <h1>textgame.room<a class="headerlink" href="#textgame-room" title="Permalink to this headline">¶</a></h1>
+<p>This module contains only one class, <a class="reference internal" href="#textgame.room.Room" title="textgame.room.Room"><code class="xref py py-class docutils literal notranslate"><span class="pre">textgame.room.Room</span></code></a>, that represents
+a single room and its connections to other rooms.</p>
+<p>You can create one like so</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">myroom1</span> <span class="o">=</span> <span class="n">textgame</span><span class="o">.</span><span class="n">room</span><span class="o">.</span><span class="n">Room</span><span class="p">(</span><span class="s2">&quot;room_01&quot;</span><span class="p">)</span>
+<span class="n">myroom2</span> <span class="o">=</span> <span class="n">textgame</span><span class="o">.</span><span class="n">room</span><span class="o">.</span><span class="n">Room</span><span class="p">(</span><span class="s2">&quot;room_02&quot;</span><span class="p">)</span>
+<span class="c1"># add some information</span>
+<span class="n">myroom1</span><span class="o">.</span><span class="n">fill_info</span><span class="p">(</span>
+    <span class="n">doors</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;north&quot;</span><span class="p">:</span> <span class="n">myroom2</span><span class="p">},</span>
+    <span class="n">descript</span><span class="o">=</span><span class="s2">&quot;You are at a beach stretching from north to south.&quot;</span><span class="p">,</span>
+    <span class="n">sdescript</span><span class="o">=</span><span class="s2">&quot;You&#39;re at the beach.&quot;</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>See <a class="reference internal" href="#textgame.room.Room.fill_info" title="textgame.room.Room.fill_info"><code class="xref py py-func docutils literal notranslate"><span class="pre">textgame.room.Room.fill_info()</span></code></a> for more. It is also possible for a room to
+have a connection to itself.</p>
+<p><code class="docutils literal notranslate"><span class="pre">Room</span></code> has a method <a class="reference internal" href="#textgame.room.Room.check_restrictions" title="textgame.room.Room.check_restrictions"><code class="xref py py-func docutils literal notranslate"><span class="pre">textgame.room.Room.check_restrictions()</span></code></a> that checks if
+it’s dark inside the room and calls a <code class="docutils literal notranslate"><span class="pre">special_func</span></code>. You can specify the <code class="docutils literal notranslate"><span class="pre">special_func</span></code>
+to do whatever you wish should happen when a player enters this room. Say for example,
+all the player’s money gets stolen if he/she enters <code class="docutils literal notranslate"><span class="pre">myroom2</span></code>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># NOTE: the first argument must be the player</span>
+<span class="k">def</span> <span class="nf">steal_money</span><span class="p">(</span><span class="n">player</span><span class="p">):</span>
+    <span class="k">if</span> <span class="s2">&quot;money&quot;</span> <span class="ow">in</span> <span class="n">player</span><span class="o">.</span><span class="n">inventory</span><span class="p">:</span>
+        <span class="c1"># don&#39;t delete the money, better store it in</span>
+        <span class="c1"># the storage room (see :class:`textgame.world.World`)</span>
+        <span class="n">player</span><span class="o">.</span><span class="n">world</span><span class="o">.</span><span class="n">add_item</span><span class="p">(</span> <span class="n">player</span><span class="o">.</span><span class="n">inventory</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;money&quot;</span><span class="p">)</span> <span class="p">)</span>
+        <span class="k">return</span> <span class="s2">&quot;Someone just stole all your money.&quot;</span>
+     <span class="c1"># be sure to return a string</span>
+     <span class="k">return</span> <span class="s2">&quot;&quot;</span>
+
+ <span class="n">myroom2</span><span class="o">.</span><span class="n">set_specials</span><span class="p">(</span><span class="n">steal_money</span><span class="p">)</span>
+</pre></div>
+</div>
 <dl class="class">
 <dt id="textgame.room.Room">
 <em class="property">class </em><code class="sig-prename descclassname">textgame.room.</code><code class="sig-name descname">Room</code><span class="sig-paren">(</span><em class="sig-param">ID</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/textgame/room.html#Room"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#textgame.room.Room" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>ID</strong> (<em>str</em>) – unique identifier</p>
+</dd>
+</dl>
 <dl class="method">
 <dt id="textgame.room.Room.add_connection">
 <code class="sig-name descname">add_connection</code><span class="sig-paren">(</span><em class="sig-param">dir</em>, <em class="sig-param">room</em>, <em class="sig-param">hidden=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/textgame/room.html#Room.add_connection"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#textgame.room.Room.add_connection" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>add a single connection to the room</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dir</strong> – direction, must be in <code class="xref py py-class docutils literal notranslate"><span class="pre">textgame.globals.DIRECTIONS</span></code></p></li>
+<li><p><strong>room</strong> – <a class="reference internal" href="#textgame.room.Room" title="textgame.room.Room"><code class="xref py py-class docutils literal notranslate"><span class="pre">textgame.room.Room</span></code></a> object</p></li>
+<li><p><strong>hidden</strong> – specify if the connection is hidden</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="method">
 <dt id="textgame.room.Room.add_item">
 <code class="sig-name descname">add_item</code><span class="sig-paren">(</span><em class="sig-param">item</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/textgame/room.html#Room.add_item"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#textgame.room.Room.add_item" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>put an item inside the room</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="textgame.room.Room.add_monster">
 <code class="sig-name descname">add_monster</code><span class="sig-paren">(</span><em class="sig-param">monster</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/textgame/room.html#Room.add_monster"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#textgame.room.Room.add_monster" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>put a monster inside the room</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="textgame.room.Room.check_restrictions">
 <code class="sig-name descname">check_restrictions</code><span class="sig-paren">(</span><em class="sig-param">player</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/textgame/room.html#Room.check_restrictions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#textgame.room.Room.check_restrictions" title="Permalink to this definition">¶</a></dt>
-<dd><p>check if it’s dark and call self.special_func</p>
+<dd><p>check if it’s dark and call the function set by <a class="reference internal" href="#textgame.room.Room.set_specials" title="textgame.room.Room.set_specials"><code class="xref py py-func docutils literal notranslate"><span class="pre">textgame.room.Room.set_specials()</span></code></a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>player</strong> – <a class="reference internal" href="textgame.player.html#textgame.player.Player" title="textgame.player.Player"><code class="xref py py-class docutils literal notranslate"><span class="pre">textgame.player.Player</span></code></a> object</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>empty string or the string returned by the special function</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="textgame.room.Room.describe">
 <code class="sig-name descname">describe</code><span class="sig-paren">(</span><em class="sig-param">long=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/textgame/room.html#Room.describe"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#textgame.room.Room.describe" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>return the description (<code class="docutils literal notranslate"><span class="pre">long=True</span></code>) or short description (<code class="docutils literal notranslate"><span class="pre">long=False</span></code>)
+of the room or <a class="reference internal" href="textgame.globals.html#textgame.globals.DESCRIPTIONS.DARK_L" title="textgame.globals.DESCRIPTIONS.DARK_L"><code class="xref py py-class docutils literal notranslate"><span class="pre">textgame.globals.DESCRIPTIONS.DARK_L</span></code></a> if the room is dark</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="textgame.room.Room.fill_info">
 <code class="sig-name descname">fill_info</code><span class="sig-paren">(</span><em class="sig-param">descript=''</em>, <em class="sig-param">sdescript=''</em>, <em class="sig-param">value=5</em>, <em class="sig-param">dark=None</em>, <em class="sig-param">sound=&quot;It's all quiet.&quot;</em>, <em class="sig-param">hint=''</em>, <em class="sig-param">hint_value=2</em>, <em class="sig-param">errors=None</em>, <em class="sig-param">doors=None</em>, <em class="sig-param">hiddendoors=None</em>, <em class="sig-param">locked=None</em>, <em class="sig-param">dir_descriptions=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/textgame/room.html#Room.fill_info"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#textgame.room.Room.fill_info" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>add all the descriptive information</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>descript</strong> – string describing the room</p></li>
+<li><p><strong>sdescript</strong> – string describing the room, but shorter</p></li>
+<li><p><strong>value</strong> (<em>int</em><em> or </em><em>float</em>) – how much player’s score increases on first visit</p></li>
+<li><p><strong>dark</strong> – dict specifying if the room is dark. Sould be formatted like <code class="docutils literal notranslate"><span class="pre">{&quot;now&quot;:</span> <span class="pre">&lt;bool&gt;,</span> <span class="pre">&quot;always&quot;:</span> <span class="pre">&lt;bool&gt;}</span></code></p></li>
+<li><p><strong>sound</strong> – string describing the sound in this room</p></li>
+<li><p><strong>hint</strong> – string giving a hint on what to do in this room</p></li>
+<li><p><strong>hint_value</strong> (<em>int</em><em> or </em><em>float</em>) – how much score this hint costs</p></li>
+<li><p><strong>errors</strong> – dict mapping directions to error messages that get printet if player tries to go in this direction eg <code class="docutils literal notranslate"><span class="pre">{&quot;north&quot;:&quot;Something</span> <span class="pre">blocks</span> <span class="pre">the</span> <span class="pre">way.&quot;}</span></code></p></li>
+<li><p><strong>doors</strong> – dict mapping directions to rooms</p></li>
+<li><p><strong>hiddendoors</strong> – dict mapping directions to rooms but it’s not possible to use these connections via <a class="reference internal" href="textgame.player.html#textgame.player.Player.go" title="textgame.player.Player.go"><code class="xref py py-func docutils literal notranslate"><span class="pre">textgame.player.Player.go()</span></code></a></p></li>
+<li><p><strong>locked</strong> – dict mapping directions to the state of the connections, eg <code class="docutils literal notranslate"><span class="pre">{&quot;north&quot;:</span> <span class="pre">{&quot;locked&quot;:True,</span> <span class="pre">&quot;key&quot;:123}}</span></code> see examples</p></li>
+<li><p><strong>dir_descriptions</strong> – dict mapping directions to descriptive messages about going in this directions, eg <code class="docutils literal notranslate"><span class="pre">{&quot;up&quot;:</span> <span class="pre">&quot;You</span> <span class="pre">spread</span> <span class="pre">your</span> <span class="pre">wings</span> <span class="pre">and</span> <span class="pre">start</span> <span class="pre">to</span> <span class="pre">fly.&quot;}</span></code></p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="method">
 <dt id="textgame.room.Room.get_hint">
 <code class="sig-name descname">get_hint</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/textgame/room.html#Room.get_hint"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#textgame.room.Room.get_hint" title="Permalink to this definition">¶</a></dt>
-<dd><p>return a tuple of warning and the actual hint</p>
+<dd><p>return a tuple of warning and the actual hint (<code class="docutils literal notranslate"><span class="pre">(str,str)</span></code>)</p>
 </dd></dl>
 
 <dl class="method">
@@ -213,17 +291,28 @@
 <dl class="method">
 <dt id="textgame.room.Room.reveal_hiddendoors">
 <code class="sig-name descname">reveal_hiddendoors</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/textgame/room.html#Room.reveal_hiddendoors"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#textgame.room.Room.reveal_hiddendoors" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>add all hidden connections to visible connections</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="textgame.room.Room.set_specials">
-<code class="sig-name descname">set_specials</code><span class="sig-paren">(</span><em class="sig-param">func</em>, <em class="sig-param">**args</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/textgame/room.html#Room.set_specials"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#textgame.room.Room.set_specials" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<code class="sig-name descname">set_specials</code><span class="sig-paren">(</span><em class="sig-param">func</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/textgame/room.html#Room.set_specials"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#textgame.room.Room.set_specials" title="Permalink to this definition">¶</a></dt>
+<dd><p>set a custom function that gets called in <a class="reference internal" href="#textgame.room.Room.check_restrictions" title="textgame.room.Room.check_restrictions"><code class="xref py py-func docutils literal notranslate"><span class="pre">textgame.room.Room.check_restrictions()</span></code></a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>func</strong> – function that takes a <a class="reference internal" href="textgame.player.html#textgame.player.Player" title="textgame.player.Player"><code class="xref py py-class docutils literal notranslate"><span class="pre">textgame.player.Player</span></code></a> object as first argument. Must return a string!</p></li>
+<li><p><strong>kwargs</strong> – optional keyword arguments for <code class="docutils literal notranslate"><span class="pre">func</span></code></p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="method">
 <dt id="textgame.room.Room.visit">
 <code class="sig-name descname">visit</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/textgame/room.html#Room.visit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#textgame.room.Room.visit" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>mark this room as visited if it’s not dark and return its value</p>
+</dd></dl>
 
 </dd></dl>
 
