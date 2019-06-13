@@ -33,7 +33,7 @@ all the player's money gets stolen if he/she enters ``myroom2``:
        if "money" in player.inventory:
            # don't delete the money, better store it in
            # the storage room (see :class:`textgame.world.World`)
-           player.world.add_item( player.inventory.pop("money") )
+           player.world.storage_room.add_item( player.inventory.pop("money") )
            return "Someone just stole all your money."
         # be sure to return a string
         return ""
