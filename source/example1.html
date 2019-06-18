@@ -1,0 +1,280 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>2.1. First steps &mdash; textgame 0.2 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="3. textgame documentation" href="../textgame.html" />
+    <link rel="prev" title="2. Code Examples" href="examples.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> textgame
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.2
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="intro.html">1. Installation</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="examples.html">2. Code Examples</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">2.1. First steps</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../textgame.html">3. textgame documentation</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">textgame</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="examples.html">2. Code Examples</a> &raquo;</li>
+        
+      <li>2.1. First steps</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/source/example1.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="first-steps">
+<h1>2.1. First steps<a class="headerlink" href="#first-steps" title="Permalink to this headline">¶</a></h1>
+<p>This example shows how to setup a basic text adventure game.</p>
+<p>First, import the relevant classes and set up a logger</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">textgame.player</span> <span class="kn">import</span> <span class="n">Player</span>
+<span class="kn">from</span> <span class="nn">textgame.parser</span> <span class="kn">import</span> <span class="n">Parser</span>
+<span class="kn">from</span> <span class="nn">textgame.world</span> <span class="kn">import</span> <span class="n">World</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">WARNING</span><span class="p">,</span> <span class="n">format</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">%(levelname)-8s</span><span class="s1"> </span><span class="si">%(name)-16s</span><span class="s1"> </span><span class="si">%(funcName)-18s</span><span class="s1">: </span><span class="si">%(message)s</span><span class="s1">&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Next, we define some rooms and items. For further explanation of these dicts, see the documentation of <a class="reference internal" href="textgame.room.html#textgame.room.Room" title="textgame.room.Room"><code class="xref py py-class docutils literal notranslate"><span class="pre">textgame.room.Room</span></code></a>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">myrooms</span> <span class="o">=</span> <span class="p">{</span>
+ <span class="s2">&quot;field_0&quot;</span><span class="p">:</span> <span class="p">{</span>
+     <span class="s2">&quot;descript&quot;</span><span class="p">:</span> <span class="s2">&quot;You are standing in the middle of a wide open field. In the west the silhouette of an enormeous castle cuts the sky. North of you is a birch grove. A dark forest reaches to the east.&quot;</span><span class="p">,</span>
+     <span class="s2">&quot;sdescript&quot;</span><span class="p">:</span> <span class="s2">&quot;You are in a wide open field.&quot;</span><span class="p">,</span>
+     <span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+     <span class="s2">&quot;doors&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;north&quot;</span><span class="p">:</span> <span class="s2">&quot;field_2&quot;</span><span class="p">,</span> <span class="s2">&quot;south&quot;</span><span class="p">:</span> <span class="s2">&quot;field_1&quot;</span><span class="p">}</span>
+ <span class="p">},</span>
+ <span class="s2">&quot;field_1&quot;</span><span class="p">:</span> <span class="p">{</span>
+     <span class="s2">&quot;descript&quot;</span><span class="p">:</span> <span class="s2">&quot;You are in a wide rocky pit. An aisle leads upwards to the north.&quot;</span><span class="p">,</span>
+     <span class="s2">&quot;sdescript&quot;</span><span class="p">:</span> <span class="s2">&quot;You&#39;re in the rocky pit.&quot;</span><span class="p">,</span>
+     <span class="s2">&quot;errors&quot;</span><span class="p">:</span> <span class="p">{</span>
+         <span class="s2">&quot;south&quot;</span><span class="p">:</span> <span class="s2">&quot;The slope is too steep here.&quot;</span>
+     <span class="p">},</span>
+     <span class="s2">&quot;doors&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;north&quot;</span><span class="p">:</span> <span class="s2">&quot;field_0&quot;</span><span class="p">,</span> <span class="s2">&quot;up&quot;</span><span class="p">:</span> <span class="s2">&quot;field_0&quot;</span><span class="p">},</span>
+     <span class="s2">&quot;dir_descriptions&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;up&quot;</span><span class="p">:</span> <span class="s2">&quot;You spread your wings and start to fly.&quot;</span><span class="p">},</span>
+     <span class="s2">&quot;locked&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;north&quot;</span><span class="p">:{</span><span class="s2">&quot;closed&quot;</span><span class="p">:</span><span class="bp">True</span><span class="p">,</span> <span class="s2">&quot;key&quot;</span><span class="p">:</span><span class="mi">123</span><span class="p">}},</span>
+     <span class="s2">&quot;hint&quot;</span><span class="p">:</span> <span class="s2">&quot;here&#39;s my special hint for you.&quot;</span><span class="p">,</span>
+     <span class="s2">&quot;hint_value&quot;</span><span class="p">:</span> <span class="mi">7</span>
+ <span class="p">},</span>
+ <span class="s2">&quot;field_2&quot;</span><span class="p">:</span> <span class="p">{</span>
+     <span class="s2">&quot;descript&quot;</span><span class="p">:</span> <span class="s2">&quot;You are in a clear birch grove. A small stream flows by.&quot;</span><span class="p">,</span>
+     <span class="s2">&quot;sdescript&quot;</span><span class="p">:</span> <span class="s2">&quot;You are in the birch grove.&quot;</span><span class="p">,</span>
+     <span class="s2">&quot;dark&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;always&quot;</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span> <span class="s2">&quot;now&quot;</span><span class="p">:</span> <span class="bp">True</span><span class="p">},</span>
+     <span class="s2">&quot;sound&quot;</span><span class="p">:</span> <span class="s2">&quot;You hear the sound of water splashing.&quot;</span><span class="p">,</span>
+     <span class="s2">&quot;doors&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;south&quot;</span><span class="p">:</span> <span class="s2">&quot;field_0&quot;</span><span class="p">}</span>
+ <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="c1"># add some items</span>
+<span class="n">myitems</span> <span class="o">=</span> <span class="p">{</span>
+ <span class="s2">&quot;key&quot;</span><span class="p">:</span> <span class="p">{</span>
+     <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;A key lies around.&quot;</span><span class="p">,</span>
+     <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;key&quot;</span><span class="p">,</span>
+     <span class="s2">&quot;key&quot;</span><span class="p">:</span> <span class="mi">123</span><span class="p">,</span>
+     <span class="s2">&quot;initlocation&quot;</span><span class="p">:</span> <span class="s2">&quot;field_0&quot;</span>
+ <span class="p">},</span>
+ <span class="s2">&quot;diamond&quot;</span><span class="p">:</span> <span class="p">{</span>
+     <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;A sparkling diamond lies around!&quot;</span><span class="p">,</span>
+     <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;diamond&quot;</span><span class="p">,</span>
+     <span class="s2">&quot;initlocation&quot;</span><span class="p">:</span> <span class="s2">&quot;field_1&quot;</span>
+ <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Now we can setup a world, player and parser:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">world</span> <span class="o">=</span> <span class="n">World</span><span class="p">(</span><span class="n">rooms</span><span class="o">=</span><span class="n">myrooms</span><span class="p">,</span> <span class="n">items</span><span class="o">=</span><span class="n">myitems</span><span class="p">)</span>
+<span class="n">player</span> <span class="o">=</span> <span class="n">Player</span><span class="p">(</span><span class="n">world</span><span class="p">,</span> <span class="n">world</span><span class="o">.</span><span class="n">room</span><span class="p">(</span><span class="s2">&quot;field_0&quot;</span><span class="p">))</span>
+<span class="n">parser</span> <span class="o">=</span> <span class="n">Parser</span><span class="p">(</span><span class="n">player</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Finally a possible game routine could be</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">while</span> <span class="n">player</span><span class="o">.</span><span class="n">status</span><span class="p">[</span><span class="s2">&quot;alive&quot;</span><span class="p">]:</span>
+     <span class="n">response</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">understand</span><span class="p">(</span> <span class="nb">input</span><span class="p">(</span><span class="s2">&quot;&gt; &quot;</span><span class="p">)</span> <span class="p">)</span>
+     <span class="k">print</span><span class="p">(</span><span class="n">response</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../textgame.html" class="btn btn-neutral float-right" title="3. textgame documentation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="examples.html" class="btn btn-neutral float-left" title="2. Code Examples" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, David Koch
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

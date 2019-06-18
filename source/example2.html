@@ -1,0 +1,330 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>2.2. Adding functionality to Player &mdash; textgame 0.2 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="2.3. Time dependent events" href="example3.html" />
+    <link rel="prev" title="2.1. First steps" href="example1.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> textgame
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.2
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="intro.html">1. Installation</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="examples.html">2. Code Examples</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="example1.html">2.1. First steps</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">2.2. Adding functionality to Player</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#add-a-simple-method-to-player">2.2.1. Add a simple method to Player</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#overwrite-an-existing-player-method">2.2.2. Overwrite an existing player method</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#trigger-a-yes-no-conversation-and-magic-words">2.2.3. Trigger a yes/no conversation and magic words</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#unlock-advanced-modes-for-player">2.2.4. Unlock advanced modes for Player</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="example3.html">2.3. Time dependent events</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../textgame.html">3. textgame documentation</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">textgame</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="examples.html">2. Code Examples</a> &raquo;</li>
+        
+      <li>2.2. Adding functionality to Player</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/source/example2.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="adding-functionality-to-player">
+<h1>2.2. Adding functionality to Player<a class="headerlink" href="#adding-functionality-to-player" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="add-a-simple-method-to-player">
+<h2>2.2.1. Add a simple method to Player<a class="headerlink" href="#add-a-simple-method-to-player" title="Permalink to this headline">¶</a></h2>
+<p>You can define custom methods by writing your own class that inherits from <a class="reference internal" href="textgame.player.html#textgame.player.Player" title="textgame.player.Player"><code class="xref py py-class docutils literal notranslate"><span class="pre">textgame.player.Player</span></code></a>. Say you want your player to eat something:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">textgame.player</span> <span class="kn">import</span> <span class="n">Player</span><span class="p">,</span> <span class="n">action_method</span>
+
+<span class="k">class</span> <span class="nc">MyPlayer</span><span class="p">(</span><span class="n">Player</span><span class="p">):</span>
+
+     <span class="nd">@action_method</span>
+     <span class="k">def</span> <span class="nf">eat</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">noun</span><span class="p">):</span>
+         <span class="c1"># check if player carries noun</span>
+         <span class="k">if</span> <span class="n">noun</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">inventory</span><span class="p">:</span>
+             <span class="c1"># define behaviour for different nouns</span>
+             <span class="k">if</span> <span class="n">noun</span> <span class="o">==</span> <span class="s2">&quot;lunch&quot;</span><span class="p">:</span>
+                 <span class="c1"># remove it</span>
+                 <span class="bp">self</span><span class="o">.</span><span class="n">inventory</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;lunch&quot;</span><span class="p">)</span>
+                 <span class="k">return</span> <span class="s2">&quot;That was delicious!&quot;</span>
+             <span class="k">return</span> <span class="s2">&quot;Ew!&quot;</span>
+         <span class="k">return</span> <span class="s2">&quot;You don&#39;t have it!&quot;</span>
+</pre></div>
+</div>
+<p>If you want user input like ‘eat lunch’ to call this method like <code class="docutils literal notranslate"><span class="pre">player.eat(&quot;lunch&quot;)</span></code>, you need to tell the parser to do so.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">textgame.parser</span> <span class="kn">import</span> <span class="n">Parser</span>
+
+<span class="c1"># use the world from previous example</span>
+<span class="n">player</span> <span class="o">=</span> <span class="n">MyPlayer</span><span class="p">(</span><span class="n">world</span><span class="p">,</span> <span class="n">world</span><span class="o">.</span><span class="n">room</span><span class="p">(</span><span class="s2">&quot;field_0&quot;</span><span class="p">))</span>
+<span class="n">parser</span> <span class="o">=</span> <span class="n">Parser</span><span class="p">(</span><span class="n">player</span><span class="p">)</span>
+
+<span class="c1"># tell the parser it&#39;s ok to say &#39;eat&#39;</span>
+<span class="n">parser</span><span class="o">.</span><span class="n">legal_verbs</span><span class="o">.</span><span class="n">update</span><span class="p">({</span>
+ <span class="s2">&quot;eat&quot;</span><span class="p">:</span> <span class="s2">&quot;eat&quot;</span>
+<span class="p">})</span>
+<span class="c1"># map the new verb to the method</span>
+<span class="n">parser</span><span class="o">.</span><span class="n">actionmap</span><span class="o">.</span><span class="n">update</span><span class="p">({</span>
+ <span class="s2">&quot;eat&quot;</span><span class="p">:</span> <span class="n">player</span><span class="o">.</span><span class="n">eat</span>
+<span class="p">})</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="overwrite-an-existing-player-method">
+<h2>2.2.2. Overwrite an existing player method<a class="headerlink" href="#overwrite-an-existing-player-method" title="Permalink to this headline">¶</a></h2>
+<p>In principle overwriting methods is straight forward, however you need to be careful with the decorator <a class="reference internal" href="textgame.player.html#textgame.player.action_method" title="textgame.player.action_method"><code class="xref py py-func docutils literal notranslate"><span class="pre">textgame.player.action_method()</span></code></a>. It makes sure that <a class="reference internal" href="textgame.world.html#textgame.world.World.update" title="textgame.world.World.update"><code class="xref py py-func docutils literal notranslate"><span class="pre">textgame.world.World.update()</span></code></a> gets called at the end of the method.
+However, you don’t want to call it twice in case your new method makes use of the old one, so you need to call the old one undecorated. Observe:
+Say you want to add an item’s value to the player’s score if he/she takes it.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">MyPlayer</span><span class="p">(</span><span class="n">Player</span><span class="p">):</span>
+
+    <span class="nd">@action_method</span>
+    <span class="k">def</span> <span class="nf">take</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">itemid</span><span class="p">):</span>
+         <span class="c1"># check if the thing is here</span>
+         <span class="k">if</span> <span class="n">itemid</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">location</span><span class="o">.</span><span class="n">items</span><span class="p">:</span>
+             <span class="bp">self</span><span class="o">.</span><span class="n">score</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">location</span><span class="o">.</span><span class="n">items</span><span class="p">[</span><span class="n">itemid</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+
+         <span class="c1"># now we call take, but without the action_method-decorator</span>
+         <span class="k">return</span> <span class="n">Player</span><span class="o">.</span><span class="n">take</span><span class="o">.</span><span class="n">undecorated</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">itemid</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="trigger-a-yes-no-conversation-and-magic-words">
+<h2>2.2.3. Trigger a yes/no conversation and magic words<a class="headerlink" href="#trigger-a-yes-no-conversation-and-magic-words" title="Permalink to this headline">¶</a></h2>
+<p>Here’s an obscure example of a magic word that takes the player to a magic room, but only if he/she owns a coin and confirms.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">textgame.Parser</span> <span class="kn">import</span> <span class="n">EnterYesNoLoop</span>
+
+<span class="k">class</span> <span class="nc">MyPlayer</span><span class="p">(</span><span class="n">Player</span><span class="p">):</span>
+
+    <span class="nd">@action_method</span>
+    <span class="k">def</span> <span class="nf">magicword</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+         <span class="k">if</span> <span class="s2">&quot;coin&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">inventory</span><span class="p">:</span>
+
+             <span class="c1"># define a helper function that gets called if the player answers yes</span>
+             <span class="k">def</span> <span class="nf">magicmove</span><span class="p">():</span>
+                 <span class="bp">self</span><span class="o">.</span><span class="n">location</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">world</span><span class="o">.</span><span class="n">room</span><span class="p">(</span><span class="s2">&quot;magicroom&quot;</span><span class="p">)</span>
+                 <span class="n">msg</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">location</span><span class="o">.</span><span class="n">check_restrictions</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+                 <span class="n">msg</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">location</span><span class="o">.</span><span class="n">describe</span><span class="p">()</span>
+                 <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">location</span><span class="o">.</span><span class="n">visited</span><span class="p">:</span>
+                     <span class="bp">self</span><span class="o">.</span><span class="n">score</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">location</span><span class="o">.</span><span class="n">visit</span><span class="p">()</span>
+                 <span class="k">return</span> <span class="n">msg</span>
+
+             <span class="k">return</span> <span class="n">EnterYesNoLoop</span><span class="p">(</span>
+                 <span class="n">question</span> <span class="o">=</span> <span class="s2">&quot;Do you really want to travel magically?&quot;</span><span class="p">,</span>
+                 <span class="n">yes</span> <span class="o">=</span> <span class="n">magicmove</span><span class="p">,</span>
+                 <span class="n">no</span> <span class="o">=</span> <span class="s2">&quot;You stay where you are.&quot;</span><span class="p">)</span>
+
+         <span class="c1"># do nothing if there&#39;s no coin</span>
+         <span class="k">return</span> <span class="s2">&quot;Nothing happens.&quot;</span>
+</pre></div>
+</div>
+<p>Again, you need to map a word to this method.</p>
+</div>
+<div class="section" id="unlock-advanced-modes-for-player">
+<h2>2.2.4. Unlock advanced modes for Player<a class="headerlink" href="#unlock-advanced-modes-for-player" title="Permalink to this headline">¶</a></h2>
+<p>If you want certain methods to work only if the player did something special before, you can do so by dynamically adding attributes to the player:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">MyPlayer</span><span class="p">(</span><span class="n">Player</span><span class="p">):</span>
+
+     <span class="nd">@action_method</span>
+     <span class="k">def</span> <span class="nf">prerequisite</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">noun</span><span class="p">):</span>
+         <span class="c1"># make this player a magician</span>
+         <span class="bp">self</span><span class="o">.</span><span class="n">magician</span> <span class="o">=</span> <span class="bp">True</span>
+         <span class="c1"># ....</span>
+
+     <span class="nd">@action_method</span>
+     <span class="k">def</span> <span class="nf">do_magic</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">noun</span><span class="p">):</span>
+         <span class="c1"># check if this player is a magician</span>
+         <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;magician&quot;</span><span class="p">):</span>
+             <span class="c1"># ...</span>
+         <span class="k">else</span><span class="p">:</span>
+             <span class="k">return</span> <span class="s2">&quot;You can&#39;t do this yet!&quot;</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="example3.html" class="btn btn-neutral float-right" title="2.3. Time dependent events" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="example1.html" class="btn btn-neutral float-left" title="2.1. First steps" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, David Koch
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
