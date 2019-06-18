@@ -17,7 +17,7 @@ By writing a new player class that inherits from `textgame.Player`, arbitrary ac
 Creating a map for the game is just as easy as writing a dict/json-file that contains descriptions for all the rooms and then loading them in your program:
 
 ```python
-from textgame import World
+from textgame.world import World
 import json
 
 with open("myrooms.json") as f:
@@ -28,7 +28,7 @@ world = World(rooms=rooms)
 
 See in [the example](example.py) how `myrooms.json` should be formatted. Creating items, weapons or monsters follows the same scheme.
 
-The parser is restricted to understand commands consisting of two or one words. The first word in the command must be mapped to a function or a method of Player that will then be called with the second word as an argument. This is done by writing a class that inherits from `textgame.ActionMapper`  (again, see [the example](example.py)).
+The parser is restricted to understand commands consisting of two or one words. The first word in the command must be mapped to a function or a method of Player that will then be called with the second word as an argument. This is done by writing a class that inherits from `textgame.parser.Parser`  (again, see [the example](example.py)).
 
 The output to the user is always returned as a string. This way you can build your adventure game as a terminal application or integrate it to a website or write a chat bot like so:
 
