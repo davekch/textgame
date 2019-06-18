@@ -163,19 +163,72 @@
             
   <span class="target" id="module-textgame.parser"></span><div class="section" id="textgame-parser">
 <h1>textgame.parser<a class="headerlink" href="#textgame-parser" title="Permalink to this headline">¶</a></h1>
+<p>This module’s main class is <a class="reference internal" href="#textgame.parser.Parser" title="textgame.parser.Parser"><code class="xref py py-class docutils literal notranslate"><span class="pre">textgame.parser.Parser</span></code></a>. The parser can take
+user input, call a function that’s associated to the input and return to the user a
+message describing what happened.</p>
+<p>Use <code class="docutils literal notranslate"><span class="pre">actionmap</span></code> and <code class="docutils literal notranslate"><span class="pre">legal_verbs</span></code> to define how verbs should be mapped to functions, eg:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">parser</span><span class="o">.</span><span class="n">actionmap</span><span class="o">.</span><span class="n">update</span><span class="p">({</span>
+ <span class="s2">&quot;scream&quot;</span><span class="p">:</span> <span class="n">player</span><span class="o">.</span><span class="n">scream</span>
+<span class="p">})</span>
+<span class="n">parser</span><span class="o">.</span><span class="n">legal_verbs</span><span class="o">.</span><span class="n">update</span><span class="p">({</span>
+ <span class="s2">&quot;scream&quot;</span><span class="p">:</span> <span class="s2">&quot;scream&quot;</span><span class="p">,</span>
+ <span class="s2">&quot;shout&quot;</span><span class="p">:</span> <span class="s2">&quot;scream&quot;</span>
+<span class="p">})</span>
+</pre></div>
+</div>
+<p>You can use <code class="docutils literal notranslate"><span class="pre">legal_nouns</span></code> to define synonyms for nouns.</p>
+<p>A parser is the only thing needed to during the main loop of a game:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">parser</span> <span class="o">=</span> <span class="n">textgame</span><span class="o">.</span><span class="n">parser</span><span class="o">.</span><span class="n">Parser</span><span class="p">(</span><span class="n">player</span><span class="p">)</span>
+<span class="k">while</span> <span class="n">player</span><span class="o">.</span><span class="n">status</span><span class="p">[</span><span class="s2">&quot;alive&quot;</span><span class="p">]:</span>
+    <span class="n">response</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">understand</span><span class="p">(</span> <span class="nb">input</span><span class="p">(</span><span class="s2">&quot;&gt; &quot;</span><span class="p">)</span> <span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">response</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This module also provides <a class="reference internal" href="#textgame.parser.EnterYesNoLoop" title="textgame.parser.EnterYesNoLoop"><code class="xref py py-class docutils literal notranslate"><span class="pre">textgame.parser.EnterYesNoLoop</span></code></a>. If a function
+called by the parser returns an <code class="docutils literal notranslate"><span class="pre">EnterYesNoLoop</span></code> instead of a string, the parser falls
+into a mode where it only allows ‘yes’ and ‘no’ as an answer. An object of type
+<code class="docutils literal notranslate"><span class="pre">EnterYesNoLoop</span></code> also provides strings/functions to print/call for each case.</p>
+<p>Example: a player method that saves the user from drinking poison</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@action_method</span>
+<span class="k">def</span> <span class="nf">drink</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">noun</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">noun</span> <span class="o">==</span> <span class="s2">&quot;poison&quot;</span><span class="p">:</span>
+
+        <span class="k">def</span> <span class="nf">actually_do_it</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="p">[</span><span class="s2">&quot;alive&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">False</span>
+            <span class="k">return</span> <span class="s2">&quot;You drink the poison and die.&quot;</span>
+
+        <span class="k">return</span> <span class="n">textgame</span><span class="o">.</span><span class="n">parser</span><span class="o">.</span><span class="n">EnterYesNoLoop</span><span class="p">(</span>
+             <span class="n">question</span> <span class="o">=</span> <span class="s2">&quot;Do you really want to drink poison?&quot;</span><span class="p">,</span>
+             <span class="n">yes</span> <span class="o">=</span> <span class="n">actually_do_it</span><span class="p">,</span>
+             <span class="n">no</span> <span class="o">=</span> <span class="s2">&quot;You stay alive&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># ...</span>
+</pre></div>
+</div>
 <dl class="class">
 <dt id="textgame.parser.EnterYesNoLoop">
 <em class="property">class </em><code class="sig-prename descclassname">textgame.parser.</code><code class="sig-name descname">EnterYesNoLoop</code><span class="sig-paren">(</span><em class="sig-param">question</em>, <em class="sig-param">yes</em>, <em class="sig-param">no</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/textgame/parser.html#EnterYesNoLoop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#textgame.parser.EnterYesNoLoop" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>question</strong> (<em>string</em>) – a yes/no question</p></li>
+<li><p><strong>yes</strong> – string to return or a function with signature <code class="docutils literal notranslate"><span class="pre">f()</span> <span class="pre">-&gt;</span> <span class="pre">str</span></code> or <code class="docutils literal notranslate"><span class="pre">f()</span> <span class="pre">-&gt;</span> <span class="pre">EnterYesNoLoop</span></code> that should get called if player answeres ‘yes’ to the question</p></li>
+<li><p><strong>no</strong> – same as yes</p></li>
+</ul>
+</dd>
+</dl>
 <dl class="method">
 <dt id="textgame.parser.EnterYesNoLoop.no">
 <code class="sig-name descname">no</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/textgame/parser.html#EnterYesNoLoop.no"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#textgame.parser.EnterYesNoLoop.no" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>if no is callable, return its result, else return it</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="textgame.parser.EnterYesNoLoop.yes">
 <code class="sig-name descname">yes</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/textgame/parser.html#EnterYesNoLoop.yes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#textgame.parser.EnterYesNoLoop.yes" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>if yes is callable, return its result, else return it</p>
+</dd></dl>
 
 </dd></dl>
 
@@ -183,19 +236,24 @@
 <dt id="textgame.parser.Parser">
 <em class="property">class </em><code class="sig-prename descclassname">textgame.parser.</code><code class="sig-name descname">Parser</code><span class="sig-paren">(</span><em class="sig-param">player</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/textgame/parser.html#Parser"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#textgame.parser.Parser" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>makes sense of user’s input, performs actions,
-defines which words are allowed to use and maps them to player’s methods</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>player</strong> – <a class="reference internal" href="textgame.player.html#textgame.player.Player" title="textgame.player.Player"><code class="xref py py-class docutils literal notranslate"><span class="pre">textgame.player.Player</span></code></a> object</p>
+</dd>
+</dl>
 <dl class="method">
 <dt id="textgame.parser.Parser.check">
 <code class="sig-name descname">check</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/textgame/parser.html#Parser.check"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#textgame.parser.Parser.check" title="Permalink to this definition">¶</a></dt>
-<dd><p>check if every verb in self.legal_verbs has a function mapped to
+<dd><p>check if every verb in self.legal_verbs has a function mapped to.
 if not, the game will crash on the input of this verb</p>
+<p>logs the error</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="textgame.parser.Parser.check_result">
 <code class="sig-name descname">check_result</code><span class="sig-paren">(</span><em class="sig-param">result</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/textgame/parser.html#Parser.check_result"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#textgame.parser.Parser.check_result" title="Permalink to this definition">¶</a></dt>
-<dd><p>checks if the result of the do() method is EnterYesNoLoop or str</p>
+<dd><p>checks if result is EnterYesNoLoop or str, if it’s EnterYesNoLoop,
+return the question and fall back to yes/no mode</p>
 </dd></dl>
 
 <dl class="method">
@@ -218,7 +276,7 @@ if not, the game will crash on the input of this verb</p>
 <dt id="textgame.parser.Parser.understand">
 <code class="sig-name descname">understand</code><span class="sig-paren">(</span><em class="sig-param">input</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/textgame/parser.html#Parser.understand"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#textgame.parser.Parser.understand" title="Permalink to this definition">¶</a></dt>
 <dd><p>based on the input, perform player method and return its output
-the return value is what will be printed to the user</p>
+the return value is what can be printed to the user</p>
 </dd></dl>
 
 </dd></dl>

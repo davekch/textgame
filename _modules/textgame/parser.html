@@ -152,6 +152,58 @@
 <span class="sd">textgame.parser</span>
 <span class="sd">=====================</span>
 
+<span class="sd">This module&#39;s main class is :class:`textgame.parser.Parser`. The parser can take</span>
+<span class="sd">user input, call a function that&#39;s associated to the input and return to the user a</span>
+<span class="sd">message describing what happened.</span>
+
+<span class="sd">Use ``actionmap`` and ``legal_verbs`` to define how verbs should be mapped to functions, eg:</span>
+
+<span class="sd">.. code-block:: python</span>
+
+<span class="sd">   parser.actionmap.update({</span>
+<span class="sd">    &quot;scream&quot;: player.scream</span>
+<span class="sd">   })</span>
+<span class="sd">   parser.legal_verbs.update({</span>
+<span class="sd">    &quot;scream&quot;: &quot;scream&quot;,</span>
+<span class="sd">    &quot;shout&quot;: &quot;scream&quot;</span>
+<span class="sd">   })</span>
+
+<span class="sd">You can use ``legal_nouns`` to define synonyms for nouns.</span>
+
+<span class="sd">A parser is the only thing needed to during the main loop of a game:</span>
+
+<span class="sd">.. code-block:: python</span>
+
+<span class="sd">   parser = textgame.parser.Parser(player)</span>
+<span class="sd">   while player.status[&quot;alive&quot;]:</span>
+<span class="sd">       response = parser.understand( input(&quot;&gt; &quot;) )</span>
+<span class="sd">       print(response)</span>
+
+
+<span class="sd">This module also provides :class:`textgame.parser.EnterYesNoLoop`. If a function</span>
+<span class="sd">called by the parser returns an ``EnterYesNoLoop`` instead of a string, the parser falls</span>
+<span class="sd">into a mode where it only allows &#39;yes&#39; and &#39;no&#39; as an answer. An object of type</span>
+<span class="sd">``EnterYesNoLoop`` also provides strings/functions to print/call for each case.</span>
+
+<span class="sd">Example: a player method that saves the user from drinking poison</span>
+
+<span class="sd">.. code-block:: python</span>
+
+<span class="sd">   @action_method</span>
+<span class="sd">   def drink(self, noun):</span>
+<span class="sd">       if noun == &quot;poison&quot;:</span>
+
+<span class="sd">           def actually_do_it():</span>
+<span class="sd">               self.status[&quot;alive&quot;] = False</span>
+<span class="sd">               return &quot;You drink the poison and die.&quot;</span>
+
+<span class="sd">           return textgame.parser.EnterYesNoLoop(</span>
+<span class="sd">                question = &quot;Do you really want to drink poison?&quot;,</span>
+<span class="sd">                yes = actually_do_it,</span>
+<span class="sd">                no = &quot;You stay alive&quot;)</span>
+<span class="sd">       else:</span>
+<span class="sd">           # ...</span>
+
 <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">namedtuple</span>
@@ -163,6 +215,12 @@
 
 
 <div class="viewcode-block" id="EnterYesNoLoop"><a class="viewcode-back" href="../../source/textgame.parser.html#textgame.parser.EnterYesNoLoop">[docs]</a><span class="k">class</span> <span class="nc">EnterYesNoLoop</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    :param question: a yes/no question</span>
+<span class="sd">    :type question: string</span>
+<span class="sd">    :param yes: string to return or a function with signature ``f() -&gt; str`` or ``f() -&gt; EnterYesNoLoop`` that should get called if player answeres &#39;yes&#39; to the question</span>
+<span class="sd">    :param no: same as yes</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">question</span><span class="p">,</span> <span class="n">yes</span><span class="p">,</span> <span class="n">no</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">question</span> <span class="o">=</span> <span class="n">question</span>
@@ -170,11 +228,17 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_no</span> <span class="o">=</span> <span class="n">no</span>
 
 <div class="viewcode-block" id="EnterYesNoLoop.yes"><a class="viewcode-back" href="../../source/textgame.parser.html#textgame.parser.EnterYesNoLoop.yes">[docs]</a>    <span class="k">def</span> <span class="nf">yes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        if yes is callable, return its result, else return it</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">callable</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_yes</span><span class="p">):</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_yes</span><span class="p">()</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_yes</span></div>
 
 <div class="viewcode-block" id="EnterYesNoLoop.no"><a class="viewcode-back" href="../../source/textgame.parser.html#textgame.parser.EnterYesNoLoop.no">[docs]</a>    <span class="k">def</span> <span class="nf">no</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        if no is callable, return its result, else return it</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">callable</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_no</span><span class="p">):</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_no</span><span class="p">()</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_no</span></div></div>
@@ -182,8 +246,7 @@
 
 <div class="viewcode-block" id="Parser"><a class="viewcode-back" href="../../source/textgame.parser.html#textgame.parser.Parser">[docs]</a><span class="k">class</span> <span class="nc">Parser</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    makes sense of user&#39;s input, performs actions,</span>
-<span class="sd">    defines which words are allowed to use and maps them to player&#39;s methods</span>
+<span class="sd">    :param player: :class:`textgame.player.Player` object</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">player</span><span class="p">):</span>
@@ -276,8 +339,10 @@
 
 <div class="viewcode-block" id="Parser.check"><a class="viewcode-back" href="../../source/textgame.parser.html#textgame.parser.Parser.check">[docs]</a>    <span class="k">def</span> <span class="nf">check</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        check if every verb in self.legal_verbs has a function mapped to</span>
+<span class="sd">        check if every verb in self.legal_verbs has a function mapped to.</span>
 <span class="sd">        if not, the game will crash on the input of this verb</span>
+
+<span class="sd">        logs the error</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">verb</span> <span class="ow">in</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">legal_verbs</span><span class="o">.</span><span class="n">values</span><span class="p">()):</span>
             <span class="k">if</span> <span class="n">verb</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">actionmap</span><span class="p">:</span>
@@ -287,7 +352,8 @@
 
 <div class="viewcode-block" id="Parser.check_result"><a class="viewcode-back" href="../../source/textgame.parser.html#textgame.parser.Parser.check_result">[docs]</a>    <span class="k">def</span> <span class="nf">check_result</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">result</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        checks if the result of the do() method is EnterYesNoLoop or str</span>
+<span class="sd">        checks if result is EnterYesNoLoop or str, if it&#39;s EnterYesNoLoop,</span>
+<span class="sd">        return the question and fall back to yes/no mode</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">result</span><span class="p">)</span> <span class="ow">is</span> <span class="nb">str</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">result</span>
@@ -327,7 +393,7 @@
 <div class="viewcode-block" id="Parser.understand"><a class="viewcode-back" href="../../source/textgame.parser.html#textgame.parser.Parser.understand">[docs]</a>    <span class="k">def</span> <span class="nf">understand</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        based on the input, perform player method and return its output</span>
-<span class="sd">        the return value is what will be printed to the user</span>
+<span class="sd">        the return value is what can be printed to the user</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">verb</span><span class="p">,</span> <span class="n">noun</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_split_input</span><span class="p">(</span><span class="nb">input</span><span class="p">)</span>
