@@ -163,27 +163,57 @@
             
   <span class="target" id="module-textgame.movable"></span><div class="section" id="textgame-movable">
 <h1>textgame.movable<a class="headerlink" href="#textgame-movable" title="Permalink to this headline">¶</a></h1>
+<p>This module is for everything that sits around in rooms.</p>
 <dl class="class">
 <dt id="textgame.movable.Item">
 <em class="property">class </em><code class="sig-prename descclassname">textgame.movable.</code><code class="sig-name descname">Item</code><span class="sig-paren">(</span><em class="sig-param">description</em>, <em class="sig-param">name</em>, <em class="sig-param">ID=''</em>, <em class="sig-param">takable=True</em>, <em class="sig-param">value=0</em>, <em class="sig-param">key=None</em>, <em class="sig-param">initlocation=''</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/textgame/movable.html#Item"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#textgame.movable.Item" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>everything that is somewhat movable like treasures, weapons, tools, monsters</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>description</strong> – string describing the thing</p></li>
+<li><p><strong>name</strong> – short name for the thing</p></li>
+<li><p><strong>ID</strong> – unique string by which the item can be taken by the player (eg. ‘coins’ for ‘a sack of coins’)</p></li>
+<li><p><strong>takable</strong> (<em>bool</em>) – is the player able to add this to his/her inventory?</p></li>
+<li><p><strong>value</strong> (<em>int</em><em> or </em><em>float</em>) – how valuable the item is</p></li>
+<li><p><strong>key</strong> – if an item has a key, it can be used to open/close doors that are locked with the same key</p></li>
+<li><p><strong>initlocation</strong> (<em>string</em>) – room ID of the room this thing should be placed in at the beginning of the game</p></li>
+</ul>
+</dd>
+</dl>
 <dl class="method">
 <dt id="textgame.movable.Item.describe">
 <code class="sig-name descname">describe</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/textgame/movable.html#Item.describe"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#textgame.movable.Item.describe" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>return the description</p>
+</dd></dl>
 
 </dd></dl>
 
 <dl class="class">
 <dt id="textgame.movable.Monster">
-<em class="property">class </em><code class="sig-prename descclassname">textgame.movable.</code><code class="sig-name descname">Monster</code><span class="sig-paren">(</span><em class="sig-param">description</em>, <em class="sig-param">name</em>, <em class="sig-param">ID=''</em>, <em class="sig-param">takable=False</em>, <em class="sig-param">deaddescript=''</em>, <em class="sig-param">initlocation=''</em>, <em class="sig-param">strength=0</em>, <em class="sig-param">spawns_in=None</em>, <em class="sig-param">spawns_at='always'</em>, <em class="sig-param">spawn_prob=0</em>, <em class="sig-param">safe_kill=None</em>, <em class="sig-param">ignoretext=''</em>, <em class="sig-param">status=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/textgame/movable.html#Monster"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#textgame.movable.Monster" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">textgame.movable.</code><code class="sig-name descname">Monster</code><span class="sig-paren">(</span><em class="sig-param">description</em>, <em class="sig-param">name</em>, <em class="sig-param">ID=''</em>, <em class="sig-param">takable=False</em>, <em class="sig-param">deaddescript=''</em>, <em class="sig-param">initlocation=''</em>, <em class="sig-param">strength=0</em>, <em class="sig-param">spawns_in=None</em>, <em class="sig-param">spawns_at='always'</em>, <em class="sig-param">spawn_prob=0</em>, <em class="sig-param">ignoretext=''</em>, <em class="sig-param">status=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/textgame/movable.html#Monster"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#textgame.movable.Monster" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#textgame.movable.Item" title="textgame.movable.Item"><code class="xref py py-class docutils literal notranslate"><span class="pre">textgame.movable.Item</span></code></a></p>
-<p>monsters or people, can get fight, get spawned or always be at one place, get killed</p>
+<p>monsters or people, can fight, get spawned or always be at one place, get killed</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>deaddescript</strong> – string describing the thing when it’s dead</p></li>
+<li><p><strong>strength</strong> – float between 0 and 1</p></li>
+<li><p><strong>spawns_in</strong> – list of strings with room IDs (or even only part of room IDs) that specify in which rooms the monster should spawn</p></li>
+<li><p><strong>spawns_at</strong> – define the daytime at which the monster should spawn (always/night/day)</p></li>
+<li><p><strong>spawn_prob</strong> – probability to spawn (float between 0 and 1)</p></li>
+<li><p><strong>ignoretext</strong> – this gets returned by <a class="reference internal" href="textgame.player.html#textgame.player.Player.attack" title="textgame.player.Player.attack"><code class="xref py py-func docutils literal notranslate"><span class="pre">textgame.player.Player.attack()</span></code></a> if the monster’s history is -1. This only happens if the monster has an initlocation</p></li>
+<li><p><strong>status</strong> – dict that can (but doesn’t need to) contain the following key-value pairs (values must be bool): ‘alive’, ‘active’, ‘fighting’, ‘trap’, ‘singleencounter’, ‘harmless’</p></li>
+</ul>
+</dd>
+</dl>
 <dl class="method">
 <dt id="textgame.movable.Monster.kill">
 <code class="sig-name descname">kill</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/textgame/movable.html#Monster.kill"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#textgame.movable.Monster.kill" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>set <code class="docutils literal notranslate"><span class="pre">description</span></code> to <code class="docutils literal notranslate"><span class="pre">deaddescript</span></code> and make sure this monster does not
+spawn anymore</p>
+</dd></dl>
 
 </dd></dl>
 
@@ -191,7 +221,6 @@
 <dt id="textgame.movable.Weapon">
 <em class="property">class </em><code class="sig-prename descclassname">textgame.movable.</code><code class="sig-name descname">Weapon</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/textgame/movable.html#Weapon"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#textgame.movable.Weapon" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#textgame.movable.Item" title="textgame.movable.Item"><code class="xref py py-class docutils literal notranslate"><span class="pre">textgame.movable.Item</span></code></a></p>
-<p>anything that is used in a fight</p>
 </dd></dl>
 
 </div>

@@ -152,6 +152,7 @@
 <span class="sd">textgame.movable</span>
 <span class="sd">=====================</span>
 
+<span class="sd">This module is for everything that sits around in rooms.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="kn">import</span> <span class="nn">logging</span>
@@ -162,6 +163,17 @@
 <div class="viewcode-block" id="Item"><a class="viewcode-back" href="../../source/textgame.movable.html#textgame.movable.Item">[docs]</a><span class="k">class</span> <span class="nc">Item</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    everything that is somewhat movable like treasures, weapons, tools, monsters</span>
+
+<span class="sd">    :param description: string describing the thing</span>
+<span class="sd">    :param name: short name for the thing</span>
+<span class="sd">    :param ID: unique string by which the item can be taken by the player (eg. &#39;coins&#39; for &#39;a sack of coins&#39;)</span>
+<span class="sd">    :param takable: is the player able to add this to his/her inventory?</span>
+<span class="sd">    :type takable: bool</span>
+<span class="sd">    :param value: how valuable the item is</span>
+<span class="sd">    :type value: int or float</span>
+<span class="sd">    :param key: if an item has a key, it can be used to open/close doors that are locked with the same key</span>
+<span class="sd">    :param initlocation: room ID of the room this thing should be placed in at the beginning of the game</span>
+<span class="sd">    :type initlocation: string</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">ID</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">takable</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">initlocation</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">):</span>
@@ -177,13 +189,12 @@
 
 
 <div class="viewcode-block" id="Item.describe"><a class="viewcode-back" href="../../source/textgame.movable.html#textgame.movable.Item.describe">[docs]</a>    <span class="k">def</span> <span class="nf">describe</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;return the description</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">description</span></div></div>
 
 
 <div class="viewcode-block" id="Weapon"><a class="viewcode-back" href="../../source/textgame.movable.html#textgame.movable.Weapon">[docs]</a><span class="k">class</span> <span class="nc">Weapon</span><span class="p">(</span><span class="n">Item</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    anything that is used in a fight</span>
-<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="n">Item</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
@@ -191,13 +202,21 @@
 
 <div class="viewcode-block" id="Monster"><a class="viewcode-back" href="../../source/textgame.movable.html#textgame.movable.Monster">[docs]</a><span class="k">class</span> <span class="nc">Monster</span><span class="p">(</span><span class="n">Item</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    monsters or people, can get fight, get spawned or always be at one place, get killed</span>
+<span class="sd">    monsters or people, can fight, get spawned or always be at one place, get killed</span>
+
+<span class="sd">    :param deaddescript: string describing the thing when it&#39;s dead</span>
+<span class="sd">    :param strength: float between 0 and 1</span>
+<span class="sd">    :param spawns_in: list of strings with room IDs (or even only part of room IDs) that specify in which rooms the monster should spawn</span>
+<span class="sd">    :param spawns_at: define the daytime at which the monster should spawn (always/night/day)</span>
+<span class="sd">    :param spawn_prob: probability to spawn (float between 0 and 1)</span>
+<span class="sd">    :param ignoretext: this gets returned by :func:`textgame.player.Player.attack` if the monster&#39;s history is -1. This only happens if the monster has an initlocation</span>
+<span class="sd">    :param status: dict that can (but doesn&#39;t need to) contain the following key-value pairs (values must be bool): &#39;alive&#39;, &#39;active&#39;, &#39;fighting&#39;, &#39;trap&#39;, &#39;singleencounter&#39;, &#39;harmless&#39;</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">ID</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">takable</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>\
                  <span class="n">deaddescript</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">initlocation</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">strength</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>\
                  <span class="n">spawns_in</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">spawns_at</span><span class="o">=</span><span class="s2">&quot;always&quot;</span><span class="p">,</span> <span class="n">spawn_prob</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>\
-                 <span class="n">safe_kill</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ignoretext</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">status</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+                 <span class="n">ignoretext</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">status</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 
         <span class="n">Item</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">ID</span><span class="o">=</span><span class="n">ID</span><span class="p">,</span> <span class="n">takable</span><span class="o">=</span><span class="n">takable</span><span class="p">,</span> <span class="n">initlocation</span><span class="o">=</span><span class="n">initlocation</span><span class="p">)</span>
 
@@ -220,6 +239,10 @@
 
 
 <div class="viewcode-block" id="Monster.kill"><a class="viewcode-back" href="../../source/textgame.movable.html#textgame.movable.Monster.kill">[docs]</a>    <span class="k">def</span> <span class="nf">kill</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        set ``description`` to ``deaddescript`` and make sure this monster does not</span>
+<span class="sd">        spawn anymore</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="p">[</span><span class="s2">&quot;alive&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">description</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">deaddescript</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">spawn_prob</span> <span class="o">=</span> <span class="mi">0</span></div></div>
