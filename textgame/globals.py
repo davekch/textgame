@@ -2,6 +2,13 @@
 textgame.globals
 =====================
 
+This is a collection of predefined messages that get returned to the user. If you don't like them, modify them like this:
+
+.. code-block:: python
+
+   from textgame.globals import MOVING
+   MOVING.FAIL_CANT_GO = "It's not possible to go there"
+
 """
 
 from collections import namedtuple
