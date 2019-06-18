@@ -2,6 +2,58 @@
 textgame.parser
 =====================
 
+This module's main class is :class:`textgame.parser.Parser`. The parser can take
+user input, call a function that's associated to the input and return to the user a
+message describing what happened.
+
+Use ``actionmap`` and ``legal_verbs`` to define how verbs should be mapped to functions, eg:
+
+.. code-block:: python
+
+   parser.actionmap.update({
+    "scream": player.scream
+   })
+   parser.legal_verbs.update({
+    "scream": "scream",
+    "shout": "scream"
+   })
+
+You can use ``legal_nouns`` to define synonyms for nouns.
+
+A parser is the only thing needed to during the main loop of a game:
+
+.. code-block:: python
+
+   parser = textgame.parser.Parser(player)
+   while player.status["alive"]:
+       response = parser.understand( input("> ") )
+       print(response)
+
+
+This module also provides :class:`textgame.parser.EnterYesNoLoop`. If a function
+called by the parser returns an ``EnterYesNoLoop`` instead of a string, the parser falls
+into a mode where it only allows 'yes' and 'no' as an answer. An object of type
+``EnterYesNoLoop`` also provides strings/functions to print/call for each case.
+
+Example: a player method that saves the user from drinking poison
+
+.. code-block:: python
+
+   @action_method
+   def drink(self, noun):
+       if noun == "poison":
+
+           def actually_do_it():
+               self.status["alive"] = False
+               return "You drink the poison and die."
+
+           return textgame.parser.EnterYesNoLoop(
+                question = "Do you really want to drink poison?",
+                yes = actually_do_it,
+                no = "You stay alive")
+       else:
+           # ...
+
 """
 
 from collections import namedtuple
@@ -13,6 +65,12 @@ from textgame.globals import INFO
 
 
 class EnterYesNoLoop:
+    """
+    :param question: a yes/no question
+    :type question: string
+    :param yes: string to return or a function with signature ``f() -> str`` or ``f() -> EnterYesNoLoop`` that should get called if player answeres 'yes' to the question
+    :param no: same as yes
+    """
 
     def __init__(self, question, yes, no):
         self.question = question
@@ -20,11 +78,17 @@ class EnterYesNoLoop:
         self._no = no
 
     def yes(self):
+        """
+        if yes is callable, return its result, else return it
+        """
         if callable(self._yes):
             return self._yes()
         return self._yes
 
     def no(self):
+        """
+        if no is callable, return its result, else return it
+        """
         if callable(self._no):
             return self._no()
         return self._no
@@ -32,8 +96,7 @@ class EnterYesNoLoop:
 
 class Parser:
     """
-    makes sense of user's input, performs actions,
-    defines which words are allowed to use and maps them to player's methods
+    :param player: :class:`textgame.player.Player` object
     """
 
     def __init__(self, player):
@@ -126,8 +189,10 @@ class Parser:
 
     def check(self):
         """
-        check if every verb in self.legal_verbs has a function mapped to
+        check if every verb in self.legal_verbs has a function mapped to.
         if not, the game will crash on the input of this verb
+
+        logs the error
         """
         for verb in set(self.legal_verbs.values()):
             if verb not in self.actionmap:
@@ -137,7 +202,8 @@ class Parser:
 
     def check_result(self, result):
         """
-        checks if the result of the do() method is EnterYesNoLoop or str
+        checks if result is EnterYesNoLoop or str, if it's EnterYesNoLoop,
+        return the question and fall back to yes/no mode
         """
         if type(result) is str:
             return result
@@ -177,7 +243,7 @@ class Parser:
     def understand(self, input):
         """
         based on the input, perform player method and return its output
-        the return value is what will be printed to the user
+        the return value is what can be printed to the user
         """
         try:
             verb, noun = self._split_input(input)
