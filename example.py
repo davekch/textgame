@@ -113,9 +113,10 @@ player = MyPlayer(world, world.room("field_0"))
 parser = MyParser(player)
 
 
-# start the game routine
-while player.status["alive"]:
-    command = input("> ")
-    response = parser.understand(command)
-    print(response)
-    print()
+if __name__ == "__main__":
+    # start the game routine
+    while player.status["alive"]:
+        command = input("> ")
+        response = parser.understand(command)
+        print(response)
+        print()

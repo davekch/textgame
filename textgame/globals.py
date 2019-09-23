@@ -65,6 +65,8 @@ INFO.NOTHING = "Nothing happens."
 INFO.SCORE = "Your score is {}."
 INFO.TOO_MANY_ARGUMENTS = "Please restrict your command to two words."
 INFO.YES_NO = "Please answer yes or no."
+INFO.SAVED = "Game saved!"
+INFO.LOADED = "Game loaded!"
 
 
 FIGHTING = namedtuple("FIGHTING", [])

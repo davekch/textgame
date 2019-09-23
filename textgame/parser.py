@@ -57,6 +57,7 @@ Example: a player method that saves the user from drinking poison
 """
 
 from collections import namedtuple
+import pickle
 import logging
 logger = logging.getLogger("textgame.parser")
 logger.addHandler(logging.NullHandler())
@@ -140,6 +141,8 @@ class Parser:
             "w": "west",
             "walk": "go",
             "west": "west",
+            "save": "save",
+            "load": "load",
         }
 
         # this may be used to define synonyms
@@ -174,9 +177,42 @@ class Parser:
             "take": player.take,
             "up": lambda x: player.go("up"),
             "west": lambda x: player.go("west"),
+            "save": lambda session="": self.save_game(session),
+            "load": lambda session="": self.load_game(session),
         }
 
         self.check()
+
+
+    def save_game(self, session):
+        """
+        dump self.player as textgame_session.pickle
+        """
+        if session:
+            filename = "textgame_{}.pickle".format(session)
+        else:
+            filename = "textgame.pickle"
+        logger.info("saving game to {}".format(filename))
+        with open(filename, "wb") as f:
+            pickle.dump(self.player, f, pickle.HIGHEST_PROTOCOL)
+        return INFO.SAVED
+
+
+    def load_game(self, session):
+        """
+        load textgame_session.pickle (player object) and reinitialize parser with it
+        """
+        if session:
+            filename = "textgame_{}.pickle".format(session)
+        else:
+            filename = "textgame.pickle"
+        try:
+            with open(filename, "rb") as f:
+                logger.info("reinitializing parser with loaded player object")
+                self.__init__(pickle.load(f))
+        except FileNotFoundError:
+            return "There's no game with the name '{}'.".format(session)
+        return INFO.LOADED
 
 
     def lookup_verb(self, verb):
