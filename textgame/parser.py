@@ -58,6 +58,7 @@ Example: a player method that saves the user from drinking poison
 
 from collections import namedtuple
 import pickle
+import os
 import logging
 logger = logging.getLogger("textgame.parser")
 logger.addHandler(logging.NullHandler())
@@ -177,35 +178,35 @@ class Parser:
             "take": player.take,
             "up": lambda x: player.go("up"),
             "west": lambda x: player.go("west"),
-            "save": lambda session="": self.save_game(session),
-            "load": lambda session="": self.load_game(session),
+            "save": lambda session="": self.save_game(session=session),
+            "load": lambda session="": self.load_game(session=session),
         }
 
         self.check()
 
 
-    def save_game(self, session):
+    def save_game(self, path="", session=""):
         """
         dump self.player as textgame_session.pickle
         """
         if session:
-            filename = "textgame_{}.pickle".format(session)
+            filename = os.path.join(path, "textgame_{}.pickle".format(session))
         else:
-            filename = "textgame.pickle"
+            filename = os.path.join(path, "textgame.pickle")
         logger.info("saving game to {}".format(filename))
         with open(filename, "wb") as f:
             pickle.dump(self.player, f, pickle.HIGHEST_PROTOCOL)
         return INFO.SAVED
 
 
-    def load_game(self, session):
+    def load_game(self, path="", session=""):
         """
         load textgame_session.pickle (player object) and reinitialize parser with it
         """
         if session:
-            filename = "textgame_{}.pickle".format(session)
+            filename = os.path.join(path, "textgame_{}.pickle".format(session))
         else:
-            filename = "textgame.pickle"
+            filename = os.path.join(path, "textgame.pickle")
         try:
             with open(filename, "rb") as f:
                 logger.info("reinitializing parser with loaded player object")
