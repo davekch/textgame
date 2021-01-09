@@ -216,6 +216,18 @@ class Parser:
         return INFO.LOADED
 
 
+    def delete_game(self, path="", session=""):
+        """
+        delete path/textgame_session.pickle if present
+        """
+        if session:
+            filename = os.path.join(path, "textgame_{}.pickle".format(session))
+        else:
+            filename = os.path.join(path, "textgame.pickle")
+        if os.path.isfile(filename):
+            os.remove(filename)
+
+
     def lookup_verb(self, verb):
         return self.legal_verbs.get(verb)
 
