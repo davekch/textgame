@@ -51,7 +51,6 @@ class Player:
         # move to other places quickly (eg.)
         self.world = world
         self.score = 0
-        self.age = 0    # TODO: maybe this is redundant with world.time
         # dict to contain all the items the player is carrying
         self.inventory = OrderedDict()
         self.status = {"alive": True, "fighting": False, "trapped": False}
@@ -93,13 +92,13 @@ class Player:
             self.status["alive"] = False
             return MOVING.DEATH_BY_COWARDICE
         else:
-            destination = self.location.doors[direction]
+            destination = self.location.get_connection(direction)
             # see if there is a door
             if destination:
                 # see if door is open
-                if not self.location.locked[direction]["closed"]:
+                if not self.location.is_locked(direction):
                     # how does moving to this direction look like?
-                    dir_description = self.location.dir_descriptions[direction]
+                    dir_description = self.location.describe_way_to(direction)
                     # move, but remember previous room
                     self.oldlocation = self.location
                     self.location = destination
@@ -109,7 +108,7 @@ class Player:
                     # check if room is dark etc, plus extrawürste
                     msg = self.location.check_restrictions(self)
                     # if the room is not dark, add dir_description to the beginning
-                    if not self.location.dark["now"] and dir_description:
+                    if not self.location.is_dark() and dir_description:
                         msg = dir_description + '\n' + msg
                     msg += self.location.describe()
                     if not self.location.visited:
@@ -118,7 +117,7 @@ class Player:
                 else:
                     return MOVING.FAIL_DOOR_LOCKED
             else:
-                return self.location.errors[direction]
+                return self.location.describe_error(direction)
 
 
     def goback(self):
@@ -128,7 +127,7 @@ class Player:
         if self.oldlocation == self.location:
             return MOVING.FAIL_NO_MEMORY
         # maybe there's no connection to oldlocation
-        if not self.oldlocation in self.location.doors.values():
+        if not self.location.connects_to(self.oldlocation):
             return MOVING.FAIL_NO_WAY_BACK
         else:
             # find in which direction oldlocation is
@@ -184,21 +183,21 @@ class Player:
         if direction not in DIRECTIONS:
             return ACTION.FAIL_OPENDIR.format(action)
         # check if there's a door
-        if not self.location.doors[direction]:
+        if not self.location.has_connection_in(direction):
             return MOVING.FAIL_NO_DOOR
         # check if door is already open/closed
-        if action=="open" and not self.location.locked[direction]["closed"]:
+        if action=="open" and not self.location.is_locked(direction):
             return ACTION.ALREADY_OPEN
-        elif action=="lock" and self.location.locked[direction]["closed"]:
+        elif action=="lock" and self.location.is_locked(direction):
             return ACTION.ALREADY_CLOSED
         # check if there are any items that are keys
         if any([i.key for i in self.inventory.values()]):
             # get all keys and try them out
             keys = [i for i in self.inventory.values() if i.key]
             for key in keys:
-                if key.key == self.location.locked[direction]["key"]:
+                if key.key == self.location.get_door_code(direction):
                     # open/close the door, depending on action
-                    self.location.locked[direction]["closed"] = (action == "lock")
+                    self.location.set_locked(direction, action == "lock")
                     return ACTION.NOW_OPEN.format(action)
             return ACTION.FAIL_OPEN
         return ACTION.FAIL_NO_KEY
@@ -221,11 +220,11 @@ class Player:
         if itemid in self.inventory:
             return ACTION.OWN_ALREADY
 
-        item = self.location.items.get(itemid)
+        item = self.location.get_item(itemid)
         if item:
             if item.takable:
                 # move item from location to inventory
-                self.inventory[itemid] = self.location.items.pop(itemid)
+                self.inventory[itemid] = self.location.pop_item(itemid)
                 return ACTION.SUCC_TAKE.format(item.name)
             return ACTION.FAIL_TAKE
         elif itemid in self.location.description:
@@ -239,10 +238,10 @@ class Player:
         """
         if not self.location.items:
             return DESCRIPTIONS.NOTHING_THERE
-        if self.location.dark["now"]:
+        if self.location.is_dark():
             return DESCRIPTIONS.DARK_S
         response = []
-        for itemid in list(self.location.items.keys()):
+        for itemid in self.location.get_itemnames():
             response.append(self.take(itemid))
         return '\n'.join(response)
 

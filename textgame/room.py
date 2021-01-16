@@ -56,11 +56,14 @@ class Room:
 
     def __init__(self, ID):
         self.id = ID   # unique, similar rooms should have a common keyword in ID
-        self.doors = {dir: None for dir in DIRECTIONS}
+        self.doors = {}
         # dict that describes the locked/opened state of doors
-        self.locked = {dir: {"closed":False, "key":None} for dir in DIRECTIONS}
+        self.locked = {}
         # description to print when going in this direction
-        self.dir_descriptions = {dir: "" for dir in DIRECTIONS}
+        self.dir_descriptions = {}
+        # errors is a dict that contains error messages that get printed if player
+        # tries to move to a direction where there is no door
+        self.errors = {}
         # items that lie around in this room, format {ID: item}
         self.items = {}
         # monsters that are in this room, format {ID: monster}
@@ -104,9 +107,6 @@ class Room:
         self.hint = hint
         self.hint_value = hint_value
 
-        # errors is a dict that contains error messages that get printed if player
-        # tries to move to a direction where there is no door
-        self.errors = {dir: MOVING.FAIL_CANT_GO for dir in DIRECTIONS}
         if errors:
             for dir in errors:
                 if dir not in DIRECTIONS:
@@ -179,6 +179,54 @@ class Room:
         return 0
 
 
+    def is_locked(self, direction):
+        return self.locked.get(direction, {}).get("closed")
+
+
+    def describe_way_to(self, direction):
+        dir_descript = self.dir_descriptions.get(direction)
+        if not dir_descript:
+            return ""
+        return dir_descript
+
+
+    def get_connection(self, direction):
+        return self.doors.get(direction)
+
+
+    def is_dark(self):
+        return self.dark["now"]
+
+
+    def describe_error(self, direction):
+        error = self.errors.get(direction)
+        if not error:
+            return MOVING.FAIL_CANT_GO
+        return error
+
+
+    def connects_to(self, other):
+        """
+        returns True if there is a connection to other location
+        """
+        return other in self.doors.values()
+
+
+    def has_connection_in(self, direction):
+        """
+        returns True if there is a connection in the specified direction
+        """
+        return self.doors.get(direction) is not None
+
+
+    def get_door_code(self, direction):
+        return self.locked.get(direction, {}).get("key")
+
+
+    def set_locked(self, direction, locked):
+        self.locked[direction]["closed"] = locked
+
+
     def get_hint(self):
         """return a tuple of warning and the actual hint (``(str,str)``)
         """
@@ -229,6 +277,18 @@ class Room:
         else:
             logger.warning("You try to add item {} to room {} but "\
                 "it's already there".format(item.id, self.id))
+
+
+    def get_item(self, item_id):
+        return self.items.get(item_id)
+
+
+    def pop_item(self, item_id):
+        return self.items.pop(item_id)
+
+
+    def get_itemnames(self):
+        return list(self.items.keys())
 
 
     def add_monster(self, monster):
