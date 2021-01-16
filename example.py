@@ -3,7 +3,7 @@ import textgame
 # the module makes use of logging, I recommend using it
 # the logger will warn you for example if the rooms / ActionMapper are inconsistent
 import logging
-logging.basicConfig(level=logging.WARNING, format='%(levelname)-8s %(name)-16s %(funcName)-18s: %(message)s')
+logging.basicConfig(level=logging.INFO, format='%(levelname)-8s %(name)-16s %(funcName)-18s: %(message)s')
 
 
 # describe some basic rooms
