@@ -137,8 +137,6 @@ class Parser:
         })
         self.actionmap = {}
 
-        self.check()
-
 
     def set_actionmap(self, actionmap):
         """
@@ -204,17 +202,13 @@ class Parser:
         return self.legal_nouns.get(noun)
 
 
-    def check(self):
+    def check_synonyms(self):
         """
-        check if every verb in self.legal_verbs has a function mapped to.
-        if not, the game will crash on the input of this verb
-
-        logs the error
+        checks if every known verb appears in the actionmap. Raises `KeyError` if otherwise
         """
-        for verb in set(self.legal_verbs.values()):
-            if verb not in self.actionmap:
-                logger.error("{} is a legal verb but has no definition"
-                    "in actionmap".format(verb))
+        not_mapped = set(self.legal_verbs.values()).difference(set(self.actionmap.keys()))
+        if not_mapped != set():
+            raise KeyError("These verbs are not mapped to a function: {}".format(", ".join(not_mapped)))
 
 
     def check_result(self, result):

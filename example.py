@@ -95,6 +95,7 @@ parser.set_actionmap(player.get_registered_methods())
 parser.update_verb_synonyms({
     "scream": ["shout"],
 })
+parser.check_synonyms()
 
 
 if __name__ == "__main__":
