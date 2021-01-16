@@ -97,11 +97,13 @@ parser.update_verb_synonyms({
 })
 parser.check_synonyms()
 
+game = textgame.game.Game(player, parser)
+
 
 if __name__ == "__main__":
     # start the game routine
     while player.status["alive"]:
         command = input("> ")
-        response = parser.understand(command)
+        response = game.play(command)
         print(response)
         print()

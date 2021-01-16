@@ -206,7 +206,7 @@ class Parser:
             raise KeyError("These verbs are not mapped to a function: {}".format(", ".join(not_mapped)))
 
 
-    def check_result(self, result):
+    def make_sense_of(self, result):
         """
         checks if result is EnterYesNoLoop or str, if it's EnterYesNoLoop,
         return the question and fall back to yes/no mode
@@ -218,18 +218,6 @@ class Parser:
             self.in_yesno = True
             self.yesno_backup = result
             return result.question
-
-
-    def do(self, verb, noun):
-        """
-        call function associated with verb with noun as argument
-        """
-        try:
-            result = self.actionmap[verb](noun)
-        except TypeError:
-            logger.debug("the function {} takes no arguments, discard noun".format(verb))
-            result = self.actionmap[verb]()
-        return result
 
 
     def _split_input(self, input):
@@ -253,13 +241,13 @@ class Parser:
 
     def understand(self, input):
         """
-        based on the input, perform player method and return its output
-        the return value is what can be printed to the user
+        based on the input, return the function that should be called and the noun
+        that should be used as its argument
         """
         try:
             verb, noun = self._split_input(input)
         except ValueError:
-            return INFO.TOO_MANY_ARGUMENTS
+            return (lambda: INFO.TOO_MANY_ARGUMENTS), None
 
         # if a yes/no conversation is going on, only allow yes/no as answers
         if self.in_yesno:
@@ -268,13 +256,11 @@ class Parser:
             elif verb == "yes":
                 self.in_yesno = False
                 # return the yes case
-                result = self.yesno_backup.yes()
-                return self.check_result(result)
+                return self.yesno_backup.yes, None
             else:
                 self.in_yesno = False
                 # return the no case
-                result = self.yesno_backup.no()
-                return self.check_result(result)
+                return self.yesno_backup.no, None
 
         commandverb = self.lookup_verb(verb)
         commandnoun = self.lookup_noun(noun)
@@ -286,9 +272,6 @@ class Parser:
 
         # illegal nouns are okay but illegal verbs are not
         if not commandverb:
-            return INFO.NOT_UNDERSTOOD
+            return (lambda: INFO.NOT_UNDERSTOOD), None
 
-        # perform the associated method
-        result = self.do(commandverb, commandnoun)
-
-        return self.check_result(result)
+        return self.actionmap[commandverb], commandnoun
