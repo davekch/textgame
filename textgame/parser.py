@@ -221,7 +221,7 @@ class Parser:
         # if a yes/no conversation is going on, only allow yes/no as answers
         if self.in_yesno:
             if verb != "yes" and verb != "no":
-                return INFO.YES_NO
+                return (lambda: INFO.YES_NO), None
             elif verb == "yes":
                 self.in_yesno = False
                 # return the yes case
