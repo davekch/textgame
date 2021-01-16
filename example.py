@@ -90,7 +90,7 @@ world = textgame.world.World(rooms=myrooms, items=myitems, monsters=mymonsters)
 player = MyPlayer(world, world.room("field_0"))
 
 # create a parser
-parser = textgame.parser.Parser(player)
+parser = textgame.parser.Parser()
 parser.set_actionmap(player.get_registered_methods())
 parser.update_verb_synonyms({
     "scream": ["shout"],

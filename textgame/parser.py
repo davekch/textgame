@@ -97,13 +97,8 @@ class EnterYesNoLoop:
 
 
 class Parser:
-    """
-    :param player: :class:`textgame.player.Player` object
-    """
 
-    def __init__(self, player):
-
-        self.player = player
+    def __init__(self):
 
         self.in_yesno = False    # are we inside a yes/no conversation?
         # yesno_backup must be a function that takes a bool and returns
@@ -163,35 +158,35 @@ class Parser:
                 self.legal_nouns[s] = noun
 
 
-    def save_game(self, path="", session=""):
-        """
-        dump self.player as textgame_session.pickle
-        """
-        if session:
-            filename = os.path.join(path, "textgame_{}.pickle".format(session))
-        else:
-            filename = os.path.join(path, "textgame.pickle")
-        logger.info("saving game to {}".format(filename))
-        with open(filename, "wb") as f:
-            pickle.dump(self.player, f, pickle.HIGHEST_PROTOCOL)
-        return INFO.SAVED
-
-
-    def load_game(self, path="", session=""):
-        """
-        load textgame_session.pickle (player object) and reinitialize parser with it
-        """
-        if session:
-            filename = os.path.join(path, "textgame_{}.pickle".format(session))
-        else:
-            filename = os.path.join(path, "textgame.pickle")
-        try:
-            with open(filename, "rb") as f:
-                logger.info("reinitializing parser with loaded player object")
-                self.__init__(pickle.load(f))
-        except FileNotFoundError:
-            return "There's no game with the name '{}'.".format(session)
-        return INFO.LOADED
+    # def save_game(self, path="", session=""):
+    #     """
+    #     dump self.player as textgame_session.pickle
+    #     """
+    #     if session:
+    #         filename = os.path.join(path, "textgame_{}.pickle".format(session))
+    #     else:
+    #         filename = os.path.join(path, "textgame.pickle")
+    #     logger.info("saving game to {}".format(filename))
+    #     with open(filename, "wb") as f:
+    #         pickle.dump(self.player, f, pickle.HIGHEST_PROTOCOL)
+    #     return INFO.SAVED
+    #
+    #
+    # def load_game(self, path="", session=""):
+    #     """
+    #     load textgame_session.pickle (player object) and reinitialize parser with it
+    #     """
+    #     if session:
+    #         filename = os.path.join(path, "textgame_{}.pickle".format(session))
+    #     else:
+    #         filename = os.path.join(path, "textgame.pickle")
+    #     try:
+    #         with open(filename, "rb") as f:
+    #             logger.info("reinitializing parser with loaded player object")
+    #             self.__init__(pickle.load(f))
+    #     except FileNotFoundError:
+    #         return "There's no game with the name '{}'.".format(session)
+    #     return INFO.LOADED
 
 
     def lookup_verb(self, verb):
