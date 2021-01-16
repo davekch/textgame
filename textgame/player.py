@@ -12,7 +12,6 @@ For convenience, this module provides wrappers for Player methods:
 - :func:`textgame.player.action_method`
 """
 
-from inspect import signature
 from collections import OrderedDict
 import random
 import logging
@@ -24,61 +23,16 @@ from textgame.globals import FIGHTING
 from textgame.parser import EnterYesNoLoop
 
 
-def player_method(f):
+def register(command):
     """wrapper for player methods
-
-    checks if the method has the right signature, adds a dummy argument if the method doesn't care about nouns. Throws :class:`TypeError` if there are too many arguments.
+    methods which are decorated with this function are returned by
+    func:`textgame.player.Player.get_registered_methods` in the form
+    `{command: function-object}`
     """
-    func = f
-
-    # check signature of f
-    n_args = len(signature(f).parameters)
-    if n_args == 1:
-        # add a dummy argument
-        def _f(self, noun):
-            return f(self)
-        func = _f
-        # preserve (but change) docstring
-        func.__doc__ = "decorated by :func:`textgame.player.player_method`\n\n"\
-            + (f.__doc__ if f.__doc__ else "")
-
-    elif n_args > 2:
-        raise TypeError("Action methods can't have more than 2 arguments")
-
-    return func
-
-
-def action_method(f):
-    """wrapper for player methods
-
-    does the same as :func:`textgame.player.player_method` plus it adds to the return
-    value of the original function the output of :func:`textgame.world.World.update`.
-    This way it is guaranteed that time passes and fights get managed when the player
-    does something.
-
-    Also, this saves the undecorated function in a new attribute ``f.undecorated``.
-    """
-    func = player_method(f)
-
-    # append self.world.update to the end of every method
-    def _f(self, noun):
-        msg = func(self, noun)
-        if type(msg) is str:
-            # the other possibility is EnterYesNoLoop
-            msg += self.world.update(self)
-        return msg
-
-    # save the undecorated function
-    # reason: one might want to call action_methods from other action_methods,
-    # in this case nested decorations lead to bugs bc of multiple calls
-    # on world.update
-    _f.undecorated = f
-    # preserve (but change) docstring
-    _f.__doc__ = "decorated by :func:`textgame.player.action_method`\n\n"\
-        + (f.__doc__ if f.__doc__ else "")
-
-    return _f
-
+    def wrapper(f):
+        f.command = command
+        return f
+    return wrapper
 
 
 class Player:
@@ -107,7 +61,16 @@ class Player:
         self.random.seed(self.world.seed+42)
 
 
-    @action_method
+    def get_registered_methods(self):
+        registered = {}
+        for propertyname in dir(self):
+            prop = getattr(self, propertyname)
+            if hasattr(prop, "command"):
+                registered[prop.command] = prop
+        return registered
+
+
+    @register("go")
     def go(self, direction):
         """
         change location to the room in the direction ``noun``. ``noun`` can be
@@ -173,10 +136,35 @@ class Player:
                 if dest == self.oldlocation:
                     direction = dir
                     break
-            return type(self).go.undecorated(self, direction)
+            return self.go(direction)
 
 
-    @action_method
+    @register("north")
+    def go_north(self):
+        return self.go("north")
+
+    @register("east")
+    def go_east(self):
+        return self.go("east")
+
+    @register("south")
+    def go_south(self):
+        return self.go("south")
+
+    @register("west")
+    def go_west(self):
+        return self.go("west")
+
+    @register("up")
+    def go_up(self):
+        return self.go("up")
+
+    @register("down")
+    def go_down(self):
+        return self.go("down")
+
+
+    @register("close")
     def close(self, direction):
         """
         lock the door in direction ``noun`` if player has a key in inventory
@@ -184,7 +172,7 @@ class Player:
         """
         return self._close_or_lock("lock", direction)
 
-    @action_method
+    @register("open")
     def open(self, direction):
         """
         open the door in direction ``noun`` if player has a key in inventory
@@ -216,7 +204,7 @@ class Player:
         return ACTION.FAIL_NO_KEY
 
 
-    @action_method
+    @register("take")
     def take(self, itemid):
         """
         see if something with the ID ``noun`` is in the items of the current
@@ -255,11 +243,11 @@ class Player:
             return DESCRIPTIONS.DARK_S
         response = []
         for itemid in list(self.location.items.keys()):
-            response.append(type(self).take.undecorated(self, itemid))
+            response.append(self.take(itemid))
         return '\n'.join(response)
 
 
-    @action_method
+    @register("inventory")
     def list_inventory(self):
         """
         return a pretty formatted list of what's inside inventory
@@ -271,7 +259,7 @@ class Player:
         return ACTION.NO_INVENTORY
 
 
-    @action_method
+    @register("drop")
     def drop(self, itemid):
         """
         see if something with the ID ``noun`` is in the inventory. If yes, remove
@@ -297,12 +285,11 @@ class Player:
         if not self.inventory:
             return ACTION.NO_INVENTORY
         for item in list(self.inventory.keys()):
-            # type(self) may be Player or a derived class from player
-            type(self).drop.undecorated(self, item)
+            self.drop(item)
         return ACTION.SUCC_DROP
 
 
-    @action_method
+    @register("attack")
     def attack(self, monstername):
         """
         kill a monster based on randomness, the monster's strength and on how
@@ -344,7 +331,7 @@ class Player:
                 "name {} in room {}. This should not be possible!".format(monstername, self.location.id))
 
 
-    @action_method
+    @register("score")
     def show_score(self):
         return INFO.SCORE.format(self.score)
 
@@ -356,7 +343,7 @@ class Player:
         self.oldlocation = self.location
 
 
-    @action_method
+    @register("look")
     def look(self):
         """
         get the long description of the current location.
@@ -370,7 +357,7 @@ class Player:
         return msg
 
 
-    @action_method
+    @register("listen")
     def listen(self):
         """
         get the current room's sound
@@ -385,7 +372,7 @@ class Player:
         return any([lamp in self.inventory for lamp in LIGHT])
 
 
-    @player_method
+    @register("hint")
     def ask_hint(self):
         """
         ask for a hint in the current location,

@@ -110,79 +110,59 @@ class Parser:
         # user output. it will be executed if yes/no conversation ends with yes
         self.yesno_backup = None
 
-        self.legal_verbs = {
-            "": "continue",    # dont do anything on empty input
-            "attack": "attack",
-            "back": "back",
-            "close": "close",
-            "d": "down",
-            "down": "down",
-            "drop": "drop",
-            "e": "east",
-            "east": "east",
-            "enter": "go",
-            "go": "go",
-            "grab": "take",
-            "hear": "listen",
-            "hint": "hint",
-            "inventory": "inventory",
-            "kill": "attack",
-            "listen": "listen",
-            "lock": "close",
-            "look": "look",
-            "n": "north",
-            "north": "north",
-            "open": "open",
-            "s": "south",
-            "score": "score",
-            "south": "south",
-            "take": "take",
-            "u": "up",
-            "up": "up",
-            "w": "west",
-            "walk": "go",
-            "west": "west",
-            "save": "save",
-            "load": "load",
-        }
+        self.legal_verbs = {}
+        self.update_verb_synonyms({
+            "go": ["enter", "walk"],
+            "take": ["grab"],
+            "listen": ["hear"],
+            "attack": ["kill"],
+            "close": ["lock"],
+            "north": ["n"],
+            "east": ["e"],
+            "south": ["s"],
+            "west": ["w"],
+            "up": ["u"],
+            "down": ["d"],
+        })
 
         # this may be used to define synonyms
-        self.legal_nouns = {
-            "d": "down",
-            "e": "east",
-            "n": "north",
-            "s": "south",
-            "u": "up",
-            "w": "west",
-        }
-
-        # the lambdas are there because the values in this dict must be
-        # callable with exactly one argument
-        self.actionmap = {
-            "attack": player.attack,
-            "back": lambda x: player.go("back"),
-            "continue": lambda x: "",
-            "down": lambda x: player.go("down"),
-            "drop": player.drop,
-            "east": lambda x: player.go("east"),
-            "go": player.go,
-            "hint": player.ask_hint,
-            "inventory": player.list_inventory,
-            "listen": player.listen,
-            "look": player.look,
-            "close": player.close,
-            "north": lambda x: player.go("north"),
-            "open": player.open,
-            "score": player.show_score,
-            "south": lambda x: player.go("south"),
-            "take": player.take,
-            "up": lambda x: player.go("up"),
-            "west": lambda x: player.go("west"),
-            "save": lambda session="": self.save_game(session=session),
-            "load": lambda session="": self.load_game(session=session),
-        }
+        self.legal_nouns = {}
+        self.update_noun_synonyms({
+            "north": ["n"],
+            "east": ["e"],
+            "south": ["s"],
+            "west": ["w"],
+            "up": ["u"],
+            "down": ["d"],
+        })
+        self.actionmap = {}
 
         self.check()
+
+
+    def set_actionmap(self, actionmap):
+        """
+        :param actionmap: dictionary as returned by func:`textgame.player.Player.get_registered_methods`
+        """
+        self.actionmap = actionmap
+        self.legal_verbs.update({c: c for c in actionmap.keys()})
+
+
+    def update_verb_synonyms(self, synonym_dict):
+        # TODO: docstring
+        for command, synonyms in synonym_dict.items():
+            if type(synonyms) is not list:
+                raise TypeError("synonyms must be defined as a list")
+            for s in synonyms:
+                self.legal_verbs[s] = command
+
+    def update_noun_synonyms(self, synonym_dict):
+        # TODO: docstring
+        for noun, synonyms in synonym_dict.items():
+            if type(synonyms) is not list:
+                raise TypeError("synonyms must be defined as a list")
+            for s in synonyms:
+                self.legal_nouns[s] = noun
 
 
     def save_game(self, path="", session=""):
@@ -255,7 +235,12 @@ class Parser:
         """
         call function associated with verb with noun as argument
         """
-        return self.actionmap[verb](noun)
+        try:
+            result = self.actionmap[verb](noun)
+        except TypeError:
+            logger.debug("the function {} takes no arguments, discard noun".format(verb))
+            result = self.actionmap[verb]()
+        return result
 
 
     def _split_input(self, input):

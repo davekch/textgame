@@ -79,29 +79,9 @@ mymonsters = {
 # create a subclass of Player and add some functionality
 class MyPlayer(textgame.player.Player):
 
-    def __init__(self, world, initlocation):
-        textgame.player.Player.__init__(self, world, initlocation)
-
-    @textgame.player.action_method
+    @textgame.player.register("scream")
     def scream(self):
         return "AAAAAAAAAHHH!!!"
-
-
-# create mapping between input and our new method
-class MyParser(textgame.parser.Parser):
-
-    def __init__(self, player):
-        textgame.parser.Parser.__init__(self, player)
-
-        # first, we map the inputs "scream" and "shout" both to the word "scream"
-        self.legal_verbs.update({
-            "scream": "scream",
-            "shout": "scream"
-        })
-        # now we map the word "scream" to our method
-        self.actionmap.update({
-            "scream": player.scream
-        })
 
 
 # create the world based on our rooms and items
@@ -110,7 +90,11 @@ world = textgame.world.World(rooms=myrooms, items=myitems, monsters=mymonsters)
 player = MyPlayer(world, world.room("field_0"))
 
 # create a parser
-parser = MyParser(player)
+parser = textgame.parser.Parser(player)
+parser.set_actionmap(player.get_registered_methods())
+parser.update_verb_synonyms({
+    "scream": ["shout"],
+})
 
 
 if __name__ == "__main__":
