@@ -1,4 +1,5 @@
 import pytest
+from unittest.mock import MagicMock
 from textgame.room import Room
 from textgame.globals import DESCRIPTIONS, MOVING
 
@@ -53,3 +54,12 @@ class TestRoom:
     def test_describe_error(self, roominfo_00, room_00):
         assert room_00.describe_error("north") == roominfo_00["errors"]["north"]
         assert room_00.describe_error("down") == MOVING.FAIL_CANT_GO
+
+    def test_restrictions(self, roominfo_00, room_00):
+        player = MagicMock()
+        player.look = MagicMock(return_value="great hall")
+        assert room_00.check_restrictions(player) == ""
+        special_func = lambda player: player.look()
+        room_00.set_specials(special_func)
+        assert room_00.check_restrictions(player) == "great hall"
+        assert player.look.called
