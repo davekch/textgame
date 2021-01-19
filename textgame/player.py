@@ -135,7 +135,9 @@ class Player:
                 if dest == self.oldlocation:
                     direction = dir
                     break
-            return self.go(direction)
+            # type(self) may be a child class of Player. we want to call the method of the child class
+            # in case it was overwritten.
+            return type(self).go(self, direction)
 
 
     @register("north")
@@ -242,7 +244,9 @@ class Player:
             return DESCRIPTIONS.DARK_S
         response = []
         for itemid in self.location.get_itemnames():
-            response.append(self.take(itemid))
+            # type(self) may be a child class of Player. we want to call the method of the child class
+            # in case it was overwritten.
+            response.append(type(self).take(self, itemid))
         return '\n'.join(response)
 
 
@@ -284,7 +288,9 @@ class Player:
         if not self.inventory:
             return ACTION.NO_INVENTORY
         for item in list(self.inventory.keys()):
-            self.drop(item)
+            # type(self) may be a child class of Player. we want to call the method of the child class
+            # in case it was overwritten.
+            type(self).drop(self, item)
         return ACTION.SUCC_DROP
 
 
