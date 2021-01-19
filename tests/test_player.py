@@ -15,7 +15,17 @@ class TestPlayer:
         methodmap = myplayer.get_registered_methods()
         assert "lol" in methodmap
         assert methodmap["lol"]() == 1234
-        assert "go" in methodmap  # check inheritance
+
+    def test_register_inheritance(self):
+        class MyPlayer(Player):
+            @register("take")
+            def take(self):
+                return 1234
+
+        myplayer = MyPlayer(MagicMock(), MagicMock())
+        methodmap = myplayer.get_registered_methods()
+        assert methodmap["take"]() == 1234
+        assert "go" in methodmap
 
     def test_go(self):
         location = MagicMock()
