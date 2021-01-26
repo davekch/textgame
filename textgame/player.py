@@ -35,6 +35,11 @@ def register(command):
     return wrapper
 
 
+def timeless(f):
+    f.timeless = True
+    return f
+
+
 class Player:
     """class to represent the player of the game
 
@@ -377,6 +382,7 @@ class Player:
         return any([lamp in self.inventory for lamp in LIGHT])
 
 
+    @timeless
     @register("hint")
     def ask_hint(self):
         """

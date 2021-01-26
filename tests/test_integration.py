@@ -1,5 +1,6 @@
 import pytest
-from textgame.player import Player
+from unittest.mock import MagicMock
+from textgame.player import Player, register, timeless
 from textgame.parser import Parser
 from textgame.world import World
 from textgame.game import Game
@@ -73,7 +74,7 @@ def game(rooms, items):
     return Game(player, parser)
 
 
-class TestIntegration:
+class TestGameplay:
 
     def test_go(self, game, rooms, items):
         expected = rooms["field_1"]["descript"] + "\n" + items["diamond"]["description"] + "\n"
@@ -97,3 +98,32 @@ class TestIntegration:
         walkthrough = [('look', 'You are standing in the middle of a wide open field. In the west the silhouette of an enormeous castle cuts the sky. North of you is a birch grove. A dark forest reaches to the east.\nA key lies around.\n'), ('take keys', 'I see no keys here.\n'), ('take key', 'You carry now a key.\n'), ('n', "It's pitch dark here. You can't see anything. Anytime soon, you'll probably get attacked by some night creature.\n"), ('go back', 'You are standing in the middle of a wide open field. In the west the silhouette of an enormeous castle cuts the sky. North of you is a birch grove. A dark forest reaches to the east.\n'), ('s', 'You are in a wide rocky pit. An aisle leads upwards to the north.\nA sparkling diamond lies around!\n'), ('w', 'The slope is too steep here.\n'), ('take diamond', 'You carry now a diamond.\n'), ('inventory', 'You are now carrying:\n A key\n A diamond\n'), ('drop ', 'Please specify an item you want to drop.\n'), ('drop key', 'Dropped.\n'), ('take all', 'You carry now a key.\n'), ('n', 'The door is locked.\n'), ('up', 'You spread your wings and start to fly.\nYou are in a wide open field.\n'), ('back', "I don't understand that.\n"), ('go back', "You're in the rocky pit.\n"), ('open door', "I can only open doors if you tell me the direction. Eg. 'open west'.\n"), ('open west', 'There is no door in this direction.\n'), ('open north', 'You take the key and open the door.\n'), ('n', 'You are in a wide open field.\n'), ('s', "You're in the rocky pit.\n"), ('close north', 'You take the key and lock the door.\n'), ('drop key', 'Dropped.\n'), ('go north', 'The door is locked.\n'), ('score', 'Your score is 5.\n')]
         for command, reply in walkthrough:
             assert game.play(command) == reply
+
+
+class TestWorldtime:
+
+    def test_time(self):
+        world = World()
+        player = Player(world, MagicMock())
+        parser = Parser()
+        parser.set_actionmap(player.get_registered_methods())
+        game = Game(player, parser)
+        assert game.world.time == 0
+        game.play("look")
+        assert game.world.time == 1
+
+    def test_timeless(self):
+        class MyPlayer(Player):
+            @timeless
+            @register("fart")
+            def fart(self):
+                return "prrrfft"
+
+        world = World()
+        player = MyPlayer(world, MagicMock())
+        parser = Parser()
+        parser.set_actionmap(player.get_registered_methods())
+        game = Game(player, parser)
+        assert game.world.time == 0
+        game.play("fart")
+        assert game.world.time == 0

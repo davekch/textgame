@@ -22,7 +22,9 @@ class Game:
             logger.debug("the function {} takes no arguments, discard noun".format(func.__name__))
             result = func()
         response = self.parser.make_sense_of(result)
-        response += "\n" + self.world.update(self.player)
+        if not getattr(func, "timeless", False):
+            response += self.world.update(self.player)
+        response += "\n"
         self.gameover = not self.player.status["alive"]
         return response
 
