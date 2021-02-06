@@ -33,7 +33,7 @@ all the player's money gets stolen if he/she enters ``myroom2``:
        if "money" in player.inventory:
            # don't delete the money, better store it in
            # the storage room (see :class:`textgame.world.World`)
-           player.world.storage_room.add_item( player.inventory.pop("money") )
+           player.world.storage_room.add_item(player.pop_item("money"))
            return "Someone just stole all your money."
         # be sure to return a string
         return ""
@@ -157,7 +157,7 @@ class Room:
     def add_connection(self, dir, room, hidden=False):
         """add a single connection to the room
 
-        :param dir: direction, must be in :class:`textgame.globals.DIRECTIONS`
+        :param dir: direction, must be in :data:`textgame.globals.DIRECTIONS`
         :param room: :class:`textgame.room.Room` object
         :param hidden: specify if the connection is hidden
         """
@@ -180,17 +180,21 @@ class Room:
 
 
     def is_locked(self, direction):
+        """return ``True`` if the door in ``direction`` is locked
+        """
         return self.locked.get(direction, {}).get("closed")
 
 
     def describe_way_to(self, direction):
-        dir_descript = self.dir_descriptions.get(direction)
-        if not dir_descript:
-            return ""
-        return dir_descript
+        """return content of ``self.dir_descriptions`` (see :func:`textgame.room.Room.fill_info`) in the given direction.
+        Returns an empty string if no description exists.
+        """
+        return self.dir_descriptions.get(direction, "")
 
 
     def get_connection(self, direction):
+        """returns room object that lies in the given direction, ``None`` if there is no door in that direction.
+        """
         return self.doors.get(direction)
 
 
@@ -199,6 +203,9 @@ class Room:
 
 
     def describe_error(self, direction):
+        """return content of ``self.errors`` (see :func:`textgame.room.Room.fill_info`) in the given direction. Returns the default
+        :attr:`textgame.globals.MOVING.FAIL_CANT_GO` if no other direction is given.
+        """
         error = self.errors.get(direction)
         if not error:
             return MOVING.FAIL_CANT_GO
@@ -207,23 +214,31 @@ class Room:
 
     def connects_to(self, other):
         """
-        returns True if there is a connection to other location
+        returns ``True`` if there is a connection to other location
         """
         return other in self.doors.values()
 
 
     def has_connection_in(self, direction):
         """
-        returns True if there is a connection in the specified direction
+        returns ``True`` if there is a connection in the specified direction
         """
         return self.doors.get(direction) is not None
 
 
     def get_door_code(self, direction):
+        """gets the key code to the door in the given direction, ``None`` else
+        """
         return self.locked.get(direction, {}).get("key")
 
 
     def set_locked(self, direction, locked):
+        """set the status of the door in ``direction``.
+
+        :param direction: one of :data:`textgame.globals.DIRECTIONS`
+        :type direction: string
+        :param locked: bool
+        """
         self.locked[direction]["closed"] = locked
 
 

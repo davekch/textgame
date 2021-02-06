@@ -1,4 +1,22 @@
-# TODO: docstring
+"""
+textgame.game
+=====================
+
+This module provides the :class:`textgame.game.Game` class, which will handle the flow of the game once
+everything is set up.
+
+.. code-block:: python
+
+    from textgame.game import Game
+
+    # ...
+    game = Game(myplayer, myparser)
+    while not game.over():
+        command = input("> ")
+        reply = game.play(command)
+        print(reply)
+"""
+
 
 import pickle
 import os
@@ -8,6 +26,11 @@ logger.addHandler(logging.NullHandler())
 
 
 class Game:
+    """
+    :param player: :class:`textgame.player.Player` object
+    :param parser: :class:`textgame.parser.Parser` object
+    """
+
     def __init__(self, player, parser):
         self.player = player
         self.parser = parser
@@ -15,6 +38,15 @@ class Game:
         self.gameover = False
 
     def play(self, command):
+        """
+        passes the command to :func:`textgame.parser.Parser.understand` and executes the resulting function. The result gets checked by
+        :func:`textgame.parser.Parser.make_sense_of`. If the called function is not marked as timeless (see :func:`textgame.player.timeless`),
+        :func:`textgame.world.World.update` gets called as well and the result added.
+
+        :param command: command given by user
+        :type command: string
+        :returns: string
+        """
         func, noun = self.parser.understand(command)
         try:
             result = func(noun)
@@ -28,10 +60,18 @@ class Game:
         self.gameover = not self.player.status["alive"]
         return response
 
+    def over(self):
+        """returns ``True`` if the player is dead
+        """
+        return self._gameover
 
     def save_game(self, path="", session=""):
         """
-        dump self.player as textgame_session.pickle
+        pickle the player and parser object
+
+        :param path: directory where to store the game
+        :param session: some identifyer. If empty or None, the pickle gets saved as ``textgame.pickle``, else ``textgame_<session>.pickle``.
+        :type session: string
         """
         if session:
             filename = os.path.join(path, "textgame_{}.pickle".format(session))
@@ -45,7 +85,11 @@ class Game:
     @classmethod
     def load_game(cls, path="", session=""):
         """
-        load textgame_session.pickle (player object) and reinitialize parser with it
+        load previously saved pickle
+
+        :param path: parent directory of the pickle
+        :param session: some identifyer. If empty or None, ``textgame.pickle`` gets loaded, else ``textgame_<session>.pickle``.
+        :type session: string
         """
         if session:
             filename = os.path.join(path, "textgame_{}.pickle".format(session))

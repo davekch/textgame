@@ -3,43 +3,41 @@ textgame.parser
 =====================
 
 This module's main class is :class:`textgame.parser.Parser`. The parser can take
-user input, call a function that's associated to the input and return to the user a
-message describing what happened.
+user input in the form of a verb and a noun and parse it into a function that should be called
+and its argument (usually a noun).
 
-Use ``actionmap`` and ``legal_verbs`` to define how verbs should be mapped to functions, eg:
-
-.. code-block:: python
-
-   parser.actionmap.update({
-    "scream": player.scream
-   })
-   parser.legal_verbs.update({
-    "scream": "scream",
-    "shout": "scream"
-   })
-
-You can use ``legal_nouns`` to define synonyms for nouns.
-
-A parser is the only thing needed to during the main loop of a game:
+To create a mapping between verbs and functions, use :func:`textgame.player.Player.get_registered_methods`:
 
 .. code-block:: python
 
-   parser = textgame.parser.Parser(player)
-   while player.status["alive"]:
-       response = parser.understand( input("> ") )
-       print(response)
+   from textgame.parser import Parser
 
+   # setup world and player
+   parser = Parser()
+   parser.set_actionmap(player.get_registered_methods())
 
-This module also provides :class:`textgame.parser.EnterYesNoLoop`. If a function
-called by the parser returns an ``EnterYesNoLoop`` instead of a string, the parser falls
-into a mode where it only allows 'yes' and 'no' as an answer. An object of type
-``EnterYesNoLoop`` also provides strings/functions to print/call for each case.
+You can define synonyms to make it easier for the user to guess certain moves:
+
+.. code-block:: python
+
+    parser.update_verb_synonyms({
+        "go": ["walk", "move", "run", "stroll", "wander"],
+        "take": ["grab", "pick"],
+    })
+    parser.update_noun_synonyms({
+        "diamond": ["gem", "crystal"],
+    })
+
+This module also provides :class:`textgame.parser.EnterYesNoLoop`. If a player method
+returns an ``EnterYesNoLoop`` instead of a string, the parser falls
+into a mode where it only allows 'yes' and 'no' as an answer. An
+``EnterYesNoLoop`` object also provides strings/functions to print/call for each case.
 
 Example: a player method that saves the user from drinking poison
 
 .. code-block:: python
 
-   @action_method
+   @register("drink")
    def drink(self, noun):
        if noun == "poison":
 
@@ -47,10 +45,11 @@ Example: a player method that saves the user from drinking poison
                self.status["alive"] = False
                return "You drink the poison and die."
 
-           return textgame.parser.EnterYesNoLoop(
+           return EnterYesNoLoop(
                 question = "Do you really want to drink poison?",
                 yes = actually_do_it,
-                no = "You stay alive")
+                no = "You stay alive."
+            )
        else:
            # ...
 
@@ -135,14 +134,18 @@ class Parser:
 
     def set_actionmap(self, actionmap):
         """
-        :param actionmap: dictionary as returned by func:`textgame.player.Player.get_registered_methods`
+        :param actionmap: dictionary as returned by :func:`textgame.player.Player.get_registered_methods`
         """
         self.actionmap = actionmap
         self.legal_verbs.update({c: c for c in actionmap.keys()})
 
 
     def update_verb_synonyms(self, synonym_dict):
-        # TODO: docstring
+        """
+        define synonyms for verbs
+
+        :param synonym_dict: dict of the form ``{command: [synonyms], ...}``
+        """
         for command, synonyms in synonym_dict.items():
             if type(synonyms) is not list:
                 raise TypeError("synonyms must be defined as a list")
@@ -150,7 +153,11 @@ class Parser:
                 self.legal_verbs[s] = command
 
     def update_noun_synonyms(self, synonym_dict):
-        # TODO: docstring
+        """
+        define synonyms for nouns
+
+        :param synonym_dict: dict of the form ``{noun: [synonyms], ...}``
+        """
         for noun, synonyms in synonym_dict.items():
             if type(synonyms) is not list:
                 raise TypeError("synonyms must be defined as a list")
@@ -168,7 +175,9 @@ class Parser:
 
     def check_synonyms(self):
         """
-        checks if every known verb appears in the actionmap. Raises `KeyError` if otherwise
+        checks if every known verb is linked to a function.
+
+        :raises KeyError: else
         """
         not_mapped = set(self.legal_verbs.values()).difference(set(self.actionmap.keys()))
         if not_mapped != set():

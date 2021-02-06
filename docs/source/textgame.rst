@@ -10,7 +10,9 @@ Submodules
 ----------
 
 .. toctree::
+   :maxdepth: 4
 
+   textgame.game
    textgame.globals
    textgame.movable
    textgame.parser

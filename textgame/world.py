@@ -26,7 +26,27 @@ and linked to each other according to the ``doors`` dict.
 Every argument of :func:`textgame.room.Room.fill_info` can be put as a key-value
 pair inside this dict.
 
-The same is true for items, weapons and monsters, see the example.
+The same is true for items, weapons and monsters.
+
+A more convenient way to initialize ``World`` is to store the rooms, items, etc. as JSON-Files (or any other file-type that can be read into a dict)
+and let the world load them automatically:
+
+.. code-block::
+
+    .
+    ├── resources
+    │   ├── items.json
+    │   ├── monsters.json
+    │   └── rooms.json
+    └─── myadventuregame.py
+
+.. code-block:: python
+
+    # myadventuregame.py
+    from textgame.world import World
+    
+    world = World()
+    world.load_resources("./resources")
 
 World has a member called ``storage_room`` of type :class:`textgame.room.Room` that
 can be used to put stuff inside that should not be visible for the player.
@@ -77,9 +97,10 @@ class World:
     def load_resources(self, dir, loader=json.load, log_traceback=False):
         """looks for the files ``rooms.*``, ``items.*``, ``monsters.*`` and ``weapons.*`` in
         ``dir`` and tries to load them with the specified ``loader``.
+
         :param dir: directory path to resource files
-        :param loader: function that takes a file handler and reads it into a dictionary, defaults to ``json.load``
-        :param log_traceback: when an exception occurs, log the full traceback and raise, defaults to False
+        :param loader: function that takes a file handler and reads it into a dictionary, defaults to :py:func:`json.load`
+        :param log_traceback: when an exception occurs, log the full traceback and raise, defaults to ``False``
         """
         if not os.path.isdir(dir):
             raise NotADirectoryError("{} is not a directory".format(dir))

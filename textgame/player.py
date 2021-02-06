@@ -3,13 +3,18 @@ textgame.player
 =====================
 
 This module contains a class :class:`textgame.player.Player` that is used to define
-what a player is able to do in the game. Every of its methods that get called by
-:class:`textgame.parser.Parser` must take a noun (string) as an argument and return
+what a player is able to do in the game. Every of its methods that is meant to represent
+a move by the user must take a noun (string) as an argument and return
 either a string that describes the action or a :class:`textgame.parser.EnterYesNoLoop`.
 For convenience, this module provides wrappers for Player methods:
 
-- :func:`textgame.player.player_method`
-- :func:`textgame.player.action_method`
+- :func:`textgame.player.register`
+- :func:`textgame.player.timeless`
+
+Methods that should be recognised by the parser should be decorated with :func:`textgame.player.register`.
+
+By default, after every move, :func:`textgame.world.World.update` gets called. To prevent this for certain methods (moves), decorate
+them with :func:`textgame.player.timeless`.
 """
 
 from collections import OrderedDict
@@ -24,18 +29,26 @@ from textgame.parser import EnterYesNoLoop
 
 
 def register(command):
-    """wrapper for player methods
-    methods which are decorated with this function are returned by
-    func:`textgame.player.Player.get_registered_methods` in the form
-    `{command: function-object}`
+    """
+    methods to link player methods to commands
+
+    :param command: the verb which should be linked to the decorated method
+    :type param: string
     """
     def wrapper(f):
         f.command = command
+        if not f.__doc__:
+            f.__doc__ = ""
+        f.__doc__ += "\nmapped to: \"{}\"\n".format(command)
         return f
     return wrapper
 
 
 def timeless(f):
+    """
+    decorator for player methods to mark them as moves which should not be followed by
+    a call to :func:`textgame.world.World.update`.
+    """
     f.timeless = True
     return f
 
@@ -43,10 +56,13 @@ def timeless(f):
 class Player:
     """class to represent the player of the game
 
-    - holds an instance of :class:`textgame.world.World` so that its methods can have the widest possible impact on the game
+    - holds an instance of :class:`textgame.world.World` so that its methods can access every room in the game
     - ``self.location`` contains the room the player is currently in, ``self.oldlocation`` contains the previous location
     - ``self.inventory`` is a dict mapping the item's IDs to the items the player is carrying
     - ``self.status`` tracks the player's status: ``{"alive": True, "fighting": False, "trapped": False}``
+
+    :param world: :class:`textgame.world.World` object
+    :param initlocation: :class:`textgame.room.Room` object. The game starts in this room.
     """
 
     def __init__(self, world, initlocation):
@@ -66,6 +82,10 @@ class Player:
 
 
     def get_registered_methods(self):
+        """
+        return all methods which are decorated with :func:`textgame.player.register` in the form
+        ``{command: function, ...}``
+        """
         registered = {}
         for propertyname in dir(self):
             prop = getattr(self, propertyname)
