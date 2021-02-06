@@ -18,7 +18,7 @@ sys.path.insert(0, os.path.abspath('../../textgame'))
 # -- Project information -----------------------------------------------------
 
 project = 'textgame'
-copyright = '2019, David Koch'
+copyright = '2019-2021, David Koch'
 author = 'David Koch'
 
 from textgame import __version__
