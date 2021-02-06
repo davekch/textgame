@@ -36,6 +36,9 @@ import logging
 logger = logging.getLogger("textgame.world")
 logger.addHandler(logging.NullHandler())
 import random
+import json
+import glob
+import os
 from collections import OrderedDict
 
 from textgame.room import Room
@@ -63,7 +66,45 @@ class World:
         # dummy room to keep stuff out of the actual world
         self.storage_room = Room("storage")
 
-        # fill stuff
+        self._fill_resources(items=items, rooms=rooms, weapons=weapons, monsters=monsters)
+
+        self.seed = seed if seed else random.randint(0,1000000)
+        logger.debug("seeding world with {}".format(self.seed))
+        self.random = random.Random()
+        self.random.seed(self.seed)
+
+
+    def load_resources(self, dir, loader=json.load, log_traceback=False):
+        """looks for the files ``rooms.*``, ``items.*``, ``monsters.*`` and ``weapons.*`` in
+        ``dir`` and tries to load them with the specified ``loader``.
+        :param dir: directory path to resource files
+        :param loader: function that takes a file handler and reads it into a dictionary, defaults to ``json.load``
+        :param log_traceback: when an exception occurs, log the full traceback and raise, defaults to False
+        """
+        if not os.path.isdir(dir):
+            raise NotADirectoryError("{} is not a directory".format(dir))
+        resources = {name: None for name in ["rooms", "items", "monsters", "weapons"]}
+        for resource in resources:
+            wildcard = resource + ".*"
+            for file in glob.glob(os.path.join(dir, wildcard)):
+                try:
+                    with open(file) as f:
+                        resources[resource] = loader(f)
+                    logger.info("load {} into world".format(os.path.join(dir, file)))
+                except:
+                    msg = "An unexpected exception occured while trying to read {} with {}".format(
+                        os.path.join(dir, file),
+                        loader.__name__
+                    )
+                    if log_traceback:
+                        logger.exception(msg)
+                        raise
+                    else:
+                        logger.warning(msg)
+        self._fill_resources(**resources)
+
+
+    def _fill_resources(self, items=None, rooms=None, monsters=None, weapons=None):
         if rooms:
             self.create_rooms(rooms)
         if items:
@@ -74,11 +115,6 @@ class World:
             self.create_items(monsters, tag="monsters")
         self.put_items_in_place()
         self.put_monsters_in_place()
-
-        self.seed = seed if seed else random.randint(0,1000000)
-        logger.debug("seeding world with {}".format(self.seed))
-        self.random = random.Random()
-        self.random.seed(self.seed)
 
 
     def create_rooms(self, descriptions):
