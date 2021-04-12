@@ -44,7 +44,7 @@ and let the world load them automatically:
 
     # myadventuregame.py
     from textgame.world import World
-    
+
     world = World()
     world.load_resources("./resources")
 
@@ -196,6 +196,9 @@ class World:
 
         :rtype: :class:`textgame.room.Room` or ``None``
         """
+        if ID == "storage_room":
+            return self.storage_room
+
         result = self.rooms.get(ID)
         if not result:
             logger.error("Room not found: {}".format(ID))
@@ -228,7 +231,7 @@ class World:
         This is done automatically if the items are passed at initialization
         """
         for item in self.items.values():
-            initlocation = self.rooms.get(item.initlocation)
+            initlocation = self.room(item.initlocation)
             if initlocation:
                 initlocation.add_item(item)
             else:
@@ -243,7 +246,7 @@ class World:
         This is done automatically if the monsters are passed at initialization
         """
         for monster in self.monsters.values():
-            initlocation = self.rooms.get(monster.initlocation)
+            initlocation = self.room(monster.initlocation)
             if initlocation:
                 initlocation.add_monster(monster)
             elif monster.initlocation:
