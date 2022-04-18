@@ -1,4 +1,4 @@
-from typing import List
+from typing import Callable, List, Optional
 from ..registry import command_registry, Registry
 from ..state import State, PlayerStatus
 from ..messages import (
@@ -14,7 +14,7 @@ from ..defaults.words import DIRECTIONS
 from ..things import Key, Monster, Takable, Weapon
 
 
-defaultcommand_registry = Registry()
+defaultcommand_registry: Registry[Callable[[str, State], Optional[m]]] = Registry()
 
 
 def use_defaults(exclude: List[str] = None):
