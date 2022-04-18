@@ -52,7 +52,7 @@ def randomwalk(creature: Creature, state: State, mobility: float):
         )
         return
 
-    connections = room.get_open_connections().values()
+    connections = list(room.get_open_connections().values())
     if state.random.random() < mobility:
         next_location = state.random.choice(connections)
         logging.debug(f"changing location of {creature.id!r} to {next_location.id!r}")
