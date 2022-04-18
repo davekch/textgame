@@ -50,7 +50,7 @@ class StorageManager:
     def __init__(self, storage: Dict[str, Thing]):
         self.storage = storage
         # maps the names of stores to the ids of things that are in them
-        self._stores: Dict[str, Set[str]] = defaultdict(set)
+        self._stores: Dict[str, List[str]] = defaultdict(list)
         # maps the ids of thing to the names of stores they are in
         self._thing_stores: Dict[str, str] = {}
 
@@ -62,7 +62,7 @@ class StorageManager:
             raise UniqueConstraintError(
                 f"store with the id {store.id!r} already exists in this manager"
             )
-        self._stores[store.id] = set()
+        self._stores[store.id] = []
         store.set_manager(self)
 
     @_require_thing_exists
@@ -76,7 +76,7 @@ class StorageManager:
             )
             self._stores[current_store].remove(thing_id)
         # now add the thing to the intended store and update the thing's store
-        self._stores[store_id].add(thing_id)
+        self._stores[store_id].append(thing_id)
         self._thing_stores[thing_id] = store_id
 
     @_require_thing_exists
