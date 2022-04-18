@@ -34,6 +34,7 @@ class State:
     ):
         self.rooms = rooms
         self.player_location = player_location
+        self.player_location.visit()  # mark the initial room as visited
         self.creatures = StorageManager(
             creatures
         )  # rename to creature_manager and item_manager?

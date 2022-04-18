@@ -31,7 +31,7 @@ class Room:
 
     def __init__(
         self,
-        ID: str,
+        id: str,
         description: str,
         shortdescription: str = "",
         value: int = 5,
@@ -45,14 +45,14 @@ class Room:
         locked: Dict[str, Dict] = None,
         dir_descriptions: Dict[str, str] = None,
     ):
-        self.id = ID  # unique, similar rooms should have a common keyword in ID
+        self.id = id  # unique, similar rooms should have a common keyword in ID
         self.doors = {dir: None for dir in DIRECTIONS}
         # dict that describes the locked/opened state of doors
         self.locked = {dir: {"closed": False, "key": None} for dir in DIRECTIONS}
         # description to print when going in this direction
         self.dir_descriptions = {dir: m() for dir in DIRECTIONS}
-        self.items = Store(ID)
-        self.creatures = Store(ID)
+        self.items = Store(id)
+        self.creatures = Store(id)
         self.visited = False
         self.hiddendoors = {}
         self.description = m(description)

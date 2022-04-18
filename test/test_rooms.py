@@ -6,7 +6,7 @@ from textgame.messages import DESCRIPTIONS, MOVING
 @pytest.fixture
 def roominfo_00():
     return dict(
-        ID="room_00",
+        id="room_00",
         description="some long description",
         shortdescription="some description",
         value=3,

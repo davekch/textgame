@@ -210,7 +210,7 @@ def list_inventory(_: str, state: State) -> m:
     if state.inventory:
         response = m("You are now carrying:")
         for i in state.inventory.values():
-            response += m("A " + i.name)
+            response += m(" A " + i.name)
         return response
     return ACTION.NO_INVENTORY
 
