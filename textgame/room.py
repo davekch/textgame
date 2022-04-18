@@ -180,7 +180,7 @@ class Room:
         """
         self.locked[direction]["locked"] = locked
 
-    def get_hint(self) -> Tuple[m, int]:
-        """return a tuple of warning and the actual hint (``(str,str)``)
+    def get_hint(self) -> Tuple[m, m]:
+        """return a tuple of warning and the actual hint (``(m, m)``)
         """
         return (INFO.HINT_WARNING.format(self.hint_value), self.hint)

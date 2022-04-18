@@ -89,6 +89,23 @@ class TestGamePlay:
         assert game.state.inventory.items() == {}
         game.play("take diamond")
         assert "diamond" in game.state.inventory
+    
+    def test_score(self, game: Game):
+        assert game.state.score == 0
+        game.play("go north")
+        assert game.state.score == game.state.player_location.value
+        assert game.play("score") == str(INFO.SCORE.format(game.state.player_location.value))
+    
+    def test_hint(self, game: Game):
+        warning, hint = game.state.player_location.get_hint()
+        assert game.play("hint") == str(warning)
+        assert game.play("no") == "ok."
+        assert game.state.score == 0
+        assert game.play("hint") == str(warning)
+        assert game.play("yes") == str(hint)
+        assert game.state.score == -game.state.player_location.hint_value
+        game.state.player_location = game.state.rooms["field_1"]
+        assert game.play("hint") == str(INFO.NO_HINT)
 
 
 class TestHooks:

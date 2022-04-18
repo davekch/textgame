@@ -1,6 +1,6 @@
 from ..registry import register_command
 from ..state import State, PlayerStatus
-from ..messages import m, MOVING, ACTION, DESCRIPTIONS
+from ..messages import INFO, m, EnterYesNoLoop, MOVING, ACTION, DESCRIPTIONS
 from ..defaults.words import DIRECTIONS
 from ..things import Key
 
@@ -189,7 +189,7 @@ def takeall(state: State) -> m:
 
 
 @register_command("inventory")
-def list_inventory(_: str, state: State):
+def list_inventory(_: str, state: State) -> m:
     """
     return a pretty formatted list of what's inside inventory
     """
@@ -202,7 +202,7 @@ def list_inventory(_: str, state: State):
 
 
 @register_command("drop")
-def drop(itemid: str, state: State):
+def drop(itemid: str, state: State) -> m:
     """
     see if something with the ID ``noun`` is in the inventory. If yes, remove
     it from inventory and add it to location
@@ -221,7 +221,7 @@ def drop(itemid: str, state: State):
     return ACTION.SUCC_DROP
 
 
-def dropall(state: State):
+def dropall(state: State) -> m:
     """
     move all items in the inventory to current location
     """
@@ -230,3 +230,37 @@ def dropall(state: State):
     for item in state.inventory.keys():
         drop(item, state)
     return ACTION.SUCC_DROP
+
+
+@register_command("score")
+def show_score(_: str, state: State) -> m:
+    return INFO.SCORE.format(state.score)
+
+
+@register_command("listen")
+def listen(_: str, state: State) -> m:
+    return state.player_location.sound
+
+
+@register_command("hint")
+def ask_hint(_: str, state: State):
+    """
+    ask for a hint in the current location,
+    if there is one, return :class:`textgame.parser.EnterYesNoLoop` if the hint
+    should really be displayed
+    """
+    warning, hint = state.player_location.get_hint()
+    if not hint:
+        return INFO.NO_HINT
+
+    def hint_conversation() -> m:
+        state.score -= state.player_location.hint_value
+        return hint
+
+    # stuff hint_conversation inside the EnterYesNoLoop,
+    # this will be called during conversation
+    return EnterYesNoLoop(
+        question = warning,
+        yes = hint_conversation,
+        no = m("ok.")
+    )
