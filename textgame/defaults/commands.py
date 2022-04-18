@@ -60,10 +60,15 @@ def go(direction: str, state: State) -> m:
                 # call the hook of the new location
                 msg = state.player_location.call_hook(state)
                 # if the room is not dark, add dir_description to the beginning
-                if not state.player_location.is_dark() and dir_description:
+                if (
+                    not state.player_location.is_dark() or state.lighting()
+                ) and dir_description:
                     msg += m(dir_description)
                 msg += state.player_location.describe(light=state.lighting())
-                if not state.player_location.visited:
+                # if the room is not dark and we weren't here before, add the room's score
+                if not state.player_location.visited and (
+                    state.lighting() or not state.player_location.is_dark()
+                ):
                     state.score += state.player_location.visit()
                 return msg
             else:

@@ -135,11 +135,9 @@ class Room:
         self.doors.update(self.hiddendoors)
 
     def visit(self) -> int:
-        """mark this room as visited if it's not dark and return its value"""
-        if not self.dark["now"]:
-            self.visited = True
-            return self.value
-        return 0
+        """mark this room as visited and return its value"""
+        self.visited = True
+        return self.value
 
     def call_hook(self, state: State) -> m:
         if self.id in roomhook_registry:
@@ -201,11 +199,12 @@ class Room:
                 or self.hiddendoors.get(direction) is not None
             )
 
-    def get_open_connections(self) -> Dict[str, Room]:
+    def get_open_connections(self, include_hidden: bool = False) -> Dict[str, Room]:
         return {
             direction: self.doors[direction]
             for direction in DIRECTIONS
-            if self.doors[direction] and not self.is_locked(direction)
+            if self.has_connection_in(direction, include_hidden=include_hidden)
+            and not self.is_locked(direction)
         }
 
     def get_door_code(self, direction: str) -> Optional[int]:
