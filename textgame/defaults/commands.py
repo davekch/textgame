@@ -1,4 +1,5 @@
-from ..registry import command_registry
+from typing import List
+from ..registry import command_registry, Registry
 from ..state import State, PlayerStatus
 from ..messages import (
     INFO,
@@ -13,8 +14,18 @@ from ..defaults.words import DIRECTIONS
 from ..things import Key, Monster, Weapon
 
 
-# change register_command to register_defaultcommand and add use_defaults function
-@command_registry.register("go")
+defaultcommand_registry = Registry()
+
+
+def use_defaults(exclude: List[str] = None):
+    """register the commands that are defined in textgame.defaults.commands"""
+    exclude = exclude or []
+    for command, func in defaultcommand_registry.items():
+        if command not in exclude:
+            command_registry.register(command, func)
+
+
+@defaultcommand_registry.register("go")
 def go(direction: str, state: State) -> m:
     """
     change location to the room in the direction ``noun``. ``noun`` can be
@@ -79,37 +90,37 @@ def goback(state: State) -> m:
         return go(direction, state)
 
 
-@command_registry.register("north")
+@defaultcommand_registry.register("north")
 def go_north(_, state: State) -> m:
     return go("north", state)
 
 
-@command_registry.register("east")
+@defaultcommand_registry.register("east")
 def go_east(_, state: State) -> m:
     return go("east", state)
 
 
-@command_registry.register("south")
+@defaultcommand_registry.register("south")
 def go_south(_, state: State) -> m:
     return go("south", state)
 
 
-@command_registry.register("west")
+@defaultcommand_registry.register("west")
 def go_west(_, state: State) -> m:
     return go("west", state)
 
 
-@command_registry.register("up")
+@defaultcommand_registry.register("up")
 def go_up(_, state: State) -> m:
     return go("up", state)
 
 
-@command_registry.register("down")
+@defaultcommand_registry.register("down")
 def go_down(_, state: State) -> m:
     return go("down", state)
 
 
-@command_registry.register("close")
+@defaultcommand_registry.register("close")
 def close(direction: str, state: State) -> m:
     """
     lock the door in direction ``direction`` if player has a key in inventory
@@ -118,7 +129,7 @@ def close(direction: str, state: State) -> m:
     return _close_or_lock("lock", direction, state)
 
 
-@command_registry.register("open")
+@defaultcommand_registry.register("open")
 def open(direction: str, state: State) -> m:
     """
     open the door in direction ``direction`` if player has a key in inventory
@@ -151,15 +162,17 @@ def _close_or_lock(action, direction: str, state: State) -> m:
     return ACTION.FAIL_NO_KEY
 
 
-@command_registry.register("look")
+@defaultcommand_registry.register("look")
 def look(_, state: State) -> m:
     """
     get the long description of the current location.
     """
-    return state.player_location.describe(long=True, light=state.lighting())
+    msg = state.player_location.call_hook(state)
+    msg += state.player_location.describe(long=True, light=state.lighting())
+    return msg
 
 
-@command_registry.register("take")
+@defaultcommand_registry.register("take")
 def take(itemid: str, state: State) -> m:
     """
     see if something with the ID ``itemid`` is in the items of the current
@@ -205,7 +218,7 @@ def takeall(state: State) -> m:
     return response
 
 
-@command_registry.register("inventory")
+@defaultcommand_registry.register("inventory")
 def list_inventory(_: str, state: State) -> m:
     """
     return a pretty formatted list of what's inside inventory
@@ -218,7 +231,7 @@ def list_inventory(_: str, state: State) -> m:
     return ACTION.NO_INVENTORY
 
 
-@command_registry.register("drop")
+@defaultcommand_registry.register("drop")
 def drop(itemid: str, state: State) -> m:
     """
     see if something with the ID ``noun`` is in the inventory. If yes, remove
@@ -248,17 +261,17 @@ def dropall(state: State) -> m:
     return ACTION.SUCC_DROP
 
 
-@command_registry.register("score")
+@defaultcommand_registry.register("score")
 def show_score(_: str, state: State) -> m:
     return INFO.SCORE.format(state.score)
 
 
-@command_registry.register("listen")
+@defaultcommand_registry.register("listen")
 def listen(_: str, state: State) -> m:
     return state.player_location.sound
 
 
-@command_registry.register("hint")
+@defaultcommand_registry.register("hint")
 def ask_hint(_: str, state: State) -> YesNoQuestion:
     """
     ask for a hint in the current location,
@@ -278,7 +291,7 @@ def ask_hint(_: str, state: State) -> YesNoQuestion:
     return YesNoQuestion(question=warning, yes=hint_conversation, no=m("ok."))
 
 
-@command_registry.register("fight")
+@defaultcommand_registry.register("fight")
 def fight(noun: str, state: State) -> m:
     if noun and noun not in state.player_location.creatures:
         return ACTION.NO_SUCH_FIGHT.format(noun)

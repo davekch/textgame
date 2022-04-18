@@ -50,6 +50,7 @@ def resources() -> Dict:
 
 @pytest.fixture
 def game(resources) -> Game:
+    commands.use_defaults()
     behaviour_registry.register("randomappearance", behaviours.RandomAppearance)
     behaviour_registry.register("randomwalk", behaviours.RandomWalk)
     behaviour_registry.register("random_spawn_once", behaviours.RandomSpawnOnce)
