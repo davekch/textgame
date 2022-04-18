@@ -33,3 +33,5 @@ class TestM:
         test = m("no")
         assert str(test) == "nein"
         assert m("test") == "test"  # rest remains the same
+        # reverse the change
+        m.translations = {}
