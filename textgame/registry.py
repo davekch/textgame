@@ -1,13 +1,21 @@
+from __future__ import annotations
 from functools import wraps
-from typing import Callable, List
+from typing import Callable, Dict, List, Optional, Union, TypeVar, OrderedDict
 from collections import OrderedDict
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from .messages import m
+    from .state import State
 
-command_registry = {}
-behavior_registry = {}
-precommandhook_registry = OrderedDict()
-postcommandhook_registry = OrderedDict()
 
+CommandArgTypes = TypeVar("CommandArgTypes")
+BehaviourArgTypes = TypeVar("BehaviourArgTypes")
+
+command_registry: Dict[str, Callable[[CommandArgTypes], m]] = {}
+behavior_registry: Dict[str, Callable[[BehaviourArgTypes], Optional[m]]] = {}
+precommandhook_registry: OrderedDict[str, Callable[[State], m]] = OrderedDict()
+postcommandhook_registry: OrderedDict[str, Callable[[State], m]] = OrderedDict()
 
 
 def register_command(command: str):
@@ -21,18 +29,24 @@ def unregister_command(command: str):
     command_registry.pop(command, None)
 
 
-def register_behaviour(name: str):
-    def decorated(func: Callable):
+def register_behaviour(name: str, func: Callable[[BehaviourArgTypes], Optional[m]] = None):
+    if not func:
+        # this means that this is called as a decorator @register_behaviour("behaviour")
+
+        def decorator(_func: Callable[[BehaviourArgTypes], Optional[m]]):
+            behavior_registry[name] = _func
+            return _func
+        return decorator
+    
+    else:
         behavior_registry[name] = func
-        return func
-    return decorated
 
 
 def unregister_behaviour(name: str):
     register_behaviour.pop(name, None)
 
 
-def register_precommandhook(name: str, func: Callable):
+def register_precommandhook(name: str, func: Callable[[State], m]):
     precommandhook_registry[name] = func
 
 
@@ -40,7 +54,7 @@ def unregister_precommandhook(name: str):
     precommandhook_registry.pop(name, None)
 
 
-def register_postcommandhook(name: str, func: Callable):
+def register_postcommandhook(name: str, func: Callable[[State], m]):
     postcommandhook_registry[name] = func
 
 
