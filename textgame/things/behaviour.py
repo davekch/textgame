@@ -20,7 +20,7 @@ logger.addHandler(logging.NullHandler())
 
 
 @dataclass
-class _Behaves:
+class _Behaves(Thing):
     # behaviours could look like this: {"spawn": {"probability": 0.2, "rooms": ["field_0", "field_1"]}}
     behaviours: Dict[str, Behaviour] = field(default_factory=dict)
 
