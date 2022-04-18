@@ -72,6 +72,9 @@ class MultipleChoiceQuestion:
             q += m(f" ({i}) {answer[0]}")
         return q
 
+    def __repr__(self) -> str:
+        return f"<{self.__class__.__name__} question={self._question!r} answers={self.answers}>"
+
     @wrap_m
     def get_response(self, choice: str) -> m:
         _, response = self.answers[choice]
@@ -150,7 +153,7 @@ class m:
         return self.data or ""
 
     def __repr__(self) -> str:
-        return f'<{self.__class__.__name__} "{str(self)}">'
+        return f"<{self.__class__.__name__} {repr(self.data or '')}>"
 
     def __eq__(self, other: Union[str, m]) -> bool:
         if isinstance(other, m):

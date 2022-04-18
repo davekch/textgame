@@ -1,7 +1,7 @@
 from __future__ import annotations
 from enum import Enum, auto
 from .caller import Caller
-from .state import State
+from .state import PlayerStatus, State
 
 import logging
 
@@ -25,6 +25,8 @@ class Game:
         logger.debug(f"play move with the input {input!r}")
         msg = self.caller.call(input, self.state)
         logger.debug(f"finished the move with input {input!r}, response is {msg!r}")
+        if self.state.player_status == PlayerStatus.DEAD:
+            self.status = GameStatus.OVER
         return str(msg)
 
     def cli_loop(self, prompt: str = "> "):

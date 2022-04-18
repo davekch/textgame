@@ -5,7 +5,7 @@ class TestM:
     def test_str(self):
         test = m("test")
         assert str(test) == "test"
-        assert repr(test) == '<m "test">'
+        assert repr(test) == "<m 'test'>"
 
     def test_nesting(self):
         test = m("test")
