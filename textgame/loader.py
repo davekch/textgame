@@ -4,6 +4,7 @@ from json import load
 from typing import List, Dict, Any, Callable, Type
 from pathlib import Path
 import json
+from copy import deepcopy
 import os
 from .room import Room
 from .things import (
@@ -64,10 +65,11 @@ def behaviour_factory(behaviourname: str, params: Dict[str, Any]) -> Behaviour:
     if behaviourname not in behaviour_registry:
         raise ConfigurationError(f"behaviour {behaviourname!r} is not registered")
     behaviour_class = behaviour_registry[behaviourname]
-    switch = params.pop("switch", None)
+    params_copy = params.copy()
+    switch = params_copy.pop("switch", None)
     if switch is None:
-        return behaviour_class(params=params)
-    return behaviour_class(switch=switch, params=params)
+        return behaviour_class(params=params_copy)
+    return behaviour_class(switch=switch, params=params_copy)
 
 
 def load_resources(path: Path, format: str = "json") -> Dict[str, List[Dict]]:
@@ -95,6 +97,8 @@ class Loader:
 
     @classmethod
     def load_objs(cls, dicts: List[Dict[str, Any]], obj_type=None) -> List[Any]:
+        # make sure to not accidentally mutate the original list
+        dicts = deepcopy(dicts)
         objs = []
         for args in dicts:
             if "type" not in args and not obj_type:
