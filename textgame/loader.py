@@ -3,6 +3,7 @@ from typing import List, Dict, Any, Callable
 from .room import Room
 from .items import Item, Key
 from .state import State
+from .exceptions import ConfigurationError
 
 
 class Factory:
@@ -27,10 +28,6 @@ class Factory:
         if not obj_type:
             obj_type = args_copy.pop("type")
         return cls.creation_funcs[obj_type](**args_copy)
-
-
-class ConfigurationError(Exception):
-    pass
 
 
 class Loader:
