@@ -1,6 +1,6 @@
 from __future__ import annotations
 from dataclasses import dataclass, field
-from typing import Dict, Optional, Tuple, List, TYPE_CHECKING
+from typing import Dict, Optional, Tuple, Union, TYPE_CHECKING
 from .things import Lightsource, Thing, _Contains
 from .messages import m, DESCRIPTIONS, MOVING, INFO
 from .defaults.words import DIRECTIONS
@@ -13,6 +13,8 @@ import logging
 
 logger = logging.getLogger("textgame.room")
 logger.addHandler(logging.NullHandler())
+
+DirectionType = Union[str, m]
 
 
 @dataclass
@@ -38,20 +40,23 @@ class Room(_Contains, Thing):
     shortdescription: str = ""
     value: int = 5
     dark: Dict = field(default_factory=dict)
-    sound: str = DESCRIPTIONS.NO_SOUND
+    sound: str = str(DESCRIPTIONS.NO_SOUND)
     hint: str = ""
     hint_value: int = 2
-    errors: Dict[str, str] = field(default_factory=dict)
-    doors: Dict[str, str] = field(default_factory=dict)
-    hiddendoors: Dict[str, str] = field(default_factory=dict)
-    locked: Dict[str, Dict] = field(default_factory=dict)
-    dir_descriptions: Dict[str, str] = field(default_factory=dict)
+    errors: Dict[DirectionType, str] = field(default_factory=dict)
+    doors: Dict[DirectionType, str] = field(default_factory=dict)
+    hiddendoors: Dict[DirectionType, str] = field(default_factory=dict)
+    locked: Dict[DirectionType, Dict] = field(default_factory=dict)
+    dir_descriptions: Dict[DirectionType, str] = field(default_factory=dict)
     visited: bool = field(default=False, init=False)
 
     def __post_init__(self):
         super().__post_init__()
         # fill up all the dicts with missing info
         self.doors.update({dir: None for dir in DIRECTIONS if dir not in self.doors})
+        # the same as doors but with actual rooms as the values
+        self.connections: Dict[DirectionType, Room] = {dir: None for dir in DIRECTIONS}
+        self.hiddenconnections: Dict[DirectionType, Room] = {}
         # dict that describes the locked/opened state of doors
         self.locked.update(
             {
@@ -91,7 +96,7 @@ class Room(_Contains, Thing):
                         f"locked dict of room {self.id}: {id} is not a direction"
                     )
 
-    def add_connection(self, dir: str, room_id: str, hidden=False):
+    def add_connection(self, dir: DirectionType, room_id: str, hidden=False):
         # todo: remove this method, its unnecessary and confusing (because it adds a string to the doors, not a room)
         """add a single connection to the room
 
@@ -116,6 +121,7 @@ class Room(_Contains, Thing):
             )
         )
         self.doors.update(self.hiddendoors)
+        self.connections.update(self.hiddenconnections)
 
     def visit(self) -> int:
         """mark this room as visited and return its value"""
@@ -128,19 +134,19 @@ class Room(_Contains, Thing):
             return roomhook_registry[self.id](state) or m()
         return m()
 
-    def is_locked(self, direction: str) -> bool:
+    def is_locked(self, direction: DirectionType) -> bool:
         """return ``True`` if the door in ``direction`` is locked"""
-        return self.locked.get(direction, {}).get("locked")
+        return bool(self.locked.get(direction, {}).get("locked"))
 
-    def describe_way_to(self, direction: str) -> m:
+    def describe_way_to(self, direction: DirectionType) -> m:
         """return content of ``self.dir_descriptions`` (see :func:`textgame.room.Room.fill_info`) in the given direction.
         Returns an empty string if no description exists.
         """
         return m(self.dir_descriptions.get(direction, ""))
 
-    def get_connection(self, direction: str) -> Optional[Room]:
+    def get_connection(self, direction: DirectionType) -> Optional[Room]:
         """returns room object that lies in the given direction, ``None`` if there is no door in that direction."""
-        return self.doors.get(direction)
+        return self.connections.get(direction)
 
     def is_dark(self) -> bool:
         return self.dark["now"] and not self.things.keys(filter=[Lightsource])
@@ -156,7 +162,7 @@ class Room(_Contains, Thing):
             descript += thing.describe()
         return descript
 
-    def describe_error(self, direction: str) -> m:
+    def describe_error(self, direction: DirectionType) -> m:
         """return content of ``self.errors`` (see :func:`textgame.room.Room.fill_info`) in the given direction. Returns the default
         :attr:`textgame.globals.MOVING.FAIL_CANT_GO` if no other direction is given.
         """
@@ -168,7 +174,9 @@ class Room(_Contains, Thing):
         """
         return other in self.doors.values()
 
-    def has_connection_in(self, direction: str, include_hidden: bool = False) -> bool:
+    def has_connection_in(
+        self, direction: DirectionType, include_hidden: bool = False
+    ) -> bool:
         """
         returns ``True`` if there is a connection in the specified direction
         """
@@ -180,19 +188,21 @@ class Room(_Contains, Thing):
                 or self.hiddendoors.get(direction) is not None
             )
 
-    def get_open_connections(self, include_hidden: bool = False) -> Dict[str, Room]:
+    def get_open_connections(
+        self, include_hidden: bool = False
+    ) -> Dict[DirectionType, Room]:
         return {
-            direction: self.doors[direction]
+            direction: self.connections[direction]
             for direction in DIRECTIONS
             if self.has_connection_in(direction, include_hidden=include_hidden)
             and not self.is_locked(direction)
         }
 
-    def get_door_code(self, direction: str) -> Optional[int]:
+    def get_door_code(self, direction: DirectionType) -> Optional[int]:
         """gets the key code to the door in the given direction, ``None`` else"""
         return self.locked.get(direction, {}).get("key")
 
-    def set_locked(self, direction: str, locked: bool):
+    def set_locked(self, direction: DirectionType, locked: bool):
         """set the status of the door in ``direction``.
 
         :param direction: one of :data:`textgame.globals.DIRECTIONS`

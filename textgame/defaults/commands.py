@@ -85,11 +85,11 @@ def goback(state: State) -> m:
     if state.player_location_old == state.player_location:
         return MOVING.FAIL_NO_MEMORY
     # maybe there's no connection to location_old
-    if not state.player_location.connects_to(state.player_location_old):
+    if not state.player_location.connects_to(state.player_location_old.id):
         return MOVING.FAIL_NO_WAY_BACK
     else:
         # find in which direction location_old is
-        for dir, dest in state.player_location.doors.items():
+        for dir, dest in state.player_location.get_open_connections().items():
             if dest == state.player_location_old:
                 direction = dir
                 break

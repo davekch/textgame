@@ -41,8 +41,8 @@ class TestRoom:
         )
 
     def test_connection(self, roominfo_00, room_00):
-        assert room_00.get_connection("west") == roominfo_00["doors"]["west"]
-        assert room_00.get_connection("up") == None
+        assert room_00.doors["west"] == roominfo_00["doors"]["west"]
+        assert room_00.doors["up"] == None
 
     def test_describe_error(self, roominfo_00, room_00):
         assert room_00.describe_error("north") == roominfo_00["errors"]["north"]

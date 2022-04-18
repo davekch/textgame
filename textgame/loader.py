@@ -139,10 +139,12 @@ class StateBuilder:
         for room in graph.values():
             for direction in room.doors:
                 if room.has_connection_in(direction):
-                    room.doors[direction] = graph[room.doors[direction]]
+                    room.connections[direction] = graph[room.doors[direction]]
             for direction in room.hiddendoors:
                 if room.has_connection_in(direction, include_hidden=True):
-                    room.hiddendoors[direction] = graph[room.hiddendoors[direction]]
+                    room.hiddenconnections[direction] = graph[
+                        room.hiddendoors[direction]
+                    ]
         return graph
 
     def build(
