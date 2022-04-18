@@ -12,7 +12,14 @@ from .parser import (
     MultipleChoiceParser,
 )
 from .state import State
-from .messages import MessageType, MultipleChoiceQuestion, m, YesNoQuestion, INFO
+from .messages import (
+    MessageType,
+    MultipleChoiceQuestion,
+    m,
+    YesNoQuestion,
+    INFO,
+    wrap_m,
+)
 from .registry import (
     command_registry,
     precommandhook_registry,
@@ -98,16 +105,13 @@ class CommandInterpreter(Interpreter):
             value=[prehookmsg, commandresponse, posthookmsg], type=type(commandresponse)
         )
 
+    @wrap_m
     def call_function(
         self, function: Callable[..., m], command: Command, state: State
     ) -> m:
         """define how a function should be called given the state and parsed command"""
         logger.debug(f"calling {function}")
-        result = function(command.noun, state)
-        # convert result to m if it is a string
-        if isinstance(result, str):
-            result = m(result)
-        return result
+        return function(command.noun, state)
 
     def get_function(self, command: Command) -> Callable[[str, State], m]:
         if command.verb not in command_registry:

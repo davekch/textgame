@@ -1,10 +1,24 @@
 from __future__ import annotations
+from functools import wraps
 from typing import Protocol, Union, Callable, Dict, List
 
 
 class MessageType(Protocol):
     def to_message(self) -> m:
         ...
+
+
+def wrap_m(func: Callable[..., str | m]) -> Callable[..., m]:
+    """decorator that converts the returned value of func into m if it's a string"""
+
+    @wraps(func)
+    def returns_m(*args, **kwargs):
+        result = func(*args, **kwargs)
+        if isinstance(result, str):
+            return m(result)
+        return result
+
+    return returns_m
 
 
 class YesNoQuestion:
@@ -20,6 +34,7 @@ class YesNoQuestion:
         self._yes = yes
         self._no = no
 
+    @wrap_m
     def yes(self) -> m:
         """
         if yes is callable, return its result, else return it
@@ -28,6 +43,7 @@ class YesNoQuestion:
             return self._yes()
         return self._yes
 
+    @wrap_m
     def no(self) -> m:
         """
         if no is callable, return its result, else return it
@@ -56,6 +72,7 @@ class MultipleChoiceQuestion:
             q += m(f" ({i}) {answer[0]}")
         return q
 
+    @wrap_m
     def get_response(self, choice: str) -> m:
         _, response = self.answers[choice]
         if callable(response):
