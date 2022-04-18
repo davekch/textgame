@@ -5,7 +5,15 @@ from textgame.state import State
 from textgame.messages import ACTION, MOVING, EnterYesNoLoop, m, INFO
 from textgame.room import Room
 from textgame.state import State
-from textgame.registry import register_command, register_precommandhook, register_postcommandhook
+from textgame.registry import (
+    register_command,
+    register_precommandhook,
+    register_postcommandhook,
+    precommandhook_registry,
+    postcommandhook_registry,
+    unregister_postcommandhook,
+    unregister_precommandhook,
+)
 from textgame.defaults import commands
 from typing import Dict
 import json
@@ -113,3 +121,10 @@ class TestHooks:
             " Anytime soon, you'll probably get attacked by some night creature."
         )
         assert game.state.time == 3
+    
+    def teardown_method(self, test_method):
+        # unregister everything
+        for hook in precommandhook_registry:
+            unregister_precommandhook(hook)
+        for hook in postcommandhook_registry:
+            unregister_postcommandhook(hook)

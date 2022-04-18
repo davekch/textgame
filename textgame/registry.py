@@ -17,6 +17,10 @@ def register_command(command: str):
     return decorated
 
 
+def unregister_command(command: str):
+    command_registry.pop(command, None)
+
+
 def register_behaviour(name: str):
     def decorated(func: Callable):
         behavior_registry[name] = func
@@ -24,12 +28,24 @@ def register_behaviour(name: str):
     return decorated
 
 
+def unregister_behaviour(name: str):
+    register_behaviour.pop(name, None)
+
+
 def register_precommandhook(name: str, func: Callable):
     precommandhook_registry[name] = func
 
 
+def unregister_precommandhook(name: str):
+    precommandhook_registry.pop(name, None)
+
+
 def register_postcommandhook(name: str, func: Callable):
     postcommandhook_registry[name] = func
+
+
+def unregister_postcommandhook(name: str):
+    postcommandhook_registry.pop(name, None)
 
 
 def _skip_decoratorfactory(flag: str):

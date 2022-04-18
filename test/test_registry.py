@@ -21,7 +21,7 @@ class TestSkipHooks:
         def test2(arg):
             return arg
         
-        assert "something" in registry.get_precommandhook_skips(test2)
+        assert registry.get_precommandhook_skips(test2) == ["something"]
         assert test2("arg") == "arg"
 
     def test_skip_postcommandhookdecorator(self):
@@ -44,3 +44,10 @@ class TestSkipHooks:
         
         assert "something" in registry.get_postcommandhook_skips(test2)
         assert test2("arg") == "arg"
+    
+    def teardown_method(self, test_method):
+        # unregister everything
+        for hook in registry.precommandhook_registry:
+            registry.unregister_precommandhook(hook)
+        for hook in registry.postcommandhook_registry:
+            registry.unregister_postcommandhook(hook)
