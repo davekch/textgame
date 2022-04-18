@@ -28,6 +28,7 @@ from .registry import (
     get_postcommandhook_skips,
 )
 from .exceptions import ModeNotFoundError
+from ._util import obj_info
 
 import logging
 
@@ -111,15 +112,16 @@ class CommandInterpreter(Interpreter):
         self, function: Callable[..., m], command: Command, state: State
     ) -> m:
         """define how a function should be called given the state and parsed command"""
-        logger.debug(f"calling {function}")
+        logger.debug(f"calling {obj_info(function)}")
         return function(command.noun, state)
 
     def get_function(self, command: Command) -> Callable[[str, State], m]:
         if command.verb not in command_registry:
             logger.debug(f"could not find function for verb {command.verb!r}")
             raise KeyError
-        logger.debug(f"got function {command_registry[command.verb]}")
-        return command_registry[command.verb]
+        func = command_registry[command.verb]
+        logger.debug(f"got function {obj_info(func)}")
+        return func
 
 
 class YesNoInterpreter(Interpreter):
@@ -247,7 +249,7 @@ def call_precommandhook(state: State, skip: List[str] = None) -> m:
     msg = m()
     for name, func in precommandhook_registry.items():
         if name not in (skip or []):
-            logger.debug(f"call precommandhook {func!r}")
+            logger.debug(f"call precommandhook {obj_info(func)}")
             msg += func(state)
     return msg
 
@@ -256,6 +258,6 @@ def call_postcommandhook(state: State, skip: List[str] = None) -> m:
     msg = m()
     for name, func in postcommandhook_registry.items():
         if name not in (skip or []):
-            logger.debug(f"call postcommandhook {func!r}")
+            logger.debug(f"call postcommandhook {obj_info(func)}")
             msg += func(state)
     return msg

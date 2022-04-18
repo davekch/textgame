@@ -2,6 +2,7 @@ from __future__ import annotations
 from dataclasses import dataclass, fields, field
 from abc import ABC, abstractmethod
 from typing import Generic, Optional, List, Type, Dict, Any, TypeVar
+from .base import Thing
 from ..messages import m
 from ..registry import behaviour_registry
 from ..exceptions import ConfigurationError
@@ -42,10 +43,10 @@ class _Behaves:
     def call_behaviour(self, behaviourname: str, state: State) -> Optional[m]:
         if behaviourname not in self.behaviours:
             raise ConfigurationError(
-                f"the behaviour {behaviourname!r} is not defined for the Creature {self}"
+                f"the behaviour {behaviourname!r} is not defined for the Creature {self.id!r}"
             )
         if self.behaviours[behaviourname].is_switched_on():
-            logger.debug(f"call behaviour {behaviourname!r} for creature {self}")
+            logger.debug(f"call behaviour {behaviourname!r} for creature {self.id!r}")
             return self.behaviours[behaviourname].run(self, state)
         return None
 
@@ -99,7 +100,6 @@ class BehaviourSequence(Behaviour):
     def __post_init__(self):
         self.behaviours: List[Behaviour] = []
         for behaviourdata in self.sequence:
-            print(behaviourdata)
             [(behaviourname, parameters)] = behaviourdata.items()
             behaviour = behaviour_factory(behaviourname, parameters)
             self.behaviours.append(behaviour)

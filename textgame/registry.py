@@ -7,6 +7,7 @@ from typing import (
     Mapping,
     overload,
 )
+from ._util import obj_info
 
 from typing import TYPE_CHECKING
 
@@ -44,6 +45,10 @@ class Registry(dict, Mapping[str, C]):
 
     def unregister(self, name: str):
         self.pop(name, None)
+
+    def __repr__(self) -> str:
+        description_dict = {key: obj_info(value) for key, value in self.items()}
+        return repr(description_dict)
 
 
 command_registry: Registry[CommandFunc] = Registry()
