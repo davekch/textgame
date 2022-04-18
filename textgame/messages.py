@@ -42,7 +42,6 @@ class m:
         if isinstance(msg, m):
             msg = msg.data
 
-        self.needs_answer = needs_answer  # used for questions
         self._data = msg
     
     @property
@@ -60,10 +59,7 @@ class m:
 
     def __add__(self, other) -> m:
         if isinstance(other, m):
-            other_needs_answer = other.needs_answer
             other = other.data
-        else:
-            other_needs_answer = False
 
         # only add a seperator if there is already data
         if self.data and other:
@@ -72,7 +68,7 @@ class m:
             result = other
         elif not other:
             result = self.data
-        return m(result, needs_answer=self.needs_answer or other_needs_answer)
+        return m(result)
     
     def __iadd__(self, other) -> m:
         # return a new instance instead of mutating this one, otherwise

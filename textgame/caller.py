@@ -1,36 +1,25 @@
-from typing import TypeVar, Union, Callable, List, Protocol, Any
-from .parser import Command, YesNoAnswer
+from typing import TypeVar, Union, Callable, List, Any
+from abc import ABC, abstractmethod
+from .parser import ParsedInput, YesNoAnswer, Command
 from .state import State
 from .messages import m, EnterYesNoLoop, INFO
 from .registry import command_registry, precommandhook_registry, postcommandhook_registry
 
 import logging
-logger = logging.getLogger("textgame.room")
+logger = logging.getLogger("textgame.caller")
 logger.addHandler(logging.NullHandler())
 
 
-class Caller(Protocol):
+class Caller(ABC):
 
     MessageType = TypeVar("MessageType")
-    CommandType = TypeVar("CommandType")
+    ParsedInputType = TypeVar("ParsedInputType")
     StateType = TypeVar("StateType")
-
-    def call(
-        self,
-        function: Callable[..., MessageType],
-        command: CommandType,
-        state: StateType
-    ) -> MessageType:
-        """define how a function should be called given the state and parsed command"""
-        ...
     
-    def get_function(self, command: CommandType) -> Callable[..., MessageType]:
-        """define how a function is selected given the parsed command"""
-        ...
-    
-    def call_command(self, command: CommandType, state: StateType) -> MessageType:
+    @abstractmethod
+    def call(self, input: ParsedInputType, state: StateType) -> MessageType:
         """get and call the function corresponding to the parsed command"""
-        ...
+        pass
 
 
 
@@ -38,10 +27,11 @@ class SimpleCaller(Caller):
 
     def __init__(self):
         # when the result of a command call is an EnterYesNoLoop, backup the functions
-        # that should be run when the next answer is yes or no
+        # that should be run when the next answer is yes or no and go into yesno-loop
+        self.in_yesno_loop: bool = False
         self.yesno_backup: EnterYesNoLoop = None
     
-    def call(self, function: Callable[..., m], command: Command, state: State) -> m:
+    def call_function(self, function: Callable[..., m], command: Command, state: State) -> m:
         """define how a function should be called given the state and parsed command"""
         return function(command.noun, state)
     
@@ -49,23 +39,41 @@ class SimpleCaller(Caller):
         if command.verb not in command_registry:
             raise KeyError
         return command_registry[command.verb]
+    
+    def call(self, input: ParsedInput, state: State) -> m:
+        if self.in_yesno_loop:
+            logger.debug(f"in yesno-loop, going to call the yesno function for the question {self.yesno_backup.question!r}")
+            return self.call_yesno(input.get())
+        else:
+            logger.debug(f"normal mode, going to call with hooks")
+            if input.type != Command:
+                return INFO.NOT_UNDERSTOOD
+            return self.call_with_hooks(input.get(), state)
 
     def call_command(self, command: Command, state: State) -> m:
+        """get the function corresponding to the command and call it"""
         try:
             func = self.get_function(command)
-            result = self.call(func, command, state)
+            result = self.call_function(func, command, state)
         except KeyError:
             result = INFO.NOT_UNDERSTOOD
         return self.check_result(result)
     
     def check_result(self, result: Union[m, EnterYesNoLoop]) -> m:
+        """see if the result of a function call is a message or EnterYesNoLoop and extract the latter, returning a message in any case"""
         if isinstance(result, EnterYesNoLoop):
-            logger.debug("got EnterYesNoLoop as response, return message with needs_answer=True")
+            logger.debug("got EnterYesNoLoop as response, go into in_yesno_loop mode")
+            self.in_yesno_loop = True
             self.yesno_backup = result
-            return m(result.question, needs_answer=True)
+            return m(result.question)
+
+        # in any other case, we're in normal mode
+        self.in_yesno_loop = False
+        self.yesno_backup = None
         return result
     
     def call_with_hooks(self, command: Command, state: State) -> m:
+        logger.debug(f"got {command} as command")
         try:
             func = command_registry[command.verb]
         except KeyError:
@@ -91,8 +99,7 @@ class SimpleCaller(Caller):
         elif answer == YesNoAnswer.NO:
             result = self.yesno_backup.no()
         else:
-            raise ValueError("caller received invalid YesNoAnswer")
-        self.yesno_backup = None
+            return INFO.YES_NO
         return self.check_result(result)
     
     def call_precommandhook(self, state: State, skip: List[str] = None) -> m:
