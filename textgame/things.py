@@ -1,6 +1,6 @@
 from __future__ import annotations
 from dataclasses import dataclass, field
-from typing import List, Set, Dict, Any, Callable, Optional
+from typing import List, Set, Dict, Any, Callable, Optional, Type
 from functools import wraps
 from collections import defaultdict
 from .messages import m
@@ -115,14 +115,17 @@ class Store:
     def pop(self, thing_id: str) -> Optional[Thing]:
         return self.manager.pop_thing_from_store(thing_id, self.id)
     
-    def items(self) -> Dict[str, Thing]:
-        return self.manager.get_things_from_store(self.id)
+    def items(self, filter: List[Type] = None) -> Dict[str, Thing]:
+        things = self.manager.get_things_from_store(self.id)
+        if filter:
+            return {k: v for k, v in things if any(isinstance(v, t) for t in filter)}
+        return things
     
-    def keys(self) -> List[str]:
-        return self.manager.get_things_from_store(self.id).keys()
+    def keys(self, filter: List[Type] = None) -> List[str]:
+        return self.items(filter).keys()
     
-    def values(self) -> List[Thing]:
-        return self.manager.get_things_from_store(self.id).values()
+    def values(self, filter: List[Type] = None) -> List[Thing]:
+        return self.items(filter).values()
     
     def __contains__(self, other_id) -> bool:
         return other_id in self.keys()
