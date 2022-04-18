@@ -8,7 +8,6 @@ from copy import deepcopy
 import os
 from .room import Room
 from .things import (
-    Behaviour,
     Container,
     _Contains,
     Item,
@@ -16,6 +15,7 @@ from .things import (
     Creature,
     Lightsource,
     Monster,
+    Thing,
     Weapon,
 )
 from .caller import Caller, SimpleCaller
@@ -64,16 +64,6 @@ class Factory:
             raise FactoryNotFoundError(f"{obj_type!r} is not a registered type")
 
 
-def behaviour_factory(behaviourname: str, params: Dict[str, Any]) -> Behaviour:
-    if behaviourname not in behaviour_registry:
-        raise ConfigurationError(f"behaviour {behaviourname!r} is not registered")
-    behaviour_class = behaviour_registry[behaviourname]
-    params_copy = params.copy()
-    if "switch" not in params_copy:
-        params_copy["switch"] = True
-    return behaviour_class(**params_copy)
-
-
 def load_resources(path: Path, format: str = "json") -> Dict[str, List[Dict]]:
     files = [f for f in os.listdir(path) if f.endswith(format)]
     resources = {}
@@ -98,7 +88,7 @@ class Loader:
     factory: Factory = Factory
 
     @classmethod
-    def load_objs(cls, dicts: List[Dict[str, Any]], obj_type=None) -> List[Any]:
+    def load_objs(cls, dicts: List[Dict[str, Any]], obj_type=None) -> List[Thing]:
         # make sure to not accidentally mutate the original list
         dicts = deepcopy(dicts)
         objs = []
@@ -112,7 +102,7 @@ class Loader:
         return objs
 
     @classmethod
-    def load(cls, dicts: List[Dict[str, Any]]) -> List[Any]:
+    def load(cls, dicts: List[Dict[str, Any]]) -> List[Thing]:
         return cls.load_objs(dicts, obj_type=cls.defaultclass)
 
 
@@ -127,41 +117,15 @@ class ItemLoader(Loader):
 class CreatureLoader(Loader):
     defaultclass = "creature"
 
-    @classmethod
-    def load_objs(cls, dicts: List[Dict[str, Any]], obj_type=None) -> List[Creature]:
-        objs = super().load_objs(dicts, obj_type)
-        # build behaviour objects for the creatures
-        for creature in objs:
-            for behaviourname, params in list(creature.behaviours.items()):
-                try:
-                    behaviour = behaviour_factory(behaviourname, params)
-                except ConfigurationError as error:
-                    raise ConfigurationError(
-                        f"an error occured while creating the creature {creature.id!r}"
-                    ) from error
-                # overwrite the creature's behaviour
-                logger.debug(
-                    f"add behaviour of type {type(behaviour)} to creature {creature.id!r}. "
-                    f"behaviour is switched {'on' if behaviour.switch else 'off'}"
-                )
-                creature.behaviours[behaviourname] = behaviour
-        return objs
 
-
+@dataclass
 class StateBuilder:
     """class to put everything together"""
 
-    def __init__(
-        self,
-        state_class=State,
-        itemloader: Type[Loader] = ItemLoader,
-        roomloader: Type[Loader] = RoomLoader,
-        creatureloader: Type[Loader] = CreatureLoader,
-    ):
-        self.state_class = state_class
-        self.itemloader = itemloader
-        self.roomloader = roomloader
-        self.creatureloader = creatureloader
+    state_class: Type = State
+    itemloader: Type[Loader] = ItemLoader
+    roomloader: Type[Loader] = RoomLoader
+    creatureloader: Type[Loader] = CreatureLoader
 
     @staticmethod
     def build_room_graph(rooms: List[Room]) -> Dict[str, Room]:
@@ -203,9 +167,11 @@ class StateBuilder:
             creatures={c.id: c for c in creatures},
         )
 
-        # connect the room's stores to the state's storemanagers
-        for room in rooms.values():
-            state.things_manager.add_store(room.things)
+        # connect all stores to the state's storemanagers
+        # iterate also over items and creatures, as they might be containers too
+        for container in chain(rooms.values(), items, creatures):
+            if isinstance(container, _Contains):
+                state.things_manager.add_store(container.things)
 
         logger.debug("put items and creatures in their locations")
         for thing in chain(items, creatures):
@@ -214,9 +180,6 @@ class StateBuilder:
                     f"the initial location {thing.initlocation!r} of thing {thing.name!r} does not exist"
                 )
             rooms[thing.initlocation].things.add(thing)
-            # connect all container's stores to the state's storemanager
-            if isinstance(thing, _Contains):
-                state.things_manager.add_store(thing.things)
 
         return state
 

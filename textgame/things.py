@@ -2,9 +2,10 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field, fields
 from random import Random
-from typing import List, Dict, Callable, Optional, Type
+from typing import Any, List, Dict, Callable, Optional, Type
 from functools import wraps
 from collections import defaultdict
+from .registry import behaviour_registry
 from .messages import m
 from .exceptions import (
     ConfigurationError,
@@ -287,6 +288,16 @@ def behavioursequence(behaviours: List[Type[Behaviour]]) -> Type[Behaviour]:
     return CombinedBehaviour
 
 
+def behaviour_factory(behaviourname: str, params: Dict[str, Any]) -> Behaviour:
+    if behaviourname not in behaviour_registry:
+        raise ConfigurationError(f"behaviour {behaviourname!r} is not registered")
+    behaviour_class = behaviour_registry[behaviourname]
+    params_copy = params.copy()
+    if "switch" not in params_copy:
+        params_copy["switch"] = True
+    return behaviour_class(**params_copy)
+
+
 @dataclass
 class _CanDie:
     dead_description: str = None
@@ -301,6 +312,22 @@ class _CanDie:
 class _Behaves:
     # behaviours could look like this: {"spawn": {"probability": 0.2, "rooms": ["field_0", "field_1"]}}
     behaviours: Dict[str, Behaviour] = field(default_factory=dict)
+
+    def __post_init__(self):
+        # turn the behaviours into actual behaviour objects
+        for behaviourname, params in list(self.behaviours.items()):
+            try:
+                behaviour = behaviour_factory(behaviourname, params)
+            except ConfigurationError as error:
+                raise ConfigurationError(
+                    f"an error occured while creating the creature {self.id!r}"
+                ) from error
+            # overwrite the creature's behaviour
+            logger.debug(
+                f"add behaviour of type {type(behaviour)} to creature {self.id!r}. "
+                f"behaviour is switched {'on' if behaviour.switch else 'off'}"
+            )
+            self.behaviours[behaviourname] = behaviour
 
     def call_behaviour(self, behaviourname: str, state: State) -> Optional[m]:
         if behaviourname not in self.behaviours:
