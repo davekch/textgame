@@ -61,10 +61,10 @@ class MultipleChoiceQuestion:
         self, question: m, answers: Dict[m, m | Callable[[], m]], cancel: bool = True
     ):
         self._question = question
-        answers = list(answers.items())
+        answers_list = list(answers.items())
         if cancel:
-            answers.append((m("Cancel"), m("Ok.")))
-        self.answers = {str(i + 1): a for i, a in enumerate(answers)}
+            answers_list.append((m("Cancel"), m("Ok.")))
+        self.answers = {str(i + 1): a for i, a in enumerate(answers_list)}
 
     def to_message(self) -> m:
         q = self._question
@@ -84,15 +84,15 @@ class MultipleChoiceQuestion:
 
     @property
     def possible_answers(self) -> List[str]:
-        return self.answers.keys()
+        return list(self.answers.keys())
 
 
 class m:
 
     seperator = "\n"
-    translations = {}
+    translations: Dict[str, str] = {}
 
-    def __init__(self, msg: str = "", needs_answer: bool = False):
+    def __init__(self, msg: str | m = "", needs_answer: bool = False):
         # don't accidentally nest messages
         if isinstance(msg, m):
             msg = msg.data
@@ -155,7 +155,7 @@ class m:
     def __repr__(self) -> str:
         return f"<{self.__class__.__name__} {repr(self.data or '')}>"
 
-    def __eq__(self, other: Union[str, m]) -> bool:
+    def __eq__(self, other: object) -> bool:
         if isinstance(other, m):
             return self.data == other.data
         elif isinstance(other, str):
