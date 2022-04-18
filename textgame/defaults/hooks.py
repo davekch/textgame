@@ -46,7 +46,7 @@ def daylight(
     duration_night: int,
     on_sunset: Callable[[State], m] = None,
     on_sunrise: Callable[[State], m] = None,
-) -> m:
+) -> Callable[[State], m]:
     """
     creates a hook that lets the sun rise and fall. only makes sense together with hooks.time
     """
@@ -73,7 +73,7 @@ def daylight(
             state.daytime = Daytime.DAY
             msg += INFO.SUNRISE
             if callable(on_sunrise):
-                msg += on_sunrise()
+                msg += on_sunrise(state)
             # turn all lights on
             for room in state.rooms.values():
                 room.dark["now"] = room.dark["always"]

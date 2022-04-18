@@ -2,13 +2,17 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from functools import wraps
 from collections import defaultdict
-from textwrap import wrap
-from typing import Callable, List, Dict, Optional, Type
-
-from pytest import Config
+from typing import (
+    Callable,
+    Generic,
+    List,
+    Dict,
+    Optional,
+    Type,
+    TypeVar,
+)
 from .base import Thing
 from ..exceptions import (
-    ConfigurationError,
     UniqueConstraintError,
     StoreLimitExceededError,
 )
@@ -29,8 +33,11 @@ def _require_thing_exists(func: Callable) -> Callable:
     return decorated_method
 
 
-class StorageManager:
-    def __init__(self, storage: Dict[str, Thing]):
+T = TypeVar("T", bound=Thing)
+
+
+class StorageManager(Generic[T]):
+    def __init__(self, storage: Dict[str, T]):
         self.storage = storage
         # maps the names of stores to the ids of things that are in them
         self._stores: Dict[str, List[str]] = defaultdict(list)
@@ -38,7 +45,7 @@ class StorageManager:
         self._thing_stores: Dict[str, str] = {}
 
     @_require_thing_exists
-    def get(self, thing_id: str) -> Thing:
+    def get(self, thing_id: str) -> T:
         return self.storage[thing_id]
 
     def add_store(self, store: Store):
@@ -64,7 +71,7 @@ class StorageManager:
         self._thing_stores[thing_id] = store_id
 
     @_require_thing_exists
-    def pop_thing_from_store(self, thing_id: str, store_id: str) -> Optional[Thing]:
+    def pop_thing_from_store(self, thing_id: str, store_id: str) -> Optional[T]:
         if thing_id in self._stores[store_id]:
             logger.debug(f"removing {thing_id!r} from {store_id!r}")
             self._stores[store_id].remove(thing_id)
@@ -73,19 +80,19 @@ class StorageManager:
         return None
 
     @_require_thing_exists
-    def get_thing_from_store(self, thing_id: str, store_id: str) -> Optional[Thing]:
+    def get_thing_from_store(self, thing_id: str, store_id: str) -> Optional[T]:
         if thing_id in self._stores[store_id]:
             return self.storage[thing_id]
         return None
 
-    def get_things_from_store(self, store_id: str) -> Dict[str, Thing]:
+    def get_things_from_store(self, store_id: str) -> Dict[str, T]:
         return {thing_id: self.storage[thing_id] for thing_id in self._stores[store_id]}
 
-    def get_store_id_from_thing(self, thing: Thing) -> Optional[str]:
+    def get_store_id_from_thing(self, thing: T) -> Optional[str]:
         return self._thing_stores.get(thing.id)
 
 
-class Store:
+class Store(Generic[T]):
     """things such as the inventory and room.items, room.creatures should be a store and not a dict
     reasoning:
         manage where which item is without copying the items
@@ -95,13 +102,13 @@ class Store:
         self.id = store_id
         self.limit = limit
         # todo: remove type: ignore and add a require_manager decorator
-        self.manager: StorageManager = None  # type: ignore
+        self.manager: StorageManager[T] = None  # type: ignore
 
-    def set_manager(self, manager: StorageManager):
+    def set_manager(self, manager: StorageManager[T]):
         self.manager = manager
 
     # todo: rename add -> put ?
-    def add(self, thing: Thing):
+    def add(self, thing: T):
         already_there = self.keys()
         if (
             self.limit is not None
@@ -113,13 +120,13 @@ class Store:
             )
         self.manager.add_thing_to_store(thing.id, self.id)
 
-    def get(self, thing_id: str) -> Optional[Thing]:
+    def get(self, thing_id: str) -> Optional[T]:
         return self.manager.get_thing_from_store(thing_id, self.id)
 
-    def pop(self, thing_id: str) -> Optional[Thing]:
+    def pop(self, thing_id: str) -> Optional[T]:
         return self.manager.pop_thing_from_store(thing_id, self.id)
 
-    def items(self, filter: List[Type] = None) -> Dict[str, Thing]:
+    def items(self, filter: List[Type[T]] = None) -> Dict[str, T]:
         things = self.manager.get_things_from_store(self.id)
         if filter:
             return {
@@ -130,7 +137,7 @@ class Store:
     def keys(self, filter: List[Type] = None) -> List[str]:
         return list(self.items(filter).keys())
 
-    def values(self, filter: List[Type] = None) -> List[Thing]:
+    def values(self, filter: List[Type] = None) -> List[T]:
         return list(self.items(filter).values())
 
     def __contains__(self, other_id) -> bool:
