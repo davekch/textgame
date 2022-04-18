@@ -1,7 +1,7 @@
 from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Dict, Optional, Tuple, List, TYPE_CHECKING
-from .things import Creature, Item, Lightsource, Store, Thing, _Contains
+from .things import Lightsource, Thing, _Contains
 from .messages import m, DESCRIPTIONS, MOVING, INFO
 from .defaults.words import DIRECTIONS
 from .registry import roomhook_registry
