@@ -1,7 +1,7 @@
 from __future__ import annotations
 from dataclasses import dataclass, fields, field
 from abc import ABC, abstractmethod
-from typing import Optional, List, Type, Dict, Any
+from typing import Generic, Optional, List, Type, Dict, Any, TypeVar
 from ..messages import m
 from ..registry import behaviour_registry
 from ..exceptions import ConfigurationError
@@ -16,81 +16,6 @@ import logging
 
 logger = logging.getLogger("textgame.things")
 logger.addHandler(logging.NullHandler())
-
-
-# this is a bug in mypy, so ignore it for now
-# https://github.com/python/mypy/issues/5374
-@dataclass  # type: ignore
-class Behaviour(ABC):
-    switch: bool
-    # note: switch gets a default of True by loader.behaviour_factory if nothing
-    # else is set. this is ugly but necessary because default-values in dataclass
-    # base classes mess up inheritance. when updating to python3.10, use
-    # @dataclass(kw_only=True) instead
-
-    def switch_on(self):
-        self.switch = True
-
-    def switch_off(self):
-        self.switch = False
-
-    def toggle(self):
-        if self.is_switched_on():
-            self.switch_off()
-        else:
-            self.switch_on()
-
-    def is_switched_on(self) -> bool:
-        return self.switch
-
-    @abstractmethod
-    def run(self, creature: _Behaves, state: State) -> Optional[m]:
-        pass
-
-
-# todo: maybe this should go in textgame.defaults.behaviours?
-@dataclass
-class BehaviourSequence(Behaviour):
-    sequence: List[Dict[str, Any]] = field(default_factory=list)
-
-    def __post_init__(self):
-        self.behaviours: List[Behaviour] = []
-        for behaviourdata in self.sequence:
-            print(behaviourdata)
-            [(behaviourname, parameters)] = behaviourdata.items()
-            behaviour = behaviour_factory(behaviourname, parameters)
-            self.behaviours.append(behaviour)
-
-    def run(self, creature: _Behaves, state: State) -> Optional[m]:
-        for behaviour in self.behaviours:
-            if behaviour.is_switched_on():
-                msg = behaviour.run(creature, state)
-                break
-        else:
-            # no break, this means all behaviours are switched off
-            self.switch_off()
-            msg = m()
-        return msg
-
-    def switch_on(self):
-        super().switch_on()
-        for behaviour in self.behaviours:
-            behaviour.switch_on()
-
-    def switch_off(self):
-        super().switch_off()
-        for behaviour in self.behaviours:
-            behaviour.switch_off()
-
-
-def behaviour_factory(behaviourname: str, params: Dict[str, Any]) -> Behaviour:
-    if behaviourname not in behaviour_registry:
-        raise ConfigurationError(f"behaviour {behaviourname!r} is not registered")
-    behaviour_class = behaviour_registry[behaviourname]
-    params_copy = params.copy()
-    if "switch" not in params_copy:
-        params_copy["switch"] = True
-    return behaviour_class(**params_copy)
 
 
 @dataclass
@@ -132,3 +57,80 @@ class _Behaves:
         for name in self.behaviours:
             msg += self.call_behaviour(name, state)
         return msg
+
+
+CanBehave = TypeVar("CanBehave", bound=_Behaves)
+
+# this is a bug in mypy, so ignore it for now
+# https://github.com/python/mypy/issues/5374
+@dataclass  # type: ignore
+class Behaviour(ABC, Generic[CanBehave]):
+    switch: bool
+    # note: switch gets a default of True by loader.behaviour_factory if nothing
+    # else is set. this is ugly but necessary because default-values in dataclass
+    # base classes mess up inheritance. when updating to python3.10, use
+    # @dataclass(kw_only=True) instead
+
+    def switch_on(self):
+        self.switch = True
+
+    def switch_off(self):
+        self.switch = False
+
+    def toggle(self):
+        if self.is_switched_on():
+            self.switch_off()
+        else:
+            self.switch_on()
+
+    def is_switched_on(self) -> bool:
+        return self.switch
+
+    @abstractmethod
+    def run(self, creature: CanBehave, state: State) -> Optional[m]:
+        pass
+
+
+# todo: maybe this should go in textgame.defaults.behaviours?
+@dataclass
+class BehaviourSequence(Behaviour):
+    sequence: List[Dict[str, Any]] = field(default_factory=list)
+
+    def __post_init__(self):
+        self.behaviours: List[Behaviour] = []
+        for behaviourdata in self.sequence:
+            print(behaviourdata)
+            [(behaviourname, parameters)] = behaviourdata.items()
+            behaviour = behaviour_factory(behaviourname, parameters)
+            self.behaviours.append(behaviour)
+
+    def run(self, creature: CanBehave, state: State) -> Optional[m]:
+        for behaviour in self.behaviours:
+            if behaviour.is_switched_on():
+                msg = behaviour.run(creature, state)
+                break
+        else:
+            # no break, this means all behaviours are switched off
+            self.switch_off()
+            msg = m()
+        return msg
+
+    def switch_on(self):
+        super().switch_on()
+        for behaviour in self.behaviours:
+            behaviour.switch_on()
+
+    def switch_off(self):
+        super().switch_off()
+        for behaviour in self.behaviours:
+            behaviour.switch_off()
+
+
+def behaviour_factory(behaviourname: str, params: Dict[str, Any]) -> Behaviour:
+    if behaviourname not in behaviour_registry:
+        raise ConfigurationError(f"behaviour {behaviourname!r} is not registered")
+    behaviour_class = behaviour_registry[behaviourname]
+    params_copy = params.copy()
+    if "switch" not in params_copy:
+        params_copy["switch"] = True
+    return behaviour_class(**params_copy)

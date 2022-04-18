@@ -6,8 +6,9 @@ from enum import Enum, auto
 from typing import Callable, Dict, Any, List, Optional
 from random import Random
 from .room import Room
-from .things import Item, Creature, Lightsource, Store, Thing, StorageManager
+from .things import Movable, Item, Creature, Lightsource, Store, Thing, StorageManager
 from .messages import m
+from .exceptions import RoomNotFoundError
 
 import logging
 
@@ -77,7 +78,7 @@ class State:
         things: Dict[str, Thing] = {**(items or {}), **(creatures or {})}
         self.things_manager = StorageManager(things)
         # create a store for inventory and register it in the items manager
-        inventory = Store("inventory")
+        inventory: Store[Movable] = Store("inventory")
         self.things_manager.add_store(inventory)
         self.inventory = inventory
         self.player_status: PlayerStatus = PlayerStatus.NORMAL
@@ -93,8 +94,10 @@ class State:
     def lighting(self) -> bool:
         return bool(self.inventory.keys(filter=[Lightsource]))
 
-    def get_room(self, room_id: str) -> Optional[Room]:
-        return self.rooms.get(room_id)
+    def get_room(self, room_id: str) -> Room:
+        if room_id not in self.rooms:
+            raise RoomNotFoundError(f"could not find room {room_id!r}")
+        return self.rooms[room_id]
 
     def get_location_of(self, thing: Thing) -> Optional[Room]:
         maybe = self.things_manager.get_store_id_from_thing(thing)

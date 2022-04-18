@@ -1,6 +1,6 @@
 from dataclasses import dataclass, field
 from functools import wraps
-from typing import List
+from typing import List, Optional
 from ..state import State
 from ..things import Creature, Behaviour
 from ..messages import m
@@ -18,7 +18,7 @@ class InRooms:
     """
 
     rooms: List[str] = field(default_factory=list)
-    room_patterns: List[str] = None
+    room_patterns: Optional[List[str]] = None
     _computed: bool = field(default=False, init=False, repr=False)
 
     def get_room_ids(self, state: State) -> List[str]:
@@ -44,14 +44,15 @@ class RandomAppearance(InRooms, Behaviour):
         spawns a creature in the same place as the player, but it vanishes after one step
         """
         # check if the creature is currently spawned
-        if state.get_location_of(creature).id != "storage_room":
+        current_location = state.get_location_of(creature)
+        if current_location and current_location.id != "storage_room":
             # put the creature inside the storage room
             state.get_room("storage_room").things.add(creature)
         elif (
             state.random.random() < self.probability
             and state.player_location in self.get_room_ids(state)
         ):
-            state.player_location.creatures.add(creature)
+            state.player_location.things.add(creature)
 
 
 @dataclass

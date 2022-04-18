@@ -20,3 +20,7 @@ class ModeNotFoundError(KeyError):
 
 class ThingNotFoundError(KeyError):
     pass
+
+
+class RoomNotFoundError(ThingNotFoundError):
+    pass
