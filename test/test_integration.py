@@ -13,12 +13,16 @@ from textgame.registry import (
     postcommandhook_registry,
     unregister_postcommandhook,
     unregister_precommandhook,
+    behaviour_registry,
+    register_behaviour,
+    unregister_behaviour,
 )
-from textgame.defaults import commands
+from textgame.defaults import commands, behaviours, hooks
 from typing import Dict
 import json
 import pytest
 import os
+from unittest import mock
 
 
 BASEDIR = os.path.dirname(os.path.abspath(__file__))
@@ -114,9 +118,6 @@ class TestGamePlay:
 class TestHooks:
 
     def test_timehooks(self, game: Game):
-        def time(state: State) -> m:
-            state.time += 1
-            return m()
 
         def daylight(state: State) -> m:
             if state.time >= 2:
@@ -126,7 +127,7 @@ class TestHooks:
                 return m("The sun has set. It is dark now.")
 
         register_precommandhook("daylight", daylight)
-        register_postcommandhook("time", time)
+        register_postcommandhook("time", hooks.time)
         assert game.state.time == 0
         game.play("go")
         assert game.state.time == 1
@@ -136,10 +137,40 @@ class TestHooks:
             " Anytime soon, you'll probably get attacked by some night creature."
         )
         assert game.state.time == 3
+    
+    def test_randomwalk_hook(self, game: Game):
+        register_postcommandhook("time", hooks.time)
+        register_behaviour("randomwalk", behaviours.randomwalk)
+        register_precommandhook("randomwalkhook", hooks.singlebehaviourhook("randomwalk"))
+        randomwalker = game.state.creatures.storage["randomwalker"]
+        randomwalker_location = game.state.get_location_of(randomwalker)
+        assert randomwalker_location == game.state.get_room("marketplace")
+
+        # define a sequence of rooms where the randomwalker walks
+        walk = [game.state.get_room("field_0"), game.state.get_room("field_1"), game.state.get_room("field_0")]
+        randomnumbers = [0.2, 0.7, 0.2, 0.6, 0.6, 0.4]
+
+        def yield_sequence(seq):
+            it = iter(seq)
+            return lambda *args: next(it)
+        
+        # monkeypatch the random engine
+        random = mock.MagicMock()
+        random.choice = yield_sequence(walk)
+        random.random = yield_sequence(randomnumbers)
+        game.state.random = random
+
+        walk_iter = iter(walk)
+        for randomnumber in randomnumbers:
+            game.play("look")
+            if randomnumber < randomwalker.behaviours["randomwalk"]["mobility"]:
+                assert game.state.get_location_of(randomwalker) == next(walk_iter)        
 
     def teardown_method(self, test_method):
         # unregister everything
-        for hook in precommandhook_registry:
+        for hook in list(precommandhook_registry.keys()):
             unregister_precommandhook(hook)
-        for hook in postcommandhook_registry:
+        for hook in list(postcommandhook_registry.keys()):
             unregister_postcommandhook(hook)
+        for behaviour in list(behaviour_registry.keys()):
+            unregister_behaviour(behaviour)

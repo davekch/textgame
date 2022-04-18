@@ -4,7 +4,7 @@ from typing import List, Set, Dict, Any, Callable, Optional
 from functools import wraps
 from collections import defaultdict
 from .messages import m
-from .registry import behavior_registry
+from .registry import behaviour_registry
 from .exceptions import ConfigurationError, UniqueConstraintError
 
 from typing import TYPE_CHECKING
@@ -84,6 +84,9 @@ class StorageManager:
             for thing_id in self._stores[store_id]
         }
 
+    def get_store_id_from_thing(self, thing: Thing) -> Optional[str]:
+        return self._thing_stores.get(thing.id)
+
 
 class Store:
     """things such as the inventory and room.items, room.creatures should be a store and not a dict
@@ -148,9 +151,9 @@ class Creature(Thing):
         if behaviourname not in self.behaviours:
             raise ConfigurationError(f"the behaviour {behaviourname!r} is not defined for the Creature {self!r}")
         params = self.behaviours[behaviourname]
-        if behaviourname not in behavior_registry:
+        if behaviourname not in behaviour_registry:
             raise ConfigurationError(f"no behaviour {behaviourname!r} is registered")
-        behaviour = behavior_registry[behaviourname]
+        behaviour = behaviour_registry[behaviourname]
         return behaviour(self, state, **params)
 
     def behave(self, state: State) -> Optional[m]:

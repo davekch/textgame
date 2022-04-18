@@ -13,7 +13,7 @@ CommandArgTypes = TypeVar("CommandArgTypes")
 BehaviourArgTypes = TypeVar("BehaviourArgTypes")
 
 command_registry: Dict[str, Callable[[CommandArgTypes], m]] = {}
-behavior_registry: Dict[str, Callable[[BehaviourArgTypes], Optional[m]]] = {}
+behaviour_registry: Dict[str, Callable[[BehaviourArgTypes], Optional[m]]] = {}
 precommandhook_registry: OrderedDict[str, Callable[[State], m]] = OrderedDict()
 postcommandhook_registry: OrderedDict[str, Callable[[State], m]] = OrderedDict()
 
@@ -34,16 +34,16 @@ def register_behaviour(name: str, func: Callable[[BehaviourArgTypes], Optional[m
         # this means that this is called as a decorator @register_behaviour("behaviour")
 
         def decorator(_func: Callable[[BehaviourArgTypes], Optional[m]]):
-            behavior_registry[name] = _func
+            behaviour_registry[name] = _func
             return _func
         return decorator
     
     else:
-        behavior_registry[name] = func
+        behaviour_registry[name] = func
 
 
 def unregister_behaviour(name: str):
-    register_behaviour.pop(name, None)
+    behaviour_registry.pop(name, None)
 
 
 def register_precommandhook(name: str, func: Callable[[State], m]):

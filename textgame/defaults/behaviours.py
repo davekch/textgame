@@ -22,3 +22,18 @@ def randomappearance(creature: Creature, state: State, probability: float, rooms
         and any(r in state.player_location.id for r in rooms)
     ):
         state.player_location.creatures.add(creature)
+
+
+def randomwalk(creature: Creature, state: State, mobility: float):
+    logger.debug(f"calling randomwalk behaviour of {creature.id!r}")
+    # get the creature's current room
+    room = state.get_location_of(creature)
+    if not room:
+        logging.debug(f"the location of the creature {creature.id!r} could not be found, skipping randomwalk")
+        return
+    
+    connections = room.get_open_connections().values()
+    if state.random.random() < mobility:
+        next_location = state.random.choice(connections)
+        logging.debug(f"changing location of {creature.id!r} to {next_location.id!r}")
+        next_location.creatures.add(creature)

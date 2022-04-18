@@ -1,3 +1,4 @@
+from __future__ import annotations
 from typing import Dict, Optional, Tuple, List
 from .things import Store
 from .messages import m, DESCRIPTIONS, MOVING, INFO
@@ -94,6 +95,7 @@ class Room:
             self.dir_descriptions.update(dir_descriptions)
 
     def add_connection(self, dir: str, room_id: str, hidden=False):
+        # todo: remove this method, its unnecessary and confusing (because it adds a string to the doors, not a room)
         """add a single connection to the room
 
         :param dir: direction, must be in :class:`textgame.globals.DIRECTIONS`
@@ -126,7 +128,7 @@ class Room:
         """
         return self.dir_descriptions.get(direction, m())
 
-    def get_connection(self, direction):
+    def get_connection(self, direction: str) -> Optional[Room]:
         """returns room object that lies in the given direction, ``None`` if there is no door in that direction.
         """
         return self.doors.get(direction)
@@ -165,6 +167,13 @@ class Room:
             return self.doors.get(direction) is not None
         else:
             return self.doors.get(direction) is not None or self.hiddendoors.get(direction) is not None
+
+    def get_open_connections(self) -> Dict[str, Room]:
+        return {
+            direction: self.doors[direction]
+            for direction in DIRECTIONS
+            if self.doors[direction] and not self.is_locked(direction)
+        }
 
     def get_door_code(self, direction: str) -> Optional[int]:
         """gets the key code to the door in the given direction, ``None`` else

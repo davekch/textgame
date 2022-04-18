@@ -13,6 +13,7 @@ def singlebehaviourhook(behaviourname: str) -> Callable[[State], m]:
     creates a hook that calls the behaviour `behaviourname` for every creature
     """
     def hook(state: State) -> m:
+        logger.debug(f"calling hook for behaviour {behaviourname!r}")
         msg = m()
         for creature in state.creatures.storage.values():
             if behaviourname in creature.behaviours:
@@ -20,3 +21,7 @@ def singlebehaviourhook(behaviourname: str) -> Callable[[State], m]:
         return msg
 
     return hook
+
+
+def time(state: State):
+    state.time += 1

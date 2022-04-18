@@ -13,5 +13,14 @@
         "behaviours": {
             "randomappearance": {"probability": 0.5, "rooms": ["field"]}
         }
+    },
+    {
+        "id": "randomwalker",
+        "description": "A randomwalker is in the room.",
+        "name": "randomwalker",
+        "initlocation": "marketplace",
+        "behaviours": {
+            "randomwalk": {"mobility": 0.5}
+        }
     }
 ]
