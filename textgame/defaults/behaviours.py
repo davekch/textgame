@@ -1,6 +1,6 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from functools import wraps
-from typing import Callable, List, Optional
+from typing import List
 from ..state import State
 from ..things import Creature, Behaviour
 from ..messages import m
@@ -12,9 +12,32 @@ logger.addHandler(logging.NullHandler())
 
 
 @dataclass
-class RandomAppearance(Behaviour):
-    probability: float
-    rooms: List[str]
+class InRooms:
+    """helper class that behaviours can inherit from that lets users define either `rooms` or `room_patterns`
+    this class provides the method `get_room_ids` to compute a complete list of room ids based on rooms and room_patterns
+    """
+
+    rooms: List[str] = field(default_factory=list)
+    room_patterns: List[str] = None
+    _computed: bool = field(default=False, init=False, repr=False)
+
+    def get_room_ids(self, state: State) -> List[str]:
+        """find out list of rooms from rooms and room_patterns"""
+        # compute only once
+        if not self._computed and self.room_patterns:
+            rooms_from_patterns = [
+                rid
+                for rid in state.rooms.keys()
+                if any(p in rid for p in self.room_patterns)
+            ]
+            self.rooms.extend(rooms_from_patterns)
+            self._computed = True
+        return self.rooms
+
+
+@dataclass
+class RandomAppearance(InRooms, Behaviour):
+    probability: float = 0
 
     def run(self, creature: Creature, state: State):
         """
@@ -25,8 +48,9 @@ class RandomAppearance(Behaviour):
         if creature.id in state.player_location.creatures:
             # put the creature inside the storage room
             state.get_room("storage_room").creatures.add(creature)
-        elif state.random.random() < self.probability and any(
-            r in state.player_location.id for r in self.rooms
+        elif (
+            state.random.random() < self.probability
+            and state.player_location in self.get_room_ids(state)
         ):
             state.player_location.creatures.add(creature)
 
@@ -55,21 +79,17 @@ class RandomWalk(Behaviour):
 
 
 @dataclass
-class RandomSpawnOnce(Behaviour):
-    rooms: List[str]
-    probability: float
+class RandomSpawnOnce(InRooms, Behaviour):
+    probability: float = 0
 
     def run(self, creature: Creature, state: State):
         """randomly spawns in one of the rooms."""
-        # only spawn creatures that are in the storage_room
-        if (
-            not hasattr(creature, "spawned")
-            and not getattr(creature, "spawned", False)
-            and state.random.random() < self.probability
-        ):
-            room = state.get_room(state.random.choice(self.rooms))
+        if state.random.random() < self.probability:
+            room_id = state.random.choice(self.get_room_ids(state))
+            room = state.get_room(room_id)
             logger.debug(f"spawning {creature.id!r} into {room.id!r}")
             room.creatures.add(creature)
+            self.switch_off()
 
 
 @dataclass
