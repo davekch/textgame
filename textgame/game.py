@@ -1,5 +1,6 @@
 from __future__ import annotations
 from enum import Enum, auto
+from rich.console import Console
 from .caller import Caller
 from .state import PlayerStatus, State
 
@@ -29,7 +30,9 @@ class Game:
             self.status = GameStatus.OVER
         return str(msg)
 
-    def cli_loop(self, prompt: str = "> "):
+    def cli_loop(self, prompt: str = "> ", console: Console = None):
+        if console:
+            print = console.print
         while self.status == GameStatus.RUNNING:
             inp = input(prompt)
             response = self.play(inp)
