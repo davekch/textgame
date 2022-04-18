@@ -81,6 +81,11 @@ class TestGamePlay:
         game.state.inventory["key"] = rooms["marketplace"].get_item("key")
         assert game.play("open west") == str(ACTION.NOW_OPEN.format("open"))
         assert game.play("go west") == str(rooms["hidden_place2"].describe())
+    
+    def test_take(self, game: Game):
+        assert game.state.inventory == {}
+        game.play("take diamond")
+        assert "diamond" in game.state.inventory
 
 
 class TestHooks:
