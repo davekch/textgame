@@ -1,10 +1,16 @@
+from dataclasses import dataclass
 from itertools import chain
 from json import load
-from typing import List, Dict, Any, Callable
+from typing import List, Dict, Any, Callable, Type
+from pathlib import Path
+import json
+import os
 from .room import Room
 from .things import Container, Item, Key, Creature, Monster, Weapon
+from .caller import Caller, SimpleCaller
 from .state import State
 from .exceptions import ConfigurationError, FactoryNotFoundError
+from .game import Game
 
 
 class Factory:
@@ -36,6 +42,23 @@ class Factory:
             return cls.creation_funcs[obj_type](**args_copy)
         except KeyError:
             raise FactoryNotFoundError(f"{obj_type!r} is not a registered type")
+
+
+def load_resources(path: Path, format: str = "json") -> Dict[str, List[Dict]]:
+    files = [f for f in os.listdir(path) if f.endswith(format)]
+    resources = {}
+    for file in files:
+        with open(Path(path) / file) as f:
+            if format == "json":
+                resource = json.load(f)
+            elif format == "yaml":
+                import yaml
+
+                resource = yaml.safe_load(f)
+            else:
+                raise NotImplementedError("can only load json or yaml")
+        resources[Path(file).stem] = resource
+    return resources
 
 
 class Loader:
@@ -78,9 +101,9 @@ class StateBuilder:
     def __init__(
         self,
         state_class=State,
-        itemloader: Loader = ItemLoader,
-        roomloader: Loader = RoomLoader,
-        creatureloader: Loader = CreatureLoader,
+        itemloader: Type[Loader] = ItemLoader,
+        roomloader: Type[Loader] = RoomLoader,
+        creatureloader: Type[Loader] = CreatureLoader,
     ):
         self.state_class = state_class
         self.itemloader = itemloader
@@ -136,7 +159,7 @@ class StateBuilder:
         for thing in chain(items, creatures):
             if thing.initlocation not in rooms:
                 raise ConfigurationError(
-                    f"the initial location '{thing.initlocation} of thing '{thing.name}' does not exist"
+                    f"the initial location {thing.initlocation!r} of thing {thing.name!r} does not exist"
                 )
             if isinstance(thing, Item):
                 rooms[thing.initlocation].items.add(thing)
@@ -144,3 +167,14 @@ class StateBuilder:
                 rooms[thing.initlocation].creatures.add(thing)
 
         return state
+
+
+@dataclass
+class GameBuilder:
+    game_class: Type[Game] = Game
+    caller_class: Type[Caller] = SimpleCaller
+
+    def build(self, state: State, **kwargs) -> Game:
+        return self.game_class(
+            initial_state=state, caller=self.caller_class(), **kwargs
+        )
