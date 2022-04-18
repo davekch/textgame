@@ -1,5 +1,7 @@
 from __future__ import annotations
+from abc import ABC, abstractmethod
 from collections import defaultdict
+from dataclasses import dataclass
 from enum import Enum, auto
 from typing import Callable, Dict, Any, List, Optional
 from random import Random
@@ -23,6 +25,40 @@ class PlayerStatus(Enum):
 class Daytime(Enum):
     DAY = auto()
     NIGHT = auto()
+
+
+class EventABC(ABC):
+    @abstractmethod
+    def condition(self, state: State) -> bool:
+        """check if this event should happen"""
+
+    @abstractmethod
+    def call(self, state: State) -> Optional[m]:
+        """call this event"""
+
+
+@dataclass
+class Event(EventABC):
+    when: Callable[[State], bool]
+    then: Callable[[State], Optional[m]]
+
+    def condition(self, state: State) -> bool:
+        return self.when(state)
+
+    def call(self, state: State) -> bool:
+        return self.then(state)
+
+
+@dataclass
+class Timer(EventABC):
+    time: int
+    then: Callable[[State], Optional[m]]
+
+    def condition(self, state: State) -> bool:
+        return state.time >= self.time
+
+    def call(self, state: State) -> bool:
+        return self.then(state)
 
 
 class State:
@@ -50,9 +86,7 @@ class State:
         self.score = 0
         self.health = 100
         self.time = 0
-        self.timed_events: defaultdict[
-            int, List[Callable[[State], Optional[m]]]
-        ] = defaultdict(list)
+        self.events: Dict[str, List[EventABC]] = {"ready": [], "pending": []}
         self.daytime: Daytime = Daytime.DAY
         self.random = Random()
 
@@ -69,20 +103,18 @@ class State:
     def set_random_seed(self, seed: int):
         self.random.seed(seed)
 
-    def set_timer(self, time: int, callback: Callable[[State], m]):
-        """set a callback function to be run after the internal clock has ticked `time` steps.
-        only makes sense if textgame.defaults.hooks.time and textgame.defaults.hooks.timers is enabled
-        """
-        self.timed_events[self.time + time].append(callback)
+    def set_event(self, event: EventABC):
+        if event.condition(self):
+            self.events["ready"].append(event)
+        else:
+            self.events["pending"].append(event)
 
-    def pop_timers(self) -> List[Callable[[State], m]]:
-        """get a list of callback functions that should be run now"""
-        return self.timed_events.pop(self.time, [])
-
-    def pop_missed_timers(self) -> List[Callable[[State], m]]:
-        """get dict of times and callbacks that were missed"""
-        missed = []
-        for time in list(self.timed_events.keys()):
-            if time < self.time:
-                missed.extend(self.timed_events.pop(time), [])
-        return missed
+    def pop_ready_events(self) -> List[EventABC]:
+        # find all events in pending that are now ready
+        for event in self.events["pending"].copy():
+            if event.condition(self):
+                self.events["pending"].remove(event)
+                self.events["ready"].append(event)
+        ready = self.events["ready"]
+        self.events["ready"] = []
+        return ready

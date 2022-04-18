@@ -32,21 +32,12 @@ def time(state: State):
     state.time += 1
 
 
-def timers(state: State) -> m:
-    """call the timers that were set by state.set_timer"""
+def events(state: State) -> m:
+    """call the events that were set by state.set_event and that are ready"""
     msg = m()
-    for callback in state.pop_timers():
-        logger.debug(f"calling timer {callback}")
-        msg += callback(state)
-    return msg
-
-
-def missed_timers(state: State) -> m:
-    """call timers that were set by state.set_timers and were missed"""
-    msg = m()
-    for callback in state.pop_missed_timers():
-        logger.debug(f"calling missed timer {callback}")
-        msg += callback(state)
+    for event in state.pop_ready_events():
+        logger.debug(f"calling event {event}")
+        msg += event.call(state)
     return msg
 
 
