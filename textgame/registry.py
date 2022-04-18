@@ -4,6 +4,7 @@ from collections import OrderedDict
 
 
 command_registry = {}
+behavior_registry = {}
 precommandhook_registry = OrderedDict()
 postcommandhook_registry = OrderedDict()
 
@@ -12,6 +13,13 @@ postcommandhook_registry = OrderedDict()
 def register_command(command: str):
     def decorated(func: Callable):
         command_registry[command] = func
+        return func
+    return decorated
+
+
+def register_behaviour(name: str):
+    def decorated(func: Callable):
+        behavior_registry[name] = func
         return func
     return decorated
 
