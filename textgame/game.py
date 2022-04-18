@@ -29,6 +29,13 @@ class Game:
         logger.debug(f"input was parsed as {parsed!r}")
         msg = str(self.caller.call(parsed, self.state))
         logger.debug(f"finished the move with input {input!r}, response is {msg!r}")
+        logger.debug(
+            f"current state:\n"
+            f"inventory: {self.state.inventory}\n"
+            f"room's creatures: {self.state.player_location.creatures.keys()}\n"
+            f"storate_room's creatures: {self.state.get_room('storage_room').creatures.keys()}\n"   # remove this soon
+            f"time: {self.state.time}"
+        )
         return str(msg)
     
     def cli_loop(self, prompt: str = "> "):

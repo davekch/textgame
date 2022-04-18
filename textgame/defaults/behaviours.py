@@ -21,6 +21,5 @@ def singleencounter(creature: Creature, state: State, probability: float, rooms:
         and state.random.random() < probability
         and any(r in state.player_location.id for r in rooms)
     ):
-        logger.debug(f"adding the creature {creature.id!r} to the room {state.player_location.id!r}")
         state.get_room("storage_room").pop_creature(creature.id)
         state.player_location.add_creature(creature)

@@ -194,29 +194,31 @@ class Room:
     def add_item(self, item: Item):
         """put an item inside the room
         """
-        if item.id not in self.items:
-            self.items[item.id] = item
-        else:
-            logger.warning(f"You try to add item {item.id!r} to room {self.id} but it's already there")
+        if item.id in self.items:
+            logger.debug(f"You try to add item {item.id!r} to room {self.id} but it's already there")
+        logger.debug(f"adding the item {item.id!r} to the room {self.id!r}")
+        self.items[item.id] = item
 
     def get_item(self, item_id: str) -> Item:
         return self.items.get(item_id)
 
     def pop_item(self, item_id: str) -> Item:
+        logger.debug(f"popping item {item_id!r} from room {self.id!r}")
         return self.items.pop(item_id, None)
 
     def get_itemnames(self) -> List[str]:
         return list(self.items.keys())
     
     def add_creature(self, creature: Creature):
-        if creature.id not in self.creatures:
-            self.creatures[creature.id] = creature
-        else:
-            logger.warning(f"You try to add monster {creature.id!r} to room {self.id} but it's already there")
+        if creature.id in self.creatures:
+            logger.debug(f"You try to add creature {creature.id!r} to room {self.id} but it's already there")
+        logger.debug(f"adding the creature {creature.id!r} to the room {self.id!r}")
+        self.creatures[creature.id] = creature
     
     def get_creature(self, creature_id: str) -> Creature:
         return self.creatures.get(creature_id)
     
     def pop_creature(self, creature_id: str) -> Creature:
+        logger.debug(f"popping creature {creature_id!r} from room {self.id!r}")
         return self.creatures.pop(creature_id, None)
 
