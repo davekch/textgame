@@ -263,7 +263,7 @@ class TestHooks:
         walk_iter = iter(walk)
         for randomnumber in randomnumbers:
             game.play("look")
-            if randomnumber < randomwalker.behaviours["randomwalk"].params["mobility"]:
+            if randomnumber < randomwalker.behaviours["randomwalk"].mobility:
                 assert game.state.get_location_of(randomwalker) == next(walk_iter)
 
     def test_randomspawn_hook(self, game: Game):

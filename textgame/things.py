@@ -198,17 +198,13 @@ class Container(Item):
         return other_key in self._contains
 
 
+@dataclass
 class Behaviour(ABC):
-    parameters: List[str] = None
-
-    def __init__(self, switch=True, params: Dict[str, Any] = None):
-        for p in self.parameters:
-            if p not in params:
-                raise ConfigurationError(
-                    f"the behaviour {self.__class__} requires {p!r} to be defined"
-                )
-        self.switch = switch
-        self.params = params
+    switch: bool
+    # note: switch gets a default of True by loader.behaviour_factory if nothing
+    # else is set. this is ugly but necessary because default-values in dataclass
+    # base classes mess up inheritance. when updating to python3.10, use
+    # @dataclass(kw_only=True) instead
 
     def switch_on(self):
         self.switch = True

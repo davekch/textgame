@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 from functools import wraps
 from typing import Callable, List, Optional
 from ..state import State
@@ -10,8 +11,10 @@ logger = logging.getLogger("textgame.defaults.behaviours")
 logger.addHandler(logging.NullHandler())
 
 
+@dataclass
 class RandomAppearance(Behaviour):
-    parameters = ["probability", "rooms"]
+    probability: float
+    rooms: List[str]
 
     def run(self, creature: Creature, state: State):
         """
@@ -22,14 +25,15 @@ class RandomAppearance(Behaviour):
         if creature.id in state.player_location.creatures:
             # put the creature inside the storage room
             state.get_room("storage_room").creatures.add(creature)
-        elif state.random.random() < self.params["probability"] and any(
-            r in state.player_location.id for r in self.params["rooms"]
+        elif state.random.random() < self.probability and any(
+            r in state.player_location.id for r in self.rooms
         ):
             state.player_location.creatures.add(creature)
 
 
+@dataclass
 class RandomWalk(Behaviour):
-    parameters = ["mobility"]
+    mobility: float
 
     def run(self, creature: Creature, state: State):
         logger.debug(f"calling randomwalk behaviour of {creature.id!r}")
@@ -42,7 +46,7 @@ class RandomWalk(Behaviour):
             return
 
         connections = list(room.get_open_connections().values())
-        if state.random.random() < self.params["mobility"]:
+        if state.random.random() < self.mobility:
             next_location = state.random.choice(connections)
             logging.debug(
                 f"changing location of {creature.id!r} to {next_location.id!r}"
@@ -50,8 +54,10 @@ class RandomWalk(Behaviour):
             next_location.creatures.add(creature)
 
 
+@dataclass
 class RandomSpawnOnce(Behaviour):
-    parameters = ["rooms"]
+    rooms: List[str]
+    probability: float
 
     def run(self, creature: Creature, state: State):
         """randomly spawns in one of the rooms."""
@@ -59,8 +65,8 @@ class RandomSpawnOnce(Behaviour):
         if (
             not hasattr(creature, "spawned")
             and not getattr(creature, "spawned", False)
-            and state.random.random() < self.params["probability"]
+            and state.random.random() < self.probability
         ):
-            room = state.get_room(state.random.choice(self.params["rooms"]))
+            room = state.get_room(state.random.choice(self.rooms))
             logger.debug(f"spawning {creature.id!r} into {room.id!r}")
             room.creatures.add(creature)

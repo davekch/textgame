@@ -66,10 +66,9 @@ def behaviour_factory(behaviourname: str, params: Dict[str, Any]) -> Behaviour:
         raise ConfigurationError(f"behaviour {behaviourname!r} is not registered")
     behaviour_class = behaviour_registry[behaviourname]
     params_copy = params.copy()
-    switch = params_copy.pop("switch", None)
-    if switch is None:
-        return behaviour_class(params=params_copy)
-    return behaviour_class(switch=switch, params=params_copy)
+    if "switch" not in params_copy:
+        params_copy["switch"] = True
+    return behaviour_class(**params_copy)
 
 
 def load_resources(path: Path, format: str = "json") -> Dict[str, List[Dict]]:
