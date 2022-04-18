@@ -1,9 +1,8 @@
-from textgame.room import DIRECTIONS
 from ..registry import register_command
 from ..state import State, PlayerStatus
 from ..messages import m, MOVING, ACTION, DESCRIPTIONS
 from ..room import DIRECTIONS
-from ..items import Key
+from ..things import Key
 
 
 @register_command("go")

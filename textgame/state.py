@@ -2,7 +2,7 @@ from dataclasses import dataclass, field
 from enum import Enum, auto
 from typing import Dict, Any, Optional
 from .room import Room
-from .items import Item
+from .things import Item
 
 
 class PlayerStatus(Enum):

@@ -1,7 +1,7 @@
 from json import load
 from typing import List, Dict, Any, Callable
 from .room import Room
-from .items import Item, Key
+from .things import Item, Key
 from .state import State
 from .exceptions import ConfigurationError
 

@@ -4,7 +4,7 @@ import os
 from typing import List, Dict
 from textgame.loader import ItemLoader, RoomLoader, Factory
 from textgame.room import Room
-from textgame.items import Item, Key
+from textgame.things import Item, Key
 
 
 BASEDIR = os.path.dirname(os.path.abspath(__file__))

@@ -1,6 +1,6 @@
 from typing import Dict, Optional, Tuple, List
 from .messages import m, DESCRIPTIONS, MOVING, INFO
-from .items import Item
+from .things import Item
 from .defaults.words import DIRECTIONS
 
 import logging
