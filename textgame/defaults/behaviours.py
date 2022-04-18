@@ -57,3 +57,19 @@ def randomwalk(creature: Creature, state: State, mobility: float):
         next_location = state.random.choice(connections)
         logging.debug(f"changing location of {creature.id!r} to {next_location.id!r}")
         next_location.creatures.add(creature)
+
+
+@require_alive
+def randomspawn_once(
+    creature: Creature, state: State, probability: float, rooms: List[str]
+):
+    """randomly spawns in one of the rooms."""
+    # only spawn creatures that are in the storage_room
+    if (
+        not hasattr(creature, "spawned")
+        and not getattr(creature, "spawned", False)
+        and state.random.random() < probability
+    ):
+        room = state.get_room(state.random.choice(rooms))
+        logger.debug(f"spawning {creature.id!r} into {room.id!r}")
+        room.creatures.add(creature)

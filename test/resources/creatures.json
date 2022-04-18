@@ -11,7 +11,12 @@
         "name": "bat",
         "initlocation": "storage_room",
         "behaviours": {
-            "randomappearance": {"probability": 0.5, "rooms": ["field"]}
+            "randomappearance": {
+                "probability": 0.5,
+                "rooms": [
+                    "field"
+                ]
+            }
         }
     },
     {
@@ -20,7 +25,23 @@
         "name": "randomwalker",
         "initlocation": "marketplace",
         "behaviours": {
-            "randomwalk": {"mobility": 0.5}
+            "randomwalk": {
+                "mobility": 0.5
+            }
+        }
+    },
+    {
+        "id": "randomspawner",
+        "description": "A creature just randomly spawned in the room.",
+        "initlocation": "storage_room",
+        "name": "random spawner",
+        "behaviours": {
+            "random_spawn_once": {
+                "probability": 0.3,
+                "rooms": [
+                    "marketplace"
+                ]
+            }
         }
     }
 ]

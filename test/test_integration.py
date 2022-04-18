@@ -18,6 +18,7 @@ from textgame.registry import (
     unregister_behaviour,
 )
 from textgame.defaults import commands, behaviours, hooks
+from utils import yield_sequence
 from typing import Dict
 import json
 import pytest
@@ -153,11 +154,6 @@ class TestHooks:
             game.state.get_room("field_0"),
         ]
         randomnumbers = [0.2, 0.7, 0.2, 0.6, 0.6, 0.4]
-
-        def yield_sequence(seq):
-            it = iter(seq)
-            return lambda *args: next(it)
-
         # monkeypatch the random engine
         random = mock.MagicMock()
         random.choice = yield_sequence(walk)
@@ -169,6 +165,22 @@ class TestHooks:
             game.play("look")
             if randomnumber < randomwalker.behaviours["randomwalk"]["mobility"]:
                 assert game.state.get_location_of(randomwalker) == next(walk_iter)
+
+    def test_randomspawn_hook(self, game: Game):
+        register_behaviour("random_spawn_once", behaviours.randomspawn_once)
+        register_precommandhook("spawn", hooks.singlebehaviourhook("random_spawn_once"))
+        random = mock.MagicMock()
+        random.random = yield_sequence(
+            [0.8, 0.2]
+        )  # first one doesn't trigger the spawn, second one does
+        random.choice = lambda *args: "marketplace"
+        game.state.random = random
+        game.state.player_location = game.state.get_room("marketplace")
+        game.play("look")
+        # the creature randomspawner has the random_spawn_once behaviour
+        assert "randomspawner" not in game.state.player_location.creatures
+        game.play("look")
+        assert "randomspawner" in game.state.player_location.creatures
 
     def test_daytime_hook(self, game: Game):
         register_precommandhook(
