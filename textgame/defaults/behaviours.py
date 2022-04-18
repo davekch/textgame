@@ -70,3 +70,15 @@ class RandomSpawnOnce(Behaviour):
             room = state.get_room(state.random.choice(self.rooms))
             logger.debug(f"spawning {creature.id!r} into {room.id!r}")
             room.creatures.add(creature)
+
+
+@dataclass
+class Monologue(Behaviour):
+    sentences: List[str]
+    index: int = 0
+
+    def run(self, _creature, _state) -> m:
+        msg = m(self.sentences[self.index])
+        # get stuck at the last sentence
+        self.index = min(self.index + 1, len(self.sentences) - 1)
+        return msg
