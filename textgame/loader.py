@@ -1,4 +1,7 @@
-from dataclasses import dataclass
+from __future__ import annotations
+from abc import abstractmethod
+from dataclasses import dataclass, field
+import importlib
 from itertools import chain
 from typing import Generic, List, Dict, Any, Optional, Type, TypeVar
 from pathlib import Path
@@ -21,7 +24,8 @@ from .caller import Caller, SimpleCaller
 from .state import State
 from .exceptions import ConfigurationError, FactoryNotFoundError
 from .game import Game
-from .registry import Registry
+from .registry import command_registry, Registry
+from .parser import Dictionary
 
 import logging
 
@@ -68,20 +72,25 @@ class Factory:
             raise FactoryNotFoundError(f"{obj_type!r} is not a registered type")
 
 
+def load_file(path: str, format: str = "json") -> Dict[str, Any]:
+    with open(path) as f:
+        if format == "json":
+            content = json.load(f)
+        elif format == "yaml":
+            import yaml
+
+            content = yaml.safe_load(f)
+        else:
+            raise NotImplementedError("can only load json or yaml")
+    return content
+
+
 def load_resources(path: Path, format: str = "json") -> Dict[str, List[Dict]]:
     files = [f for f in os.listdir(path) if f.endswith(format)]
     resources = {}
     for file in files:
         logger.debug(f"load resource {Path(path) / file}")
-        with open(Path(path) / file) as f:
-            if format == "json":
-                resource = json.load(f)
-            elif format == "yaml":
-                import yaml
-
-                resource = yaml.safe_load(f)
-            else:
-                raise NotImplementedError("can only load json or yaml")
+        resource = load_file(Path(path) / file, format=format)
         resources[Path(file).stem] = resource
     return resources
 
@@ -202,3 +211,70 @@ class GameBuilder:
         return self.game_class(
             initial_state=state, caller=self.caller_class(), **kwargs
         )
+
+
+class SettingsLoader:
+    @abstractmethod
+    def load(self):
+        pass
+
+    @staticmethod
+    def import_object(objpath: str) -> Any:
+        # import the module and get the object from it
+        modulename, objname = objpath.rsplit(".", 1)
+        module = importlib.import_module(modulename)
+        return getattr(module, objname)
+
+
+@dataclass
+class DictionarySettingsLoader(SettingsLoader):
+    use_defaults: bool = True
+    synonyms: Dict[str, List[str]] = field(default_factory=dict)
+
+    def load(self):
+        if self.use_defaults:
+            Dictionary.use_default_synonyms()
+        if self.synonyms:
+            Dictionary.update_synonyms(self.synonyms)
+
+
+class CommandsSettingsLoader(SettingsLoader):
+    use_defaults: bool = True
+    commands: Dict[str, str] = field(default_factory=dict)
+
+    def load(self):
+        if self.use_defaults:
+            from .defaults import commands
+
+            commands.use_defaults()
+        if self.commands:
+            for command, funcpath in self.commands.items():
+                func = self.import_object(funcpath)
+                # register the function
+                command_registry.register(command, func)
+
+
+class HooksSettingsLoader(SettingsLoader):
+    pass
+
+
+_settingsloader_registry: Registry[str, Type[SettingsLoader]] = Registry(
+    {
+        "dictionary": DictionarySettingsLoader,
+        "commands": CommandsSettingsLoader,
+        "hooks": HooksSettingsLoader,
+    }
+)
+
+
+def load_settings(settingsfile: str, format: str = "json"):
+    """load settings specified in settingsfile"""
+    settings = load_file(settingsfile, format=format)
+    for section, data in settings.items():
+        if section not in _settingsloader_registry:
+            raise ConfigurationError(
+                f"in file {settingsfile!r}: could not parse {section!r}"
+            )
+        # get the loader and initialize it with data
+        loader = _settingsloader_registry[section](**data)
+        loader.load()
