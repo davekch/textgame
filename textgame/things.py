@@ -1,4 +1,5 @@
 from __future__ import annotations
+from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from random import Random
 from typing import List, Set, Dict, Any, Callable, Optional, Type
@@ -188,23 +189,38 @@ class Container(Item):
         return other_key in self._contains
 
 
+class Behaviour(ABC):
+    def __init__(self, on=True, params: Dict[str, Any] = None):
+        self.on = on
+        self.params = params
+
+    def switch_on(self):
+        self.on = True
+
+    def switch_off(self):
+        self.on = False
+
+    def toggle(self):
+        self.on = not self.on
+
+    @abstractmethod
+    def run(self, creature: Creature, state: State) -> Optional[m]:
+        pass
+
+
 @dataclass
 class Creature(Thing):
     dead_description: str = None
     alive: bool = True
     # behaviours could look like this: {"spawn": {"probability": 0.2, "rooms": ["field_0", "field_1"]}}
-    behaviours: Dict[str, Dict[str, Any]] = field(default_factory=dict)
+    behaviours: Dict[str, Behaviour] = field(default_factory=dict)
 
     def call_behaviour(self, behaviourname: str, state: State) -> Optional[m]:
         if behaviourname not in self.behaviours:
             raise ConfigurationError(
                 f"the behaviour {behaviourname!r} is not defined for the Creature {self!r}"
             )
-        params = self.behaviours[behaviourname]
-        if behaviourname not in behaviour_registry:
-            raise ConfigurationError(f"no behaviour {behaviourname!r} is registered")
-        behaviour = behaviour_registry[behaviourname]
-        return behaviour(self, state, **params)
+        return self.behaviours[behaviourname].run(self, state)
 
     def behave(self, state: State) -> Optional[m]:
         """
@@ -218,6 +234,8 @@ class Creature(Thing):
     def die(self):
         self.alive = False
         self.description = self.dead_description or self.description
+        for behaviour in self.behaviours.values():
+            behaviour.switch_off()
 
 
 @dataclass

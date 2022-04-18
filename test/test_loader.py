@@ -3,8 +3,10 @@ import json
 import os
 from typing import List, Dict
 from textgame.loader import CreatureLoader, ItemLoader, RoomLoader, Factory
+from textgame.registry import register_behaviour
 from textgame.room import Room
 from textgame.things import Creature, Item, Key
+from textgame.defaults import behaviours
 
 
 BASEDIR = os.path.dirname(os.path.abspath(__file__))
@@ -52,5 +54,9 @@ class TestLoader:
         assert len([i for i in item_objs if isinstance(i, Key)]) == 1
 
     def test_load_creatures(self, creatures: List[Dict]):
+        # works only if the behaviours that the creatures have are registered
+        register_behaviour("randomappearance", behaviours.RandomAppearance)
+        register_behaviour("randomwalk", behaviours.RandomWalk)
+        register_behaviour("random_spawn_once", behaviours.RandomSpawnOnce)
         creature_objs = CreatureLoader.load(creatures)
         assert isinstance(creature_objs[0], Creature)

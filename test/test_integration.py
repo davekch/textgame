@@ -54,6 +54,9 @@ def resources() -> Dict:
 
 @pytest.fixture
 def game(resources) -> Game:
+    register_behaviour("randomappearance", behaviours.RandomAppearance)
+    register_behaviour("randomwalk", behaviours.RandomWalk)
+    register_behaviour("random_spawn_once", behaviours.RandomSpawnOnce)
     state = StateBuilder().build(initial_location="field_0", **resources)
     caller = SimpleCaller()
     return Game(initial_state=state, caller=caller)
@@ -188,7 +191,7 @@ class TestHooks:
 
     def test_randomwalk_hook(self, game: Game):
         register_postcommandhook("time", hooks.time)
-        register_behaviour("randomwalk", behaviours.randomwalk)
+        register_behaviour("randomwalk", behaviours.RandomWalk)
         register_precommandhook(
             "randomwalkhook", hooks.singlebehaviourhook("randomwalk")
         )
@@ -212,11 +215,11 @@ class TestHooks:
         walk_iter = iter(walk)
         for randomnumber in randomnumbers:
             game.play("look")
-            if randomnumber < randomwalker.behaviours["randomwalk"]["mobility"]:
+            if randomnumber < randomwalker.behaviours["randomwalk"].params["mobility"]:
                 assert game.state.get_location_of(randomwalker) == next(walk_iter)
 
     def test_randomspawn_hook(self, game: Game):
-        register_behaviour("random_spawn_once", behaviours.randomspawn_once)
+        register_behaviour("random_spawn_once", behaviours.RandomSpawnOnce)
         register_precommandhook("spawn", hooks.singlebehaviourhook("random_spawn_once"))
         random = mock.MagicMock()
         random.random = yield_sequence(

@@ -6,11 +6,12 @@ from pathlib import Path
 import json
 import os
 from .room import Room
-from .things import Container, Item, Key, Creature, Monster, Weapon
+from .things import Behaviour, Container, Item, Key, Creature, Monster, Weapon
 from .caller import Caller, SimpleCaller
 from .state import State
 from .exceptions import ConfigurationError, FactoryNotFoundError
 from .game import Game
+from .registry import behaviour_registry
 
 
 class Factory:
@@ -42,6 +43,14 @@ class Factory:
             return cls.creation_funcs[obj_type](**args_copy)
         except KeyError:
             raise FactoryNotFoundError(f"{obj_type!r} is not a registered type")
+
+
+def behaviour_factory(behaviourname: str, params: Dict[str, Any]) -> Behaviour:
+    if behaviourname not in behaviour_registry:
+        raise ConfigurationError
+    behaviour_class = behaviour_registry[behaviourname]
+    on = params.pop("on", True)
+    return behaviour_class(on=on, params=params)
 
 
 def load_resources(path: Path, format: str = "json") -> Dict[str, List[Dict]]:
@@ -93,6 +102,23 @@ class ItemLoader(Loader):
 
 class CreatureLoader(Loader):
     defaultclass = "creature"
+
+    @classmethod
+    def load_objs(cls, dicts: List[Dict[str, Any]], obj_type=None) -> List[Creature]:
+        objs = super().load_objs(dicts, obj_type)
+        # build behaviour objects for the creatures
+        for creature in objs:
+            for behaviourname, params in list(creature.behaviours.items()):
+                try:
+                    behaviour = behaviour_factory(behaviourname, params)
+                except ConfigurationError:
+                    raise ConfigurationError(
+                        f"an error occured while creating the creature {creature.id!r}:"
+                        f"behaviour {behaviourname!r} is not registered"
+                    )
+                # overwrite the creature's behaviour
+                creature.behaviours[behaviourname] = behaviour
+        return objs
 
 
 class StateBuilder:
