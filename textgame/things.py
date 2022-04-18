@@ -198,6 +198,7 @@ class _Contains:
     def __post_init__(self):
         self.things = Store(self.id, limit=self.limit)
 
+    # improve api to have get_thing and add_thing
     def insert(self, other: Thing):
         self.things.add(other)
 

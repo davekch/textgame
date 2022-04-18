@@ -37,13 +37,12 @@ class State:
         self.rooms = rooms
         self.player_location = player_location
         self.player_location.visit()  # mark the initial room as visited
-        self.creatures = StorageManager(
-            creatures
-        )  # rename to creature_manager and item_manager?
-        self.items = StorageManager(items)
+        # throw creatures and items into the things_manager
+        things = {**(items or {}), **(creatures or {})}
+        self.things_manager = StorageManager(things)
         # create a store for inventory and register it in the items manager
         inventory = Store("inventory")
-        self.items.add_store(inventory)
+        self.things_manager.add_store(inventory)
         self.inventory = inventory
         self.player_status: PlayerStatus = PlayerStatus.NORMAL
         self.player_location_old: Room = None
@@ -64,10 +63,8 @@ class State:
         return self.rooms.get(room_id)
 
     def get_location_of(self, thing: Thing) -> Optional[Room]:
-        maybe_item = self.items.get_store_id_from_thing(thing)
-        maybe_creature = self.creatures.get_store_id_from_thing(thing)
-        room_id = maybe_item or maybe_creature
-        return self.get_room(room_id)
+        maybe = self.things_manager.get_store_id_from_thing(thing)
+        return self.get_room(maybe)
 
     def set_random_seed(self, seed: int):
         self.random.seed(seed)

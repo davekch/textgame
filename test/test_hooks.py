@@ -22,7 +22,7 @@ def fake_creatures() -> MagicMock:
 @pytest.fixture
 def fake_state(fake_creatures) -> MagicMock:
     state = MagicMock()
-    state.creatures = fake_creatures
+    state.things = fake_creatures
     return state
 
 

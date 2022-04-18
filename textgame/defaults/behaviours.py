@@ -45,9 +45,9 @@ class RandomAppearance(InRooms, Behaviour):
         """
         logger.debug(f"calling the randomappearance of {creature.id!r}")
         # check if the creature is in a room with the player
-        if creature.id in state.player_location.creatures:
+        if creature.id in state.player_location.things:
             # put the creature inside the storage room
-            state.get_room("storage_room").creatures.add(creature)
+            state.get_room("storage_room").things.add(creature)
         elif (
             state.random.random() < self.probability
             and state.player_location in self.get_room_ids(state)
@@ -75,7 +75,7 @@ class RandomWalk(Behaviour):
             logging.debug(
                 f"changing location of {creature.id!r} to {next_location.id!r}"
             )
-            next_location.creatures.add(creature)
+            next_location.things.add(creature)
 
 
 @dataclass
@@ -88,7 +88,7 @@ class RandomSpawnOnce(InRooms, Behaviour):
             room_id = state.random.choice(self.get_room_ids(state))
             room = state.get_room(room_id)
             logger.debug(f"spawning {creature.id!r} into {room.id!r}")
-            room.creatures.add(creature)
+            room.things.add(creature)
             self.switch_off()
 
 

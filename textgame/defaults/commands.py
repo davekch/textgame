@@ -11,7 +11,7 @@ from ..messages import (
     DESCRIPTIONS,
 )
 from ..defaults.words import DIRECTIONS
-from ..things import Key, Monster, Weapon
+from ..things import Key, Monster, Takable, Weapon
 
 
 defaultcommand_registry = Registry()
@@ -195,17 +195,15 @@ def take(itemid: str, state: State) -> m:
     if itemid in state.inventory:
         return ACTION.OWN_ALREADY
 
-    item = state.player_location.items.get(itemid)
+    takables = state.player_location.things.items(filter=[Takable])
+    item = takables.get(itemid)
     if item:
         if item.takable:
             # move item from location to inventory
             state.inventory.add(item)
             return ACTION.SUCC_TAKE.format(item.name)
         return ACTION.FAIL_TAKE
-    elif itemid in state.player_location.description or any(
-        itemid in creature.describe()
-        for creature in state.player_location.creatures.values()
-    ):
+    elif itemid in state.player_location or itemid in state.player_location.description:
         return ACTION.FAIL_TAKE
     return ACTION.NO_SUCH_ITEM.format(itemid)
 
@@ -214,12 +212,12 @@ def takeall(state: State) -> m:
     """
     move all items in the current location to inventory
     """
-    if not state.player_location.items.keys():
+    if not state.player_location.things.keys():
         return DESCRIPTIONS.NOTHING_THERE
     if state.player_location.is_dark():
         return DESCRIPTIONS.DARK_S
     response = m()
-    for itemid in state.player_location.items.keys():
+    for itemid in state.player_location.things.keys():
         response += take(itemid, state)
     return response
 
@@ -252,7 +250,7 @@ def drop(itemid: str, state: State) -> m:
     if not itemid in state.inventory:
         return ACTION.FAIL_DROP
     # move item from inventory to current room
-    state.player_location.items.add(state.inventory.pop(itemid))
+    state.player_location.things.add(state.inventory.pop(itemid))
     return ACTION.SUCC_DROP
 
 
@@ -299,7 +297,7 @@ def ask_hint(_: str, state: State) -> YesNoQuestion:
 
 @defaultcommand_registry.register("fight")
 def fight(noun: str, state: State) -> m:
-    if noun and noun not in state.player_location.creatures:
+    if noun and noun not in state.player_location.things:
         return ACTION.NO_SUCH_FIGHT.format(noun)
     weapons = state.inventory.values(filter=[Weapon])
     if not weapons:
@@ -316,7 +314,7 @@ def use_weapon(weapon_id: str, state: State) -> m:
     # assumes that the weapon is in inventory
     weapon = state.inventory.get(weapon_id)
     msg = m()
-    for monster in state.player_location.creatures.values(filter=[Monster]):
+    for monster in state.player_location.things.values(filter=[Monster]):
         monster.health -= weapon.calculate_damage(state.random)
         msg += m(f"You use the {weapon.name} against the {monster.name}!")
     if not msg:

@@ -1,6 +1,6 @@
 from typing import Callable, List
 from ..state import Daytime, PlayerStatus, State
-from ..things import Monster
+from ..things import Monster, _Behaves
 from ..messages import INFO, m
 
 import logging
@@ -11,15 +11,18 @@ logger.addHandler(logging.NullHandler())
 
 def singlebehaviourhook(behaviourname: str) -> Callable[[State], m]:
     """
-    creates a hook that calls the behaviour `behaviourname` for every creature
+    creates a hook that calls the behaviour `behaviourname` for every thing that can behave
     """
 
     def hook(state: State) -> m:
         logger.debug(f"calling hook for behaviour {behaviourname!r}")
         msg = m()
-        for creature in state.creatures.storage.values():
-            if behaviourname in creature.behaviours:
-                msg += creature.call_behaviour(behaviourname, state)
+        for behaves in state.things_manager.storage.values():
+            # iterate over all things and select the ones which can behave
+            if not isinstance(behaves, _Behaves):
+                continue
+            if behaviourname in behaves.behaviours:
+                msg += behaves.call_behaviour(behaviourname, state)
         return msg
 
     return hook
@@ -91,7 +94,7 @@ def daylight(
 def manage_fights(state: State) -> m:
     logger.debug("manage ongoing fights")
     msg = m()
-    for monster in state.player_location.creatures.values(filter=[Monster]):
+    for monster in state.player_location.things.values(filter=[Monster]):
         if not monster.alive:
             continue
 

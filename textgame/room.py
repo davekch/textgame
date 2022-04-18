@@ -1,7 +1,7 @@
 from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Dict, Optional, Tuple, List, TYPE_CHECKING
-from .things import Lightsource, Store, Thing, _Contains
+from .things import Creature, Item, Lightsource, Store, Thing, _Contains
 from .messages import m, DESCRIPTIONS, MOVING, INFO
 from .defaults.words import DIRECTIONS
 from .registry import roomhook_registry
@@ -16,7 +16,7 @@ logger.addHandler(logging.NullHandler())
 
 
 @dataclass
-class Room(Thing):
+class Room(_Contains, Thing):
     """
     :param ID: unique identifier
     :param description: string describing the room
@@ -49,9 +49,7 @@ class Room(Thing):
     visited: bool = field(default=False, init=False)
 
     def __post_init__(self):
-        # super().__post_init__()
-        self.creatures = Store(self.id)  # replace these with inheritance of _Contains
-        self.items = Store(self.id)
+        super().__post_init__()
         # fill up all the dicts with missing info
         self.doors.update({dir: None for dir in DIRECTIONS if dir not in self.doors})
         # dict that describes the locked/opened state of doors
@@ -92,14 +90,6 @@ class Room(Thing):
                     logger.warning(
                         f"locked dict of room {self.id}: {id} is not a direction"
                     )
-
-    # @property
-    # def creatures(self) -> Store:
-    #     return self.things
-
-    # @property
-    # def items(self) -> Store:
-    #     return self.things
 
     def add_connection(self, dir: str, room_id: str, hidden=False):
         # todo: remove this method, its unnecessary and confusing (because it adds a string to the doors, not a room)
@@ -153,7 +143,7 @@ class Room(Thing):
         return self.doors.get(direction)
 
     def is_dark(self) -> bool:
-        return self.dark["now"] and not self.items.keys(filter=[Lightsource])
+        return self.dark["now"] and not self.things.keys(filter=[Lightsource])
 
     def describe(self, long: bool = False, light: bool = False) -> m:
         long = long or not self.visited
@@ -162,10 +152,8 @@ class Room(Thing):
             return DESCRIPTIONS.DARK_L
 
         descript = m(self.description) if long else m(self.shortdescription)
-        for item in self.items.values():
-            descript += item.describe()
-        for creature in self.creatures.values():
-            descript += creature.describe()
+        for thing in self.things.values():
+            descript += thing.describe()
         return descript
 
     def describe_error(self, direction: str) -> m:

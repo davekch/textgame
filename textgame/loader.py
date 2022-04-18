@@ -10,6 +10,7 @@ from .room import Room
 from .things import (
     Behaviour,
     Container,
+    _Contains,
     Item,
     Key,
     Creature,
@@ -204,12 +205,7 @@ class StateBuilder:
 
         # connect the room's stores to the state's storemanagers
         for room in rooms.values():
-            state.items.add_store(room.items)
-            state.creatures.add_store(room.creatures)
-        # connect all container's stores to the state's storemanager
-        for item in items:
-            if isinstance(item, Container):
-                state.items.add_store(item.things)
+            state.things_manager.add_store(room.things)
 
         logger.debug("put items and creatures in their locations")
         for thing in chain(items, creatures):
@@ -217,10 +213,10 @@ class StateBuilder:
                 raise ConfigurationError(
                     f"the initial location {thing.initlocation!r} of thing {thing.name!r} does not exist"
                 )
-            if isinstance(thing, Item):
-                rooms[thing.initlocation].items.add(thing)
-            elif isinstance(thing, Creature):
-                rooms[thing.initlocation].creatures.add(thing)
+            rooms[thing.initlocation].things.add(thing)
+            # connect all container's stores to the state's storemanager
+            if isinstance(thing, _Contains):
+                state.things_manager.add_store(thing.things)
 
         return state
 

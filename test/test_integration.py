@@ -71,11 +71,11 @@ class TestStateBuilder:
         assert isinstance(state.get_room("field_0"), Room)
 
     def test_items_exist(self, state: State):
-        assert "diamond" in state.items.storage
-        assert isinstance(state.items.get("diamond"), Item)
+        assert "diamond" in state.things_manager.storage
+        assert isinstance(state.things_manager.get("diamond"), Item)
 
     def test_items_in_room(self, state: State):
-        assert "diamond" in state.get_room("field_0").items
+        assert "diamond" in state.get_room("field_0")
 
 
 class TestGamePlay:
@@ -83,21 +83,21 @@ class TestGamePlay:
         expected = (
             str(game.state.rooms["field_0"].description)
             + "\n"
-            + str(game.state.rooms["field_0"].items.get("diamond").description)
+            + str(game.state.rooms["field_0"].things.get("diamond").description)
             + "\n"
-            + str(game.state.rooms["field_0"].items.get("lamp").description)
+            + str(game.state.rooms["field_0"].things.get("lamp").description)
         )
         assert game.play("look") == expected
 
     def test_darkness(self, game: Game):
         assert game.play("go east") == str(DESCRIPTIONS.DARK_L)
-        game.state.inventory.add(game.state.items.get("lamp"))
+        game.state.inventory.add(game.state.things_manager.get("lamp"))
         assert game.play("look") == str(game.state.get_room("darkroom").description)
         # should also work if the lamp is in the room
         game.play("drop lamp")
         assert game.play("look") == str(
             game.state.get_room("darkroom").description
-        ) + "\n" + str(game.state.items.get("lamp").description)
+        ) + "\n" + str(game.state.things_manager.get("lamp").description)
 
     def test_custom_command(self, game: Game):
         @command_registry.register("scream")
@@ -166,7 +166,7 @@ class TestGamePlay:
         assert game.play("go west") == str(MOVING.FAIL_DOOR_LOCKED)
         assert game.play("open west") == str(ACTION.FAIL_NO_KEY)
         # give the key to the player
-        game.state.inventory.add(game.state.rooms["marketplace"].items.pop("key"))
+        game.state.inventory.add(game.state.rooms["marketplace"].things.pop("key"))
         assert game.play("open west") == str(ACTION.NOW_OPEN.format("open"))
         assert game.play("go west") == str(game.state.rooms["hidden_place2"].describe())
 
@@ -196,8 +196,8 @@ class TestGamePlay:
 
     def test_fight(self, game: Game):
         postcommandhook_registry.register("fight", hooks.manage_fights)
-        goblin: Monster = game.state.creatures.storage["goblin"]
-        game.state.get_room("marketplace").creatures.add(goblin)
+        goblin: Monster = game.state.things_manager.storage["goblin"]
+        game.state.get_room("marketplace").things.add(goblin)
         response = game.play("go west")
         assert goblin.fight_message in response
         assert game.state.health == 100 - goblin.strength
@@ -205,7 +205,7 @@ class TestGamePlay:
         assert str(ACTION.NO_WEAPONS) in response
         assert goblin.health == 100
         assert game.state.health == 50
-        sword: Weapon = game.state.items.storage["sword"]
+        sword: Weapon = game.state.things_manager.storage["sword"]
         game.state.inventory.add(sword)
         response = game.play("fight goblin")
         assert "You use the sword against the mean goblin" in response
@@ -245,7 +245,7 @@ class TestHooks:
         )
         postcommandhook_registry.register("time", hooks.time)
         # first remove the lamp
-        game.state.player_location.items.pop("lamp")
+        game.state.player_location.things.pop("lamp")
         assert game.state.time == 0
         game.play("go")
         assert game.state.time == 1
@@ -262,7 +262,7 @@ class TestHooks:
         precommandhook_registry.register(
             "randomwalkhook", hooks.singlebehaviourhook("randomwalk")
         )
-        randomwalker = game.state.creatures.storage["randomwalker"]
+        randomwalker = game.state.things_manager.storage["randomwalker"]
         randomwalker_location = game.state.get_location_of(randomwalker)
         assert randomwalker_location == game.state.get_room("marketplace")
 
@@ -299,9 +299,9 @@ class TestHooks:
         game.state.player_location = game.state.get_room("marketplace")
         game.play("look")
         # the creature randomspawner has the random_spawn_once behaviour
-        assert "randomspawner" not in game.state.player_location.creatures
+        assert "randomspawner" not in game.state.player_location.things
         game.play("look")
-        assert "randomspawner" in game.state.player_location.creatures
+        assert "randomspawner" in game.state.player_location.things
 
     def test_daytime_hook(self, game: Game):
         precommandhook_registry.register(
@@ -309,7 +309,7 @@ class TestHooks:
         )
         postcommandhook_registry.register("time", hooks.time)
         # first, remove the lightsource from the room
-        game.state.player_location.items.pop("lamp")
+        game.state.player_location.things.pop("lamp")
         for _ in range(2):
             response = game.play("look")
             assert (
