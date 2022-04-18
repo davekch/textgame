@@ -5,6 +5,7 @@ from ..defaults.words import DIRECTIONS
 from ..things import Key
 
 
+# change register_command to register_defaultcommand and add use_defaults function
 @register_command("go")
 def go(direction: str, state: State) -> m:
     """

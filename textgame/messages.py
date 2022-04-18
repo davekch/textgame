@@ -105,7 +105,8 @@ class DefaultMessage:
 
 class INFO(DefaultMessage):
     HINT_WARNING = m("I have a hint for you, but it will cost you {} points. Do you want to hear it?")
-    NIGHT_COMES_IN = m("The sun has set. Night comes in.")
+    SUNSET = m("The sun has set. Night comes in.")
+    SUNRISE = m("The sun is rising! A new day begins")
     NO_HINT = m("I don't have any special hints for you.")
     NOT_UNDERSTOOD = m("I don't understand that.")
     NOTHING = m("Nothing happens.")

@@ -1,7 +1,7 @@
 from textgame.game import Game
 from textgame.parser import SimpleParser
 from textgame.loader import StateBuilder
-from textgame.state import State
+from textgame.state import Daytime, State
 from textgame.messages import ACTION, MOVING, EnterYesNoLoop, m, INFO
 from textgame.room import Room
 from textgame.state import State
@@ -164,7 +164,26 @@ class TestHooks:
         for randomnumber in randomnumbers:
             game.play("look")
             if randomnumber < randomwalker.behaviours["randomwalk"]["mobility"]:
-                assert game.state.get_location_of(randomwalker) == next(walk_iter)        
+                assert game.state.get_location_of(randomwalker) == next(walk_iter) 
+
+    def test_daytime_hook(self, game: Game):
+        register_precommandhook("daylight", hooks.daylight(duration_day=2, duration_night=3))
+        register_postcommandhook("time", hooks.time)
+        for _ in range(2):
+            response = game.play("look")
+            assert str(INFO.SUNSET) not in response and str(INFO.SUNRISE) not in response
+        assert game.state.time == 2
+        assert str(INFO.SUNSET) in game.play("look")
+        assert game.state.daytime == Daytime.NIGHT
+        assert game.state.player_location.is_dark()
+        for _ in range(2):
+            response = game.play("look")
+            assert str(INFO.SUNSET) not in response and str(INFO.SUNRISE) not in response
+        assert game.state.time == 5
+        assert str(INFO.SUNRISE) in game.play("look")
+        assert game.state.daytime == Daytime.DAY
+        assert not game.state.player_location.is_dark()
+
 
     def teardown_method(self, test_method):
         # unregister everything

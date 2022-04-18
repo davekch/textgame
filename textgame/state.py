@@ -17,6 +17,11 @@ class PlayerStatus(Enum):
     DEAD = auto()
 
 
+class Daytime(Enum):
+    DAY = auto()
+    NIGHT = auto()
+
+
 class State:
 
     def __init__(
@@ -40,6 +45,7 @@ class State:
         self.misc: Dict[str, Any] = {}
         self.score = 0
         self.time = 0
+        self.daytime: Daytime = Daytime.DAY
         self.random = Random()
 
     def get_room(self, room_id: str) -> Optional[Room]:
