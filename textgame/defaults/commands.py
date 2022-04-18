@@ -1,7 +1,7 @@
 from ..registry import register_command
 from ..state import State, PlayerStatus
 from ..messages import m, MOVING, ACTION, DESCRIPTIONS
-from ..room import DIRECTIONS
+from ..defaults.words import DIRECTIONS
 from ..things import Key
 
 
@@ -137,16 +137,12 @@ def _close_or_lock(action, direction: str, state: State) -> m:
     return ACTION.FAIL_NO_KEY
 
 
-def describe(state: State, long: bool = False) -> m:
-    return state.player_location.description
-
-
 @register_command("look")
 def look(_, state: State) -> m:
     """
     get the long description of the current location.
     """
-    return describe(long=True)
+    return state.player_location.describe(long=True)
 
 
 @register_command("take")

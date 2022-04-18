@@ -133,6 +133,17 @@ class Room:
 
     def is_dark(self) -> bool:
         return self.dark["now"]
+    
+    def describe(self, long: bool = False) -> m:
+        long = long or not self.visited
+        if self.dark["now"]:
+            return DESCRIPTIONS.DARK_L
+        descript = self.description if long else self.shortdescription
+        for item in self.items.values():
+            descript += item.describe()
+        for creature in self.creatures.values():
+            descript += creature.describe()
+        return descript
 
     def describe_error(self, direction: str) -> m:
         """return content of ``self.errors`` (see :func:`textgame.room.Room.fill_info`) in the given direction. Returns the default

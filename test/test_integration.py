@@ -83,7 +83,7 @@ class TestGamePlay:
         # give the key to the player
         game.state.inventory.add(game.state.rooms["marketplace"].items.pop("key"))
         assert game.play("open west") == str(ACTION.NOW_OPEN.format("open"))
-        assert game.play("go west") == str(game.state.rooms["hidden_place2"])
+        assert game.play("go west") == str(game.state.rooms["hidden_place2"].describe())
     
     def test_take(self, game: Game):
         assert game.state.inventory.items() == {}
