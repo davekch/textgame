@@ -15,10 +15,10 @@ class Dictionary:
 
         :param synonym_dict: dict of the form ``{word: [synonyms], ...}``
         """
-        for word, synonyms in synonyms.items():
-            if type(synonyms) is not list:
+        for word, syns in synonyms.items():
+            if type(syns) is not list:
                 raise TypeError("synonyms must be defined as a list")
-            for s in synonyms:
+            for s in syns:
                 cls.words[s] = word
 
     @classmethod

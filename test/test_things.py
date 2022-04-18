@@ -1,9 +1,15 @@
 from dataclasses import dataclass, field
 from textgame.messages import m
-from textgame.things import Behaviour, StorageManager, Store, behavioursequence
-from textgame.things import Container, StorageManager, Store
+from textgame.things import (
+    Container,
+    StorageManager,
+    Store,
+    Behaviour,
+    BehaviourSequence,
+)
 from textgame.exceptions import StoreLimitExceededError
 from textgame.loader import Factory
+from textgame.registry import behaviour_registry
 from unittest.mock import MagicMock
 import pytest
 from typing import Dict, List, Tuple
@@ -122,10 +128,17 @@ class BehaviourB(Behaviour):
 
 class TestBehaviours:
     def test_combine_behaviours(self):
-        BehaviourAB = behavioursequence([BehaviourA, BehaviourB])
+        behaviour_registry.register("behaviourA", BehaviourA)
+        behaviour_registry.register("behaviourB", BehaviourB)
         behaviourA = BehaviourA(switch=True, repeat=3)
         behaviourB = BehaviourB(switch=True, scream="AAH!")
-        behaviourAB = BehaviourAB(switch=True, repeat=3, scream="AAH!")
+        behaviourAB = BehaviourSequence(
+            sequence=[
+                {"behaviourA": {"repeat": 3}},
+                {"behaviourB": {"scream": "AAH!"}},
+            ],
+            switch=True,
+        )
         # first, behaviourAB should be like behaviourA, then behaviourB
         for i in range(3):
             assert behaviourA.run(None, None) == behaviourAB.run(None, None)

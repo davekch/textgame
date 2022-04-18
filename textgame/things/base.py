@@ -37,7 +37,7 @@ class _HasStrength:
 
 @dataclass
 class _CanDie:
-    dead_description: str = None
+    dead_description: str = ""
     alive: bool = True
 
     def die(self):
@@ -48,6 +48,6 @@ class _CanDie:
 @dataclass
 class _CanFight(_HasStrength):
     health: float = 100
-    fight_message: str = None
-    win_message: str = None  # when the player wins
-    loose_message: str = None  # when the player looses
+    fight_message: str = ""
+    win_message: str = ""  # when the player wins
+    loose_message: str = ""  # when the player looses

@@ -18,7 +18,9 @@ logger = logging.getLogger("textgame.things")
 logger.addHandler(logging.NullHandler())
 
 
-@dataclass
+# this is a bug in mypy, so ignore it for now
+# https://github.com/python/mypy/issues/5374
+@dataclass  # type: ignore
 class Behaviour(ABC):
     switch: bool
     # note: switch gets a default of True by loader.behaviour_factory if nothing
@@ -46,46 +48,39 @@ class Behaviour(ABC):
         pass
 
 
-def behavioursequence(behaviours: List[Type[Behaviour]]) -> Type[Behaviour]:
-    """create a behaviour that runs each of the behaviours one after another"""
+# todo: maybe this should go in textgame.defaults.behaviours?
+@dataclass
+class BehaviourSequence(Behaviour):
+    sequence: List[Dict[str, Any]] = field(default_factory=list)
 
-    @dataclass
-    class CombinedBehaviour(*behaviours, Behaviour):
-        def __post_init__(self):
-            # this must be a post-init because we must not overwrite the init by the behaviours
-            # initialize each behaviour
-            self.behaviours: List[Behaviour] = []
-            for behaviour in behaviours:
-                # collect the parameters that are meant for this behaviour
-                parameters = {
-                    field.name: getattr(self, field.name)
-                    for field in fields(behaviour)
-                    if field.init
-                }
-                self.behaviours.append(behaviour(**parameters))
+    def __post_init__(self):
+        self.behaviours: List[Behaviour] = []
+        for behaviourdata in self.sequence:
+            print(behaviourdata)
+            [(behaviourname, parameters)] = behaviourdata.items()
+            behaviour = behaviour_factory(behaviourname, parameters)
+            self.behaviours.append(behaviour)
 
-        def run(self, creature: _Behaves, state: State) -> m:
-            for behaviour in self.behaviours:
-                if behaviour.is_switched_on():
-                    msg = behaviour.run(creature, state)
-                    break
-            else:
-                # no break, this means all behaviours are switched off
-                self.switch_off()
-                msg = m()
-            return msg
+    def run(self, creature: _Behaves, state: State) -> Optional[m]:
+        for behaviour in self.behaviours:
+            if behaviour.is_switched_on():
+                msg = behaviour.run(creature, state)
+                break
+        else:
+            # no break, this means all behaviours are switched off
+            self.switch_off()
+            msg = m()
+        return msg
 
-        def switch_on(self):
-            super().switch_on()
-            for behaviour in self.behaviours:
-                behaviour.switch_on()
+    def switch_on(self):
+        super().switch_on()
+        for behaviour in self.behaviours:
+            behaviour.switch_on()
 
-        def switch_off(self):
-            super().switch_off()
-            for behaviour in self.behaviours:
-                behaviour.switch_off()
-
-    return CombinedBehaviour
+    def switch_off(self):
+        super().switch_off()
+        for behaviour in self.behaviours:
+            behaviour.switch_off()
 
 
 def behaviour_factory(behaviourname: str, params: Dict[str, Any]) -> Behaviour:
@@ -122,11 +117,12 @@ class _Behaves:
     def call_behaviour(self, behaviourname: str, state: State) -> Optional[m]:
         if behaviourname not in self.behaviours:
             raise ConfigurationError(
-                f"the behaviour {behaviourname!r} is not defined for the Creature {self!r}"
+                f"the behaviour {behaviourname!r} is not defined for the Creature {self}"
             )
         if self.behaviours[behaviourname].is_switched_on():
-            logger.debug(f"call behaviour {behaviourname!r} for creature {self.id!r}")
+            logger.debug(f"call behaviour {behaviourname!r} for creature {self}")
             return self.behaviours[behaviourname].run(self, state)
+        return None
 
     def behave(self, state: State) -> Optional[m]:
         """

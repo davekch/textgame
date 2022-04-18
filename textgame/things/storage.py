@@ -2,9 +2,16 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from functools import wraps
 from collections import defaultdict
+from textwrap import wrap
 from typing import Callable, List, Dict, Optional, Type
+
+from pytest import Config
 from .base import Thing
-from ..exceptions import UniqueConstraintError, StoreLimitExceededError
+from ..exceptions import (
+    ConfigurationError,
+    UniqueConstraintError,
+    StoreLimitExceededError,
+)
 
 import logging
 
@@ -61,13 +68,15 @@ class StorageManager:
         if thing_id in self._stores[store_id]:
             logger.debug(f"removing {thing_id!r} from {store_id!r}")
             self._stores[store_id].remove(thing_id)
-            self._thing_stores[thing_id] = None
+            self._thing_stores.pop(thing_id)
             return self.storage[thing_id]
+        return None
 
     @_require_thing_exists
     def get_thing_from_store(self, thing_id: str, store_id: str) -> Optional[Thing]:
         if thing_id in self._stores[store_id]:
             return self.storage[thing_id]
+        return None
 
     def get_things_from_store(self, store_id: str) -> Dict[str, Thing]:
         return {thing_id: self.storage[thing_id] for thing_id in self._stores[store_id]}
@@ -85,7 +94,8 @@ class Store:
     def __init__(self, store_id: str, limit: int = None):
         self.id = store_id
         self.limit = limit
-        self.manager: StorageManager = None
+        # todo: remove type: ignore and add a require_manager decorator
+        self.manager: StorageManager = None  # type: ignore
 
     def set_manager(self, manager: StorageManager):
         self.manager = manager
@@ -118,10 +128,10 @@ class Store:
         return things
 
     def keys(self, filter: List[Type] = None) -> List[str]:
-        return self.items(filter).keys()
+        return list(self.items(filter).keys())
 
     def values(self, filter: List[Type] = None) -> List[Thing]:
-        return self.items(filter).values()
+        return list(self.items(filter).values())
 
     def __contains__(self, other_id) -> bool:
         return other_id in self.keys()
@@ -130,7 +140,8 @@ class Store:
 @dataclass
 class _Contains:
     limit: Optional[int] = None
-    things: Store = field(default=None, init=False)
+    # gets set in post_init
+    things: Store = field(default=None, init=False)  # type: ignore
 
     def __post_init__(self):
         self.things = Store(self.id, limit=self.limit)
