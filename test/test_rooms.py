@@ -28,13 +28,6 @@ def room_00(roominfo_00):
 
 class TestRoom:
 
-    def test_describe(self, roominfo_00, room_00):
-        assert room_00.describe() == roominfo_00["description"]
-        room_00.visit()
-        assert room_00.describe() == roominfo_00["shortdescription"]
-        room_00.dark["now"] = True
-        assert room_00.describe() == DESCRIPTIONS.DARK_L
-
     def test_locked(self, roominfo_00, room_00):
         assert room_00.is_locked("west")
         assert not room_00.is_locked("south")

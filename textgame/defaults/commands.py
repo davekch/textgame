@@ -137,12 +137,16 @@ def _close_or_lock(action, direction: str, state: State) -> m:
     return ACTION.FAIL_NO_KEY
 
 
+def describe(state: State, long: bool = False) -> m:
+    return state.player_location.description
+
+
 @register_command("look")
 def look(_, state: State) -> m:
     """
     get the long description of the current location.
     """
-    return state.player_location.describe(long=True)
+    return describe(long=True)
 
 
 @register_command("take")
@@ -162,11 +166,11 @@ def take(itemid: str, state: State) -> m:
     if itemid in state.inventory:
         return ACTION.OWN_ALREADY
 
-    item = state.player_location.get_item(itemid)
+    item = state.player_location.items.get(itemid)
     if item:
         if item.takable:
             # move item from location to inventory
-            state.inventory[itemid] = state.player_location.pop_item(itemid)
+            state.inventory.add(item)
             return ACTION.SUCC_TAKE.format(item.name)
         return ACTION.FAIL_TAKE
     elif itemid in state.player_location.description:
@@ -178,12 +182,12 @@ def takeall(state: State) -> m:
     """
     move all items in the current location to inventory
     """
-    if not state.player_location.items:
+    if not state.player_location.items.keys():
         return DESCRIPTIONS.NOTHING_THERE
     if state.player_location.is_dark():
         return DESCRIPTIONS.DARK_S
     response = m()
-    for itemid in state.player_location.get_itemnames():
+    for itemid in state.player_location.items.keys():
         response += take(itemid, state)
     return response
 
@@ -216,7 +220,8 @@ def drop(itemid: str, state: State):
     if not itemid in state.inventory:
         return ACTION.FAIL_DROP
     # move item from inventory to current room
-    state.player_location.add_item(state.inventory.pop(itemid))
+    state.put_item_in_room(state.inventory.pop(itemid), state.player_location)
+    state.player_location.items.add(state.inventory.pop(itemid))
     return ACTION.SUCC_DROP
 
 
@@ -226,6 +231,6 @@ def dropall(state: State):
     """
     if not state.inventory:
         return ACTION.NO_INVENTORY
-    for item in list(state.inventory.keys()):
+    for item in state.inventory.keys():
         drop(item, state)
     return ACTION.SUCC_DROP

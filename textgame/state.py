@@ -1,9 +1,13 @@
-from dataclasses import dataclass, field
+from __future__ import annotations
 from enum import Enum, auto
 from typing import Dict, Any, Optional
 from random import Random
 from .room import Room
-from .things import Item
+from .things import Item, Creature, Store, Thing, StorageManager
+
+import logging
+logger = logging.getLogger("textgame.state")
+logger.addHandler(logging.NullHandler())
 
 
 class PlayerStatus(Enum):
@@ -13,17 +17,30 @@ class PlayerStatus(Enum):
     DEAD = auto()
 
 
-@dataclass
 class State:
-    rooms: Dict[str, Room]
-    player_location: Room
-    player_location_old: Room = None
-    inventory: Dict[str, Item] = field(default_factory=dict)
-    player_status: PlayerStatus = PlayerStatus.NORMAL
-    misc: Dict[str, Any] = field(default_factory=dict)
-    score: int = 0
-    time: int = 0
-    random: Random = field(default_factory=Random)
+
+    def __init__(
+        self,
+        rooms: Dict[str, Room],
+        player_location: Room,
+        creatures: Dict[str, Creature] = None,
+        # contains mappings of creature.id to room.id
+        items: Dict[str, Item] = None,
+    ):
+        self.rooms = rooms
+        self.player_location = player_location
+        self.creatures = StorageManager(creatures)
+        self.items = StorageManager(items)
+        # create a store for inventory and register it in the items manager
+        inventory = Store("inventory")
+        self.items.add_store(inventory)
+        self.inventory = inventory
+        self.player_status: PlayerStatus = PlayerStatus.NORMAL
+        self.player_location_old: Room = None
+        self.misc: Dict[str, Any] = {}
+        self.score = 0
+        self.time = 0
+        self.random = Random()
 
     def get_room(self, room_id: str) -> Optional[Room]:
         return self.rooms.get(room_id)

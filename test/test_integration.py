@@ -43,17 +43,12 @@ def game(resources) -> Game:
     return Game(initial_state=state, parser=parser)
 
 
-@pytest.fixture
-def rooms(game) -> Dict[str, Room]:
-    return game.state.rooms
-
-
 class TestGamePlay:
 
-    def test_look(self, rooms: Dict[str, Room], game: Game):
+    def test_look(self, game: Game):
         expected = (
-            str(rooms["field_0"].description) + "\n"
-            + str(rooms["field_0"].items["diamond"].description)
+            str(game.state.rooms["field_0"].description) + "\n"
+            + str(game.state.rooms["field_0"].items.get("diamond").description)
         )
         assert game.play("look") == expected
     
@@ -80,18 +75,18 @@ class TestGamePlay:
         assert game.play("jump") == "Really?"
         assert game.play("no") == "You said no."
     
-    def test_lock(self, rooms: Dict[str, Room], game: Game):
+    def test_lock(self, game: Game):
         # move the player to the hidden place and try to go through the locked door
-        game.state.player_location = rooms["hidden_place"]
+        game.state.player_location = game.state.rooms["hidden_place"]
         assert game.play("go west") == str(MOVING.FAIL_DOOR_LOCKED)
         assert game.play("open west") == str(ACTION.FAIL_NO_KEY)
         # give the key to the player
-        game.state.inventory["key"] = rooms["marketplace"].get_item("key")
+        game.state.inventory.add(game.state.rooms["marketplace"].items.pop("key"))
         assert game.play("open west") == str(ACTION.NOW_OPEN.format("open"))
-        assert game.play("go west") == str(rooms["hidden_place2"].describe())
+        assert game.play("go west") == str(game.state.rooms["hidden_place2"])
     
     def test_take(self, game: Game):
-        assert game.state.inventory == {}
+        assert game.state.inventory.items() == {}
         game.play("take diamond")
         assert "diamond" in game.state.inventory
 

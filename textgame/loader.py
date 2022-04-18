@@ -110,16 +110,26 @@ class StateBuilder:
         rooms = self.build_room_graph(self.roomloader.load(rooms))
         items = self.itemloader.load(items or [])
         creatures = self.creatureloader.load(creatures or [])
+        state = self.state_class(
+            rooms=rooms,
+            player_location=rooms[initial_location],
+            items={i.id: i for i in items},
+            creatures={c.id: c for c in creatures}
+        )
+        # connect the room's stores to the state's storemanagers
+        for room in rooms.values():
+            state.items.add_store(room.items)
+            state.creatures.add_store(room.creatures)
+
         # put items and creatures in their locations
         for thing in chain(items, creatures):
-            initlocation = rooms.get(thing.initlocation)
-            if not initlocation:
+            if thing.initlocation not in rooms:
                 raise ConfigurationError(
                     f"the initial location '{thing.initlocation} of thing '{thing.name}' does not exist"
                 )
             if isinstance(thing, Item):
-                initlocation.add_item(thing)
+                rooms[thing.initlocation].items.add(thing)
             elif isinstance(thing, Creature):
-                initlocation.add_creature(thing)
+                rooms[thing.initlocation].creatures.add(thing)
 
-        return self.state_class(rooms=rooms, player_location=rooms[initial_location])
+        return state

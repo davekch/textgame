@@ -1,6 +1,6 @@
 from typing import Dict, Optional, Tuple, List
+from .things import Store
 from .messages import m, DESCRIPTIONS, MOVING, INFO
-from .things import Creature, Item
 from .defaults.words import DIRECTIONS
 
 import logging
@@ -48,10 +48,8 @@ class Room:
         self.locked = {dir: {"closed":False, "key":None} for dir in DIRECTIONS}
         # description to print when going in this direction
         self.dir_descriptions = {dir: m() for dir in DIRECTIONS}
-        # items that lie around in this room, format {ID: item}
-        self.items = {}
-        # monsters that are in this room, format {ID: monster}
-        self.creatures = {}
+        self.items = Store(ID)
+        self.creatures = Store(ID)
         self.visited = False
         self.hiddendoors = {}
         self.description = m(description)
@@ -108,21 +106,6 @@ class Room:
             self.doors[dir] = room_id
         else:
             self.hiddendoors[dir] = room_id
-
-    def describe(self, long=False) -> m:
-        """
-        return the description (``long=True``) or short description (``long=False``)
-        of the room or :class:`textgame.globals.DESCRIPTIONS.DARK_L` if the room is dark
-        """
-        long = long or not self.visited
-        if self.dark["now"]:
-            return DESCRIPTIONS.DARK_L
-        descript = self.description if long else self.shortdescription
-        for item in self.items.values():
-            descript += item.describe()
-        for monster in self.creatures.values():
-            descript += monster.describe()
-        return descript
 
     def visit(self) -> int:
         """mark this room as visited if it's not dark and return its value
@@ -190,35 +173,3 @@ class Room:
         """return a tuple of warning and the actual hint (``(str,str)``)
         """
         return (INFO.HINT_WARNING.format(self.hint_value), self.hint)
-
-    def add_item(self, item: Item):
-        """put an item inside the room
-        """
-        if item.id in self.items:
-            logger.debug(f"You try to add item {item.id!r} to room {self.id} but it's already there")
-        logger.debug(f"adding the item {item.id!r} to the room {self.id!r}")
-        self.items[item.id] = item
-
-    def get_item(self, item_id: str) -> Item:
-        return self.items.get(item_id)
-
-    def pop_item(self, item_id: str) -> Item:
-        logger.debug(f"popping item {item_id!r} from room {self.id!r}")
-        return self.items.pop(item_id, None)
-
-    def get_itemnames(self) -> List[str]:
-        return list(self.items.keys())
-    
-    def add_creature(self, creature: Creature):
-        if creature.id in self.creatures:
-            logger.debug(f"You try to add creature {creature.id!r} to room {self.id} but it's already there")
-        logger.debug(f"adding the creature {creature.id!r} to the room {self.id!r}")
-        self.creatures[creature.id] = creature
-    
-    def get_creature(self, creature_id: str) -> Creature:
-        return self.creatures.get(creature_id)
-    
-    def pop_creature(self, creature_id: str) -> Creature:
-        logger.debug(f"popping creature {creature_id!r} from room {self.id!r}")
-        return self.creatures.pop(creature_id, None)
-
