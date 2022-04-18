@@ -81,13 +81,13 @@ class SimpleCaller(Caller):
         
         if not getattr(func, "skip_all_precommandhooks", False):
             skip = getattr(func, "skip_precommandhooks", [])
-            prehookmsg = self.call_precommandhook(state, skip=skip)
+            prehookmsg = call_precommandhook(state, skip=skip)
         else:
             prehookmsg = m()
         commandresponse = self.call_command(command, state)
         if not getattr(func, "skip_all_postcommandhooks", False):
             skip = getattr(func, "skip_postcommandhooks", [])
-            posthookmsg = self.call_postcommandhook(state, skip=skip)
+            posthookmsg = call_postcommandhook(state, skip=skip)
         else:
             posthookmsg = m()
         return prehookmsg + commandresponse + posthookmsg
@@ -101,17 +101,19 @@ class SimpleCaller(Caller):
         else:
             return INFO.YES_NO
         return self.check_result(result)
-    
-    def call_precommandhook(self, state: State, skip: List[str] = None) -> m:
-        msg = m()
-        for name, func in precommandhook_registry.items():
-            if name not in (skip or []):
-                msg += func(state)
-        return msg
-    
-    def call_postcommandhook(self, state: State, skip: List[str] = None) -> m:
-        msg = m()
-        for name, func in postcommandhook_registry.items():
-            if name not in (skip or []):
-                msg += func(state)
-        return msg
+
+
+def call_precommandhook(state: State, skip: List[str] = None) -> m:
+    msg = m()
+    for name, func in precommandhook_registry.items():
+        if name not in (skip or []):
+            msg += func(state)
+    return msg
+
+
+def call_postcommandhook(state: State, skip: List[str] = None) -> m:
+    msg = m()
+    for name, func in postcommandhook_registry.items():
+        if name not in (skip or []):
+            msg += func(state)
+    return msg
