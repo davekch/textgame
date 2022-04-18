@@ -37,22 +37,22 @@ class m:
     seperator = "\n"
     translations = {}
 
-    def __init__(self, msg: str="", needs_answer: bool=False):
+    def __init__(self, msg: str = "", needs_answer: bool = False):
         # don't accidentally nest messages
         if isinstance(msg, m):
             msg = msg.data
 
         self._data = msg
-    
+
     @property
     def data(self):
         if self._data in self.translations:
             return self.translations[self._data]
         return self._data
-    
+
     def format(self, *args, **kwargs) -> m:
         return m(self.data.format(*args, **kwargs))
-    
+
     @classmethod
     def update_translations(cls, dict):
         cls.translations.update(dict)
@@ -69,21 +69,21 @@ class m:
         elif not other:
             result = self.data
         return m(result)
-    
+
     def __iadd__(self, other) -> m:
         # return a new instance instead of mutating this one, otherwise
         # the messages add up over time
         return self + other
-    
+
     def __hash__(self):
         return hash(self.data)
-    
+
     def __bool__(self) -> bool:
         return bool(self.data)
-    
+
     def __contains__(self, string: str) -> bool:
         return string in self.data
-    
+
     def __str__(self) -> str:
         return self.data
 
@@ -104,7 +104,9 @@ class DefaultMessage:
 
 
 class INFO(DefaultMessage):
-    HINT_WARNING = m("I have a hint for you, but it will cost you {} points. Do you want to hear it?")
+    HINT_WARNING = m(
+        "I have a hint for you, but it will cost you {} points. Do you want to hear it?"
+    )
     SUNSET = m("The sun has set. Night comes in.")
     SUNRISE = m("The sun is rising! A new day begins")
     NO_HINT = m("I don't have any special hints for you.")
@@ -118,7 +120,9 @@ class INFO(DefaultMessage):
 
 
 class MOVING(DefaultMessage):
-    DEATH_BY_COWARDICE = m("Coward! Running away from a fight is generally not a good idea. Your back doesn't defend itself.")
+    DEATH_BY_COWARDICE = m(
+        "Coward! Running away from a fight is generally not a good idea. Your back doesn't defend itself."
+    )
     FAIL_ALREADY_LOCKED = m("The door is already locked!")
     FAIL_CANT_GO = m("You can't go in this direction.")
     FAIL_DOOR_LOCKED = m("The door is locked.")
@@ -132,7 +136,9 @@ class MOVING(DefaultMessage):
 
 
 class DESCRIPTIONS(DefaultMessage):
-    DARK_L = m("It's pitch dark here. You can't see anything. Anytime soon, you'll probably get attacked by some night creature.")
+    DARK_L = m(
+        "It's pitch dark here. You can't see anything. Anytime soon, you'll probably get attacked by some night creature."
+    )
     DARK_S = m("I can't see anything!")
     NO_SOUND = m("It's all quiet.")
     NOTHING_THERE = "There's nothing here."
@@ -147,7 +153,9 @@ class ACTION(DefaultMessage):
     FAIL_TAKE = m("You can't take that.")
     NO_SUCH_ITEM = m("I see no {} here.")
     NO_INVENTORY = m("You don't have anything with you.")
-    FAIL_OPENDIR = m("I can only {0} doors if you tell me the direction. Eg. '{0} west'.")
+    FAIL_OPENDIR = m(
+        "I can only {0} doors if you tell me the direction. Eg. '{0} west'."
+    )
     FAIL_NO_KEY = m("You have no keys!")
     ALREADY_OPEN = m("The door is already open.")
     ALREADY_CLOSED = m("The door is already closed.")

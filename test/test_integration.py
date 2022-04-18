@@ -51,37 +51,35 @@ def game(resources) -> Game:
 
 
 class TestGamePlay:
-
     def test_look(self, game: Game):
         expected = (
-            str(game.state.rooms["field_0"].description) + "\n"
+            str(game.state.rooms["field_0"].description)
+            + "\n"
             + str(game.state.rooms["field_0"].items.get("diamond").description)
         )
         assert game.play("look") == expected
-    
+
     def test_custom_command(self, game: Game):
         @register_command("scream")
         def scream(noun: str, state: State) -> m:
             return m(f"{noun.upper()}!!!")
-        
+
         assert game.play("scream hello") == "HELLO!!!"
-    
+
     def test_yesno(self, game: Game):
         @register_command("jump")
         def jump(_noun: str, state: State) -> EnterYesNoLoop:
             return EnterYesNoLoop(
-                question=m("Really?"),
-                yes=m("You said yes."),
-                no=m("You said no.")
+                question=m("Really?"), yes=m("You said yes."), no=m("You said no.")
             )
-        
+
         assert game.play("jump") == "Really?"
         assert game.play("go west") == str(INFO.YES_NO)
         assert game.play("yes") == "You said yes."
         assert game.play("yes") == str(INFO.NOT_UNDERSTOOD)
         assert game.play("jump") == "Really?"
         assert game.play("no") == "You said no."
-    
+
     def test_lock(self, game: Game):
         # move the player to the hidden place and try to go through the locked door
         game.state.player_location = game.state.rooms["hidden_place"]
@@ -91,18 +89,20 @@ class TestGamePlay:
         game.state.inventory.add(game.state.rooms["marketplace"].items.pop("key"))
         assert game.play("open west") == str(ACTION.NOW_OPEN.format("open"))
         assert game.play("go west") == str(game.state.rooms["hidden_place2"].describe())
-    
+
     def test_take(self, game: Game):
         assert game.state.inventory.items() == {}
         game.play("take diamond")
         assert "diamond" in game.state.inventory
-    
+
     def test_score(self, game: Game):
         assert game.state.score == 0
         game.play("go north")
         assert game.state.score == game.state.player_location.value
-        assert game.play("score") == str(INFO.SCORE.format(game.state.player_location.value))
-    
+        assert game.play("score") == str(
+            INFO.SCORE.format(game.state.player_location.value)
+        )
+
     def test_hint(self, game: Game):
         warning, hint = game.state.player_location.get_hint()
         assert game.play("hint") == str(warning)
@@ -116,9 +116,7 @@ class TestGamePlay:
 
 
 class TestHooks:
-
     def test_timehooks(self, game: Game):
-
         @register_precommandhook("daylight")
         def daylight(state: State) -> m:
             if state.time >= 2:
@@ -137,23 +135,29 @@ class TestHooks:
             " Anytime soon, you'll probably get attacked by some night creature."
         )
         assert game.state.time == 3
-    
+
     def test_randomwalk_hook(self, game: Game):
         register_postcommandhook("time", hooks.time)
         register_behaviour("randomwalk", behaviours.randomwalk)
-        register_precommandhook("randomwalkhook", hooks.singlebehaviourhook("randomwalk"))
+        register_precommandhook(
+            "randomwalkhook", hooks.singlebehaviourhook("randomwalk")
+        )
         randomwalker = game.state.creatures.storage["randomwalker"]
         randomwalker_location = game.state.get_location_of(randomwalker)
         assert randomwalker_location == game.state.get_room("marketplace")
 
         # define a sequence of rooms where the randomwalker walks
-        walk = [game.state.get_room("field_0"), game.state.get_room("field_1"), game.state.get_room("field_0")]
+        walk = [
+            game.state.get_room("field_0"),
+            game.state.get_room("field_1"),
+            game.state.get_room("field_0"),
+        ]
         randomnumbers = [0.2, 0.7, 0.2, 0.6, 0.6, 0.4]
 
         def yield_sequence(seq):
             it = iter(seq)
             return lambda *args: next(it)
-        
+
         # monkeypatch the random engine
         random = mock.MagicMock()
         random.choice = yield_sequence(walk)
@@ -164,26 +168,31 @@ class TestHooks:
         for randomnumber in randomnumbers:
             game.play("look")
             if randomnumber < randomwalker.behaviours["randomwalk"]["mobility"]:
-                assert game.state.get_location_of(randomwalker) == next(walk_iter) 
+                assert game.state.get_location_of(randomwalker) == next(walk_iter)
 
     def test_daytime_hook(self, game: Game):
-        register_precommandhook("daylight", hooks.daylight(duration_day=2, duration_night=3))
+        register_precommandhook(
+            "daylight", hooks.daylight(duration_day=2, duration_night=3)
+        )
         register_postcommandhook("time", hooks.time)
         for _ in range(2):
             response = game.play("look")
-            assert str(INFO.SUNSET) not in response and str(INFO.SUNRISE) not in response
+            assert (
+                str(INFO.SUNSET) not in response and str(INFO.SUNRISE) not in response
+            )
         assert game.state.time == 2
         assert str(INFO.SUNSET) in game.play("look")
         assert game.state.daytime == Daytime.NIGHT
         assert game.state.player_location.is_dark()
         for _ in range(2):
             response = game.play("look")
-            assert str(INFO.SUNSET) not in response and str(INFO.SUNRISE) not in response
+            assert (
+                str(INFO.SUNSET) not in response and str(INFO.SUNRISE) not in response
+            )
         assert game.state.time == 5
         assert str(INFO.SUNRISE) in game.play("look")
         assert game.state.daytime == Daytime.DAY
         assert not game.state.player_location.is_dark()
-
 
     def teardown_method(self, test_method):
         # unregister everything

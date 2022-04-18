@@ -32,16 +32,14 @@ def creatures():
 
 
 class TestLoader:
-
     def test_load_rooms(self, rooms: List[Dict]):
         room_objs = RoomLoader.load(rooms)
         assert isinstance(room_objs[0], Room)
-    
-    def test_custom_room(self, rooms: List[Dict]):
 
+    def test_custom_room(self, rooms: List[Dict]):
         class MyRoom(Room):
             pass
-    
+
         Factory.register("room", MyRoom)
         room_objs = RoomLoader.load(rooms)
         assert isinstance(room_objs[0], MyRoom)
@@ -52,7 +50,7 @@ class TestLoader:
         assert isinstance(item_objs[-1], Key)
         assert item_objs[-1].key_id == items[-1]["key_id"]
         assert len([i for i in item_objs if isinstance(i, Key)]) == 1
-    
+
     def test_load_creatures(self, creatures: List[Dict]):
         creature_objs = CreatureLoader.load(creatures)
         assert isinstance(creature_objs[0], Creature)

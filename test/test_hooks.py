@@ -26,7 +26,6 @@ def fake_state(fake_creatures) -> MagicMock:
 
 
 class TestHooks:
-
     def test_singlebehaviourhook(self, fake_state: MagicMock):
         mockhook = hooks.singlebehaviourhook("mockbehaviour")
         mockhook(fake_state)

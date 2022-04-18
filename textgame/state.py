@@ -6,6 +6,7 @@ from .room import Room
 from .things import Item, Creature, Store, Thing, StorageManager
 
 import logging
+
 logger = logging.getLogger("textgame.state")
 logger.addHandler(logging.NullHandler())
 
@@ -23,7 +24,6 @@ class Daytime(Enum):
 
 
 class State:
-
     def __init__(
         self,
         rooms: Dict[str, Room],
@@ -34,7 +34,9 @@ class State:
     ):
         self.rooms = rooms
         self.player_location = player_location
-        self.creatures = StorageManager(creatures)  # rename to creature_manager and item_manager?
+        self.creatures = StorageManager(
+            creatures
+        )  # rename to creature_manager and item_manager?
         self.items = StorageManager(items)
         # create a store for inventory and register it in the items manager
         inventory = Store("inventory")
@@ -50,10 +52,12 @@ class State:
 
     def get_room(self, room_id: str) -> Optional[Room]:
         return self.rooms.get(room_id)
-    
+
     def get_location_of(self, thing: Thing) -> Optional[Room]:
-        room_id = self.items.get_store_id_from_thing(thing) or self.creatures.get_store_id_from_thing(thing)
+        maybe_item = self.items.get_store_id_from_thing(thing)
+        maybe_creature = self.creatures.get_store_id_from_thing(thing)
+        room_id = maybe_item or maybe_creature
         return self.get_room(room_id)
-    
+
     def set_random_seed(self, seed: int):
         self.random.seed(seed)

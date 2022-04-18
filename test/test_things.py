@@ -31,7 +31,6 @@ def managed_stores(things, stores) -> Tuple[StorageManager, Dict[str, Store]]:
 
 
 class TestStores:
-
     def test_add(self, managed_stores: Tuple[StorageManager, Dict[str, Store]]):
         manager, stores = managed_stores
         things = manager.storage
@@ -39,7 +38,7 @@ class TestStores:
         assert "thing_1" in stores["store_0"].items()
         assert "thing_1" not in stores["store_1"].items()
         stores["store_0"].add(things["thing_2"])
-        assert "thing_2" in stores["store_0"].items() 
+        assert "thing_2" in stores["store_0"].items()
         assert "thing_1" in stores["store_0"].items()
         # adding a thing to another store should remove it from the other one
         stores["store_1"].add(things["thing_2"])
@@ -51,7 +50,7 @@ class TestStores:
         things = manager.storage
         stores["store_0"].add(things["thing_0"])
         assert stores["store_0"].get("thing_0") == things["thing_0"]
-    
+
     def test_limit(self, managed_stores: Tuple[StorageManager, Dict[str, Store]]):
         manager, stores = managed_stores
         things = manager.storage
@@ -78,12 +77,11 @@ def container() -> Container:
 
 
 class TestContainers:
-
     def test_containerfactory(self, container: Container):
         assert isinstance(container, Container)
-    
+
     def test_container(self, container: Container, things: Dict[str, MagicMock]):
-        things["basket"] = container   # make it nested
+        things["basket"] = container  # make it nested
         manager = StorageManager(things)
         manager.add_store(container._contains)
         container.insert(things["thing_0"])

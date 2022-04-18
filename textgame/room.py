@@ -5,6 +5,7 @@ from .messages import m, DESCRIPTIONS, MOVING, INFO
 from .defaults.words import DIRECTIONS
 
 import logging
+
 logger = logging.getLogger("textgame.room")
 logger.addHandler(logging.NullHandler())
 
@@ -28,7 +29,8 @@ class Room:
     :param dir_descriptions: dict mapping directions to descriptive messages about going in this directions, eg ``{"up": "You spread your wings and start to fly."}``
     """
 
-    def __init__(self,
+    def __init__(
+        self,
         ID: str,
         description: str,
         shortdescription: str = "",
@@ -41,12 +43,12 @@ class Room:
         doors: Dict[str, str] = None,
         hiddendoors: Dict[str, str] = None,
         locked: Dict[str, Dict] = None,
-        dir_descriptions: Dict[str, str] = None
+        dir_descriptions: Dict[str, str] = None,
     ):
-        self.id = ID   # unique, similar rooms should have a common keyword in ID
+        self.id = ID  # unique, similar rooms should have a common keyword in ID
         self.doors = {dir: None for dir in DIRECTIONS}
         # dict that describes the locked/opened state of doors
-        self.locked = {dir: {"closed":False, "key":None} for dir in DIRECTIONS}
+        self.locked = {dir: {"closed": False, "key": None} for dir in DIRECTIONS}
         # description to print when going in this direction
         self.dir_descriptions = {dir: m() for dir in DIRECTIONS}
         self.items = Store(ID)
@@ -68,30 +70,38 @@ class Room:
             for dir in errors:
                 if dir not in DIRECTIONS:
                     logger.warning(
-                        f"In errors of room {self.id}: {dir} is not a direction".format(self.id, dir)
+                        f"In errors of room {self.id}: {dir} is not a direction".format(
+                            self.id, dir
+                        )
                     )
             self.errors.update(errors)
 
         if doors:
-            for dir,room in doors.items():
+            for dir, room in doors.items():
                 self.add_connection(dir, room)
 
         if hiddendoors:
-            for dir,room in hiddendoors.items():
+            for dir, room in hiddendoors.items():
                 self.add_connection(dir, room, hidden=True)
 
         if locked:
-            for dir,lock in locked.items():
+            for dir, lock in locked.items():
                 if "locked" not in lock or "key" not in lock:
-                    logger.warning(f"locked dict of room {self.id} in direction {dir} is badly formatted")
+                    logger.warning(
+                        f"locked dict of room {self.id} in direction {dir} is badly formatted"
+                    )
                 if dir not in DIRECTIONS:
-                    logger.warning(f"locked dict of room {self.id}: {id} is not a direction")
+                    logger.warning(
+                        f"locked dict of room {self.id}: {id} is not a direction"
+                    )
             self.locked.update(locked)
 
         if dir_descriptions:
             for dir in dir_descriptions:
                 if dir not in DIRECTIONS:
-                    logger.warning("dir_descriptions dict of room {self.id}: {dir} is not a direction")
+                    logger.warning(
+                        "dir_descriptions dict of room {self.id}: {dir} is not a direction"
+                    )
             self.dir_descriptions.update(dir_descriptions)
 
     def add_connection(self, dir: str, room_id: str, hidden=False):
@@ -103,23 +113,23 @@ class Room:
         :param hidden: specify if the connection is hidden
         """
         if not dir in DIRECTIONS:
-            logger.error(f"You try to add a connection {dir} to {self.id} but this is not a direction")
+            logger.error(
+                f"You try to add a connection {dir} to {self.id} but this is not a direction"
+            )
         if not hidden:
             self.doors[dir] = room_id
         else:
             self.hiddendoors[dir] = room_id
 
     def visit(self) -> int:
-        """mark this room as visited if it's not dark and return its value
-        """
+        """mark this room as visited if it's not dark and return its value"""
         if not self.dark["now"]:
             self.visited = True
             return self.value
         return 0
 
     def is_locked(self, direction: str) -> bool:
-        """return ``True`` if the door in ``direction`` is locked
-        """
+        """return ``True`` if the door in ``direction`` is locked"""
         return self.locked.get(direction, {}).get("locked")
 
     def describe_way_to(self, direction: str) -> m:
@@ -129,13 +139,12 @@ class Room:
         return self.dir_descriptions.get(direction, m())
 
     def get_connection(self, direction: str) -> Optional[Room]:
-        """returns room object that lies in the given direction, ``None`` if there is no door in that direction.
-        """
+        """returns room object that lies in the given direction, ``None`` if there is no door in that direction."""
         return self.doors.get(direction)
 
     def is_dark(self) -> bool:
         return self.dark["now"]
-    
+
     def describe(self, long: bool = False) -> m:
         long = long or not self.visited
         if self.dark["now"]:
@@ -166,7 +175,10 @@ class Room:
         if not include_hidden:
             return self.doors.get(direction) is not None
         else:
-            return self.doors.get(direction) is not None or self.hiddendoors.get(direction) is not None
+            return (
+                self.doors.get(direction) is not None
+                or self.hiddendoors.get(direction) is not None
+            )
 
     def get_open_connections(self) -> Dict[str, Room]:
         return {
@@ -176,8 +188,7 @@ class Room:
         }
 
     def get_door_code(self, direction: str) -> Optional[int]:
-        """gets the key code to the door in the given direction, ``None`` else
-        """
+        """gets the key code to the door in the given direction, ``None`` else"""
         return self.locked.get(direction, {}).get("key")
 
     def set_locked(self, direction: str, locked: bool):
@@ -190,6 +201,5 @@ class Room:
         self.locked[direction]["locked"] = locked
 
     def get_hint(self) -> Tuple[m, m]:
-        """return a tuple of warning and the actual hint (``(m, m)``)
-        """
+        """return a tuple of warning and the actual hint (``(m, m)``)"""
         return (INFO.HINT_WARNING.format(self.hint_value), self.hint)

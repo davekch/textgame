@@ -6,7 +6,6 @@ from .defaults import words
 
 
 class Parser(ABC):
-
     @abstractmethod
     def parse_input(self, input: str) -> Any:
         """take a string as input and parse it into something"""
@@ -33,21 +32,24 @@ class ParsedInput:
 
     def is_valid(self) -> bool:
         return self.type is not None
-    
+
     def get(self) -> Union[Command, YesNoAnswer]:
         return self.value
 
 
 class SimpleParser(Parser):
-
-    def __init__(self, verb_synonyms: Dict[str, List[str]] = None, noun_synonyms: Dict[str, List[str]] = None):
+    def __init__(
+        self,
+        verb_synonyms: Dict[str, List[str]] = None,
+        noun_synonyms: Dict[str, List[str]] = None,
+    ):
         self.verb_synonyms: Dict[str, str] = {}
         self.noun_synonyms: Dict[str, str] = {}
         if verb_synonyms:
             self.update_verb_synonyms(verb_synonyms)
         if noun_synonyms:
             self.update_verb_synonyms(noun_synonyms)
-        
+
     def update_verb_synonyms(self, synonyms: Dict[str, List[str]]):
         """
         define synonyms for verbs
@@ -59,7 +61,7 @@ class SimpleParser(Parser):
                 raise TypeError("synonyms must be defined as a list")
             for s in synonyms:
                 self.verb_synonyms[s] = command
-        
+
     def update_noun_synonyms(self, synonyms: Dict[str, List[str]]):
         """
         define synonyms for verbs
@@ -71,7 +73,7 @@ class SimpleParser(Parser):
                 raise TypeError("synonyms must be defined as a list")
             for s in synonyms:
                 self.noun_synonyms[s] = noun
-            
+
     def use_default_synonyms(self):
         self.update_verb_synonyms(words.default_verb_synonyms)
         self.update_noun_synonyms(words.default_noun_synonyms)
@@ -81,7 +83,7 @@ class SimpleParser(Parser):
 
     def lookup_noun(self, noun: str) -> str:
         return self.noun_synonyms.get(noun) or noun
-    
+
     def parse_yesno(self, answer: str) -> YesNoAnswer:
         if self.lookup_noun(answer) == words.YES:
             return YesNoAnswer.YES
@@ -109,7 +111,7 @@ class SimpleParser(Parser):
         verb = self.lookup_verb(verb)
         noun = self.lookup_noun(noun)
         return Command(verb, noun)
-    
+
     def parse_input(self, input: str) -> ParsedInput:
         # try to parse the input as a yesno answer, if that fails, try to parse a command
         yesno_parsed = self.parse_yesno(input)
@@ -119,4 +121,3 @@ class SimpleParser(Parser):
         if command_parsed:
             return ParsedInput(type=Command, value=command_parsed)
         return ParsedInput(type=None)
-

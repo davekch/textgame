@@ -64,7 +64,7 @@ def goback(state: State) -> m:
         return MOVING.FAIL_NO_WAY_BACK
     else:
         # find in which direction location_old is
-        for dir,dest in state.player_location.doors.items():
+        for dir, dest in state.player_location.doors.items():
             if dest == state.player_location_old:
                 direction = dir
                 break
@@ -75,21 +75,26 @@ def goback(state: State) -> m:
 def go_north(_, state: State) -> m:
     return go("north", state)
 
+
 @register_command("east")
 def go_east(_, state: State) -> m:
     return go("east", state)
+
 
 @register_command("south")
 def go_south(_, state: State) -> m:
     return go("south", state)
 
+
 @register_command("west")
 def go_west(_, state: State) -> m:
     return go("west", state)
 
+
 @register_command("up")
 def go_up(_, state: State) -> m:
     return go("up", state)
+
 
 @register_command("down")
 def go_down(_, state: State) -> m:
@@ -260,8 +265,4 @@ def ask_hint(_: str, state: State):
 
     # stuff hint_conversation inside the EnterYesNoLoop,
     # this will be called during conversation
-    return EnterYesNoLoop(
-        question = warning,
-        yes = hint_conversation,
-        no = m("ok.")
-    )
+    return EnterYesNoLoop(question=warning, yes=hint_conversation, no=m("ok."))

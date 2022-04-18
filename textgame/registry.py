@@ -4,6 +4,7 @@ from typing import Callable, Dict, List, Optional, Union, TypeVar, OrderedDict
 from collections import OrderedDict
 
 from typing import TYPE_CHECKING
+
 if TYPE_CHECKING:
     from .messages import m
     from .state import State
@@ -22,21 +23,25 @@ postcommandhook_registry: OrderedDict[str, HookFunc] = OrderedDict()
 
 
 C = TypeVar("C")
+
+
 def _register_decoratorfactory(registry: Dict[str, C]):
-    """returns a decorator that can be used to register functions in the registry
-    """
+    """returns a decorator that can be used to register functions in the registry"""
+
     def register_decorator(name: str, func: C = None) -> Callable[[C], C]:
         # this decorator can be used like this
         # @decorator(name) or like this decorator(name, func)
         # in the first case, func is none and we must return another decorator
         if not func:
+
             def decorator(_func: C) -> C:
                 registry[name] = _func
                 return _func
+
             return decorator
         else:
             registry[name] = func
-    
+
     return register_decorator
 
 
@@ -73,21 +78,22 @@ def unregister_postcommandhook(name: str):
 
 
 def _skip_decoratorfactory(flag: str):
-
     def skip_decorator(func: Callable = None, skip: List[str] = None):
         # hack to make all of these work: @skip_decorator, @skip_decorator([...])
         if isinstance(func, list):
             skip = func
             func = None
         if not func and skip:
+
             def decorator(_func):
                 setattr(_func, flag, skip)
                 return _func
+
             return decorator
         else:
             setattr(func, flag, "all")
             return func
-        
+
     return skip_decorator
 
 
