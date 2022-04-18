@@ -1,7 +1,7 @@
 from __future__ import annotations
 from dataclasses import dataclass
 from enum import Enum, auto
-from typing import Dict, Type, TypeVar, Callable, List, Any
+from typing import Dict, Generic, Optional, Type, TypeVar, Callable, List, Any
 from abc import ABC, abstractmethod
 from .parser import (
     Parser,
@@ -42,7 +42,7 @@ class Response:
     # so that the caller can check the type and set its mode accordingly.
     # case where this is really necessary: when a response is preehookmsg + enteryesnoloop + posthookmsg
     value: MessageType | List[MessageType]
-    type: Type[MessageType] = None
+    type: Type[MessageType] = None  # type: ignore
 
     def __post_init__(self):
         if not self.type:
@@ -57,21 +57,22 @@ class Response:
         return self.value.to_message()
 
 
-class Interpreter(ABC):
-    ParsedInputType = TypeVar("ParsedInputType")
-    StateType = TypeVar("StateType")
+ParsedInputType = TypeVar("ParsedInputType")
+StateType = TypeVar("StateType")
+ResponseType = TypeVar("ResponseType")
 
+
+class Interpreter(ABC, Generic[ParsedInputType, StateType, ResponseType]):
     def __init__(self):
-        self.previous_result: Response = None
+        self.previous_result: Optional[ResponseType] = None
         self.success: bool = True  # should be set by self.interpret
 
-    def backup_result(self, result):
+    def backup_result(self, result: ResponseType):
         self.previous_result = result
 
     @abstractmethod
-    def interpret(self, input: ParsedInputType, state: StateType) -> Response:
+    def interpret(self, input: ParsedInputType, state: StateType) -> ResponseType:
         """get and call the function corresponding to the parsed command"""
-        pass
 
 
 class CommandInterpreter(Interpreter):
@@ -124,6 +125,8 @@ class CommandInterpreter(Interpreter):
 class YesNoInterpreter(Interpreter):
     def interpret(self, answer: YesNoAnswer, _state: State) -> Response:
         logger.debug(f"got answer {answer!r}")
+        if not self.previous_result:
+            raise ValueError("YesNoInterpreter has no backup of the previous response")
         self.success = True
         # if the previous result was multiple messages, get the question first
         if isinstance(self.previous_result.value, list):
@@ -146,6 +149,8 @@ class YesNoInterpreter(Interpreter):
 class MultipleChoiceInterpreter(Interpreter):
     def interpret(self, answer: str, state: State) -> Response:
         logger.debug(f"got answer {answer!r}")
+        if not self.previous_result:
+            raise ValueError("YesNoInterpreter has no backup of the previous response")
         # if the previous result was multiple messages, get the question first
         if isinstance(self.previous_result.value, list):
             for msg in self.previous_result.value:
@@ -163,9 +168,7 @@ class MultipleChoiceInterpreter(Interpreter):
         return Response(question.get_response(answer))
 
 
-class Caller(ABC):
-    StateType = TypeVar("StateType")
-
+class Caller(ABC, Generic[StateType]):
     @abstractmethod
     def call(self, input: str, state: StateType) -> MessageType:
         """parse input and call the function corresponding to the parsed input"""
@@ -220,7 +223,7 @@ class SimpleCaller(Caller):
         self.check_result(result)
         return result.to_message()
 
-    def check_result(self, result: Response) -> m:
+    def check_result(self, result: Response):
         if result.type not in self.mode_switches:
             raise ModeNotFoundError(
                 f"response contains unexpected type: {result.type!r}. no mode is configured for this type"

@@ -14,7 +14,7 @@ if TYPE_CHECKING:
     from .state import State
     from .things import Behaviour
 
-    CommandFunc = Callable[[str], m]
+    CommandFunc = Callable[[str, State], m]
     BehaviourFunc = Type[Behaviour]
     HookFunc = Callable[[State], m]
 
