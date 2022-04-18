@@ -52,7 +52,10 @@ class Factory:
 
 def behaviour_factory(behaviourname: str, params: Dict[str, Any]) -> Behaviour:
     if behaviourname not in behaviour_registry:
-        raise ConfigurationError
+        raise ConfigurationError(
+            f"an error occured while creating the creature {behaviourname!r}: "
+            f"behaviour {behaviourname!r} is not registered"
+        )
     behaviour_class = behaviour_registry[behaviourname]
     switch = params.pop("switch", None)
     if switch is None:
@@ -119,11 +122,10 @@ class CreatureLoader(Loader):
             for behaviourname, params in list(creature.behaviours.items()):
                 try:
                     behaviour = behaviour_factory(behaviourname, params)
-                except ConfigurationError:
+                except ConfigurationError as error:
                     raise ConfigurationError(
-                        f"an error occured while creating the creature {creature.id!r}: "
-                        f"behaviour {behaviourname!r} is not registered"
-                    )
+                        f"an error occured while creating the creature {creature.id!r}"
+                    ) from error
                 # overwrite the creature's behaviour
                 logger.debug(
                     f"add behaviour of type {type(behaviour)} to creature {creature.id!r}. "
