@@ -8,7 +8,7 @@ class MessageType(Protocol):
         ...
 
 
-def wrap_m(func: Callable[..., str | m]) -> Callable[..., m]:
+def wrap_m(func: Callable[..., str | MessageType]) -> Callable[..., MessageType]:
     """decorator that converts the returned value of func into m if it's a string"""
 
     @wraps(func)
@@ -58,7 +58,10 @@ class YesNoQuestion:
 
 class MultipleChoiceQuestion:
     def __init__(
-        self, question: m, answers: Dict[m, m | Callable[[], m]], cancel: bool = True
+        self,
+        question: m,
+        answers: Dict[m | str, MessageType | Callable[[], MessageType]],
+        cancel: bool = True,
     ):
         self._question = question
         answers_list = list(answers.items())
@@ -76,7 +79,7 @@ class MultipleChoiceQuestion:
         return f"<{self.__class__.__name__} question={self._question!r} answers={self.answers}>"
 
     @wrap_m
-    def get_response(self, choice: str) -> m:
+    def get_response(self, choice: str) -> MessageType:
         _, response = self.answers[choice]
         if callable(response):
             return response()
@@ -209,7 +212,7 @@ class DESCRIPTIONS(DefaultMessage):
     )
     DARK_S = m("I can't see anything!")
     NO_SOUND = m("It's all quiet.")
-    NOTHING_THERE = "There's nothing here."
+    NOTHING_THERE = m("There's nothing here.")
 
 
 class ACTION(DefaultMessage):

@@ -46,7 +46,12 @@ class Factory:
 
     @classmethod
     def register(cls, obj_type: str, creation_func: Type[Thing] = None):
-        return cls.creation_funcs.register(obj_type, creation_func)
+        if creation_func:
+            # if creation_func was none, this line would result in an error with mypy
+            # so we split the calls to register() in two cases
+            return cls.creation_funcs.register(obj_type, creation_func)
+        else:
+            return cls.creation_funcs.register(obj_type)
 
     @classmethod
     def unregister(cls, obj_type: str):
