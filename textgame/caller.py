@@ -131,8 +131,23 @@ class YesNoInterpreter(Interpreter):
 
 
 class MultipleChoiceInterpreter(Interpreter):
-    def interpret(self, parsed_input: str, state: State) -> Response:
-        pass
+    def interpret(self, answer: str, state: State) -> Response:
+        logger.debug(f"got answer {answer!r}")
+        # if the previous result was multiple messages, get the question first
+        if isinstance(self.previous_result.value, list):
+            for msg in self.previous_result.value:
+                if isinstance(msg, MultipleChoiceQuestion):
+                    question = msg
+                    break
+        else:
+            question = self.previous_result.value
+        if not answer in question.possible_answers:
+            self.success = False
+            return Response(
+                INFO.NO_VALID_ANSWER.format(", ".join(question.possible_answers))
+            )
+        self.success = True
+        return Response(question.get_response(answer))
 
 
 class Caller(ABC):

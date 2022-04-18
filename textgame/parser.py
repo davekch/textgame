@@ -64,14 +64,8 @@ class YesNoParser(Parser):
 
 
 class MultipleChoiceParser(Parser):
-    def __init__(self):
-        self.possible_answers: List[str] = None
-
-    def set_possible_answers(self, answers: List[str]):
-        self.possible_answers = answers
-
     def parse_input(self, input: str) -> str:
-        return super().parse_input(input)()
+        return input.strip()
 
 
 class CommandParser(Parser):

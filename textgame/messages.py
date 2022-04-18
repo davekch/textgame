@@ -42,13 +42,13 @@ class YesNoQuestion:
 
 class MultipleChoiceQuestion:
     def __init__(
-        self, question: m, answers: Dict[m, m | Callable], cancel: bool = True
+        self, question: m, answers: Dict[m, m | Callable[[], m]], cancel: bool = True
     ):
         self._question = question
         answers = list(answers.items())
         if cancel:
             answers.append((m("Cancel"), m("Ok.")))
-        self.answers = {str(i): a for i, a in enumerate(answers)}
+        self.answers = {str(i + 1): a for i, a in enumerate(answers)}
 
     def to_message(self) -> m:
         q = self._question
@@ -153,6 +153,9 @@ class INFO(DefaultMessage):
     SUNRISE = m("The sun is rising! A new day begins")
     NO_HINT = m("I don't have any special hints for you.")
     NOT_UNDERSTOOD = m("I don't understand that.")
+    NO_VALID_ANSWER = m(
+        "That's not a valid answer to the question. Possible answers are: {}"
+    )
     NOTHING = m("Nothing happens.")
     SCORE = m("Your score is {}.")
     TOO_MANY_ARGUMENTS = m("Please restrict your command to two words.")

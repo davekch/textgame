@@ -2,7 +2,14 @@ from textgame.game import Game
 from textgame.caller import SimpleCaller
 from textgame.loader import StateBuilder
 from textgame.state import Daytime, State
-from textgame.messages import ACTION, MOVING, YesNoQuestion, m, INFO
+from textgame.messages import (
+    ACTION,
+    MOVING,
+    MultipleChoiceQuestion,
+    YesNoQuestion,
+    m,
+    INFO,
+)
 from textgame.room import Room
 from textgame.state import State
 from textgame.registry import (
@@ -80,6 +87,28 @@ class TestGamePlay:
         assert game.play("yes") == str(INFO.NOT_UNDERSTOOD)
         assert game.play("jump") == "Really?"
         assert game.play("no") == "You said no."
+
+    def test_multiplechoicequestion(self, game: Game):
+        question = MultipleChoiceQuestion(
+            question=m("What do you want to buy?"),
+            answers={
+                "bread": m("You buy bread."),
+                "fish": lambda: m("You eat the fish."),  # test if callables also work
+            },
+        )
+
+        @register_command("trade")
+        def trade(noun: str, state: State) -> MultipleChoiceQuestion:
+            return question
+
+        assert game.play("trade") == (
+            "What do you want to buy?\n (1) bread\n (2) fish\n (3) Cancel"
+        )
+        assert game.play("quack") == str(INFO.NO_VALID_ANSWER.format("1, 2, 3"))
+        assert game.play("1") == "You buy bread."
+        assert game.play("2") == str(INFO.NOT_UNDERSTOOD)
+        game.play("trade")
+        assert game.play("2") == "You eat the fish."
 
     def test_lock(self, game: Game):
         # move the player to the hidden place and try to go through the locked door
