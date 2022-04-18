@@ -21,7 +21,7 @@ from textgame.registry import (
     roomhook_registry,
 )
 from textgame.defaults import commands, behaviours, hooks
-from textgame.things import Monster, Weapon
+from textgame.things import Item, Monster, Weapon
 from utils import yield_sequence
 from typing import Dict
 import json
@@ -49,14 +49,33 @@ def resources() -> Dict:
 
 
 @pytest.fixture
-def game(resources) -> Game:
+def state(resources) -> State:
     commands.use_defaults()
     behaviour_registry.register("randomappearance", behaviours.RandomAppearance)
     behaviour_registry.register("randomwalk", behaviours.RandomWalk)
     behaviour_registry.register("random_spawn_once", behaviours.RandomSpawnOnce)
-    state = StateBuilder().build(initial_location="field_0", **resources)
+    return StateBuilder().build(initial_location="field_0", **resources)
+
+
+@pytest.fixture
+def game(state: State) -> Game:
     caller = SimpleCaller()
     return Game(initial_state=state, caller=caller)
+
+
+class TestStateBuilder:
+    """black box test for statebuilder"""
+
+    def test_rooms_exist(self, state: State):
+        assert "field_0" in state.rooms
+        assert isinstance(state.get_room("field_0"), Room)
+
+    def test_items_exist(self, state: State):
+        assert "diamond" in state.items.storage
+        assert isinstance(state.items.get("diamond"), Item)
+
+    def test_items_in_room(self, state: State):
+        assert "diamond" in state.get_room("field_0").items
 
 
 class TestGamePlay:

@@ -1,6 +1,7 @@
 from __future__ import annotations
+from dataclasses import dataclass, field
 from typing import Dict, Optional, Tuple, List, TYPE_CHECKING
-from .things import Lightsource, Store
+from .things import Lightsource, Store, Thing, _Contains
 from .messages import m, DESCRIPTIONS, MOVING, INFO
 from .defaults.words import DIRECTIONS
 from .registry import roomhook_registry
@@ -14,7 +15,8 @@ logger = logging.getLogger("textgame.room")
 logger.addHandler(logging.NullHandler())
 
 
-class Room:
+@dataclass
+class Room(Thing):
     """
     :param ID: unique identifier
     :param description: string describing the room
@@ -33,80 +35,71 @@ class Room:
     :param dir_descriptions: dict mapping directions to descriptive messages about going in this directions, eg ``{"up": "You spread your wings and start to fly."}``
     """
 
-    def __init__(
-        self,
-        id: str,
-        description: str,
-        shortdescription: str = "",
-        value: int = 5,
-        dark: Dict = None,
-        sound: str = DESCRIPTIONS.NO_SOUND,
-        hint: str = "",
-        hint_value: int = 2,
-        errors: Dict[str, str] = None,
-        doors: Dict[str, str] = None,
-        hiddendoors: Dict[str, str] = None,
-        locked: Dict[str, Dict] = None,
-        dir_descriptions: Dict[str, str] = None,
-    ):
-        self.id = id  # unique, similar rooms should have a common keyword in ID
-        self.doors = {dir: None for dir in DIRECTIONS}
+    shortdescription: str = ""
+    value: int = 5
+    dark: Dict = field(default_factory=dict)
+    sound: str = DESCRIPTIONS.NO_SOUND
+    hint: str = ""
+    hint_value: int = 2
+    errors: Dict[str, str] = field(default_factory=dict)
+    doors: Dict[str, str] = field(default_factory=dict)
+    hiddendoors: Dict[str, str] = field(default_factory=dict)
+    locked: Dict[str, Dict] = field(default_factory=dict)
+    dir_descriptions: Dict[str, str] = field(default_factory=dict)
+    visited: bool = field(default=False, init=False)
+
+    def __post_init__(self):
+        # super().__post_init__()
+        self.creatures = Store(self.id)  # replace these with inheritance of _Contains
+        self.items = Store(self.id)
+        # fill up all the dicts with missing info
+        self.doors.update({dir: None for dir in DIRECTIONS if dir not in self.doors})
         # dict that describes the locked/opened state of doors
-        self.locked = {dir: {"closed": False, "key": None} for dir in DIRECTIONS}
+        self.locked.update(
+            {
+                dir: {"locked": False, "key": None}
+                for dir in DIRECTIONS
+                if dir not in self.locked
+            }
+        )
         # description to print when going in this direction
-        self.dir_descriptions = {dir: m() for dir in DIRECTIONS}
-        self.items = Store(id)
-        self.creatures = Store(id)
-        self.visited = False
-        self.hiddendoors = {}
-        self.description = m(description)
-        self.shortdescription = m(shortdescription) or self.description
-        self.value = value
-        self.dark = dark if dark else {"now": False, "always": False}
-        self.sound = m(sound)
-        self.hint = m(hint)
-        self.hint_value = hint_value
+        self.dir_descriptions.update(
+            {dir: "" for dir in DIRECTIONS if dir not in self.dir_descriptions}
+        )
+        self.shortdescription = self.shortdescription or self.description
+        self.dark = self.dark if self.dark else {"now": False, "always": False}
 
         # errors is a dict that contains error messages that get printed if player
         # tries to move to a direction where there is no door
-        self.errors = {dir: MOVING.FAIL_CANT_GO for dir in DIRECTIONS}
-        if errors:
-            for dir in errors:
-                if dir not in DIRECTIONS:
-                    logger.warning(
-                        f"In errors of room {self.id}: {dir} is not a direction".format(
-                            self.id, dir
-                        )
-                    )
-            self.errors.update(errors)
+        self.errors.update(
+            {dir: MOVING.FAIL_CANT_GO for dir in DIRECTIONS if dir not in self.errors}
+        )
 
-        if doors:
-            for dir, room in doors.items():
-                self.add_connection(dir, room)
+        for dir, room in self.doors.items():
+            self.add_connection(dir, room)
 
-        if hiddendoors:
-            for dir, room in hiddendoors.items():
-                self.add_connection(dir, room, hidden=True)
+        for dir, room in self.hiddendoors.items():
+            self.add_connection(dir, room, hidden=True)
 
-        if locked:
-            for dir, lock in locked.items():
+        # validate the locked dict
+        if self.locked:
+            for dir, lock in self.locked.items():
                 if "locked" not in lock or "key" not in lock:
                     logger.warning(
-                        f"locked dict of room {self.id} in direction {dir} is badly formatted"
+                        f"locked dict of room {self.id} in direction {dir} is badly formatted: {self.locked}"
                     )
                 if dir not in DIRECTIONS:
                     logger.warning(
                         f"locked dict of room {self.id}: {id} is not a direction"
                     )
-            self.locked.update(locked)
 
-        if dir_descriptions:
-            for dir in dir_descriptions:
-                if dir not in DIRECTIONS:
-                    logger.warning(
-                        "dir_descriptions dict of room {self.id}: {dir} is not a direction"
-                    )
-            self.dir_descriptions.update(dir_descriptions)
+    # @property
+    # def creatures(self) -> Store:
+    #     return self.things
+
+    # @property
+    # def items(self) -> Store:
+    #     return self.things
 
     def add_connection(self, dir: str, room_id: str, hidden=False):
         # todo: remove this method, its unnecessary and confusing (because it adds a string to the doors, not a room)
@@ -153,7 +146,7 @@ class Room:
         """return content of ``self.dir_descriptions`` (see :func:`textgame.room.Room.fill_info`) in the given direction.
         Returns an empty string if no description exists.
         """
-        return self.dir_descriptions.get(direction, m())
+        return m(self.dir_descriptions.get(direction, ""))
 
     def get_connection(self, direction: str) -> Optional[Room]:
         """returns room object that lies in the given direction, ``None`` if there is no door in that direction."""
@@ -168,7 +161,7 @@ class Room:
         if self.is_dark() and not light:
             return DESCRIPTIONS.DARK_L
 
-        descript = self.description if long else self.shortdescription
+        descript = m(self.description) if long else m(self.shortdescription)
         for item in self.items.values():
             descript += item.describe()
         for creature in self.creatures.values():
@@ -179,7 +172,7 @@ class Room:
         """return content of ``self.errors`` (see :func:`textgame.room.Room.fill_info`) in the given direction. Returns the default
         :attr:`textgame.globals.MOVING.FAIL_CANT_GO` if no other direction is given.
         """
-        return self.errors[direction]
+        return m(self.errors[direction])
 
     def connects_to(self, other: str) -> bool:
         """
@@ -222,4 +215,4 @@ class Room:
 
     def get_hint(self) -> Tuple[m, m]:
         """return a tuple of warning and the actual hint (``(m, m)``)"""
-        return (INFO.HINT_WARNING.format(self.hint_value), self.hint)
+        return (INFO.HINT_WARNING.format(self.hint_value), m(self.hint))
