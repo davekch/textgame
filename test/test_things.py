@@ -85,7 +85,7 @@ class TestContainers:
     def test_container(self, container: Container, things: Dict[str, MagicMock]):
         things["basket"] = container  # make it nested
         manager = StorageManager(things)
-        manager.add_store(container._contains)
+        manager.add_store(container.things)
         container.insert(things["thing_0"])
         assert "thing_0" in container
         with pytest.raises(StoreLimitExceededError):

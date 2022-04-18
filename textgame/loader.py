@@ -209,7 +209,7 @@ class StateBuilder:
         # connect all container's stores to the state's storemanager
         for item in items:
             if isinstance(item, Container):
-                state.items.add_store(item._contains)
+                state.items.add_store(item.things)
 
         logger.debug("put items and creatures in their locations")
         for thing in chain(items, creatures):

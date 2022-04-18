@@ -2,15 +2,13 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field, fields
 from random import Random
-from typing import List, Set, Dict, Any, Callable, Optional, Type
+from typing import List, Dict, Callable, Optional, Type
 from functools import wraps
 from collections import defaultdict
 from .messages import m
-from .registry import behaviour_registry
 from .exceptions import (
     ConfigurationError,
     StoreLimitExceededError,
-    ThingNotFoundError,
     UniqueConstraintError,
 )
 
@@ -29,12 +27,16 @@ logger.addHandler(logging.NullHandler())
 @dataclass
 class Thing:
     id: str
-    name: str
     description: str
-    initlocation: str
 
     def describe(self) -> m:
         return m(self.description)
+
+
+@dataclass
+class Movable(Thing):
+    name: str
+    initlocation: str
 
 
 def _require_thing_exists(func: Callable) -> Callable:
@@ -153,9 +155,13 @@ class Store:
 
 
 @dataclass
-class Item(Thing):
-    value: int = 0
+class Takable:
     takable: bool = True
+
+
+@dataclass
+class Item(Takable, Movable):
+    value: int = 0
 
 
 class Lightsource(Item):
@@ -168,34 +174,46 @@ class Key(Item):
 
 
 @dataclass
-class Weapon(Item):
+class _HasStrength:
     strength: float = 0
     strength_variation: float = 0
 
     def calculate_damage(self, random_engine: Random) -> float:
+        # the state's random engine gets passed so that everything
+        # is determined by the state's seed
         variation = random_engine.uniform(-1, 1) * self.strength_variation
         return abs(self.strength * (1 - variation))
 
 
 @dataclass
-class Container(Item):
+class Weapon(_HasStrength, Item):
+    pass
+
+
+@dataclass
+class _Contains:
     limit: Optional[int] = None
-    _contains: Store = None
+    things: Store = field(default=None, init=False)
 
     def __post_init__(self):
-        self._contains = Store(self.id, limit=self.limit)
+        self.things = Store(self.id, limit=self.limit)
 
     def insert(self, other: Thing):
-        self._contains.add(other)
+        self.things.add(other)
 
     def pop(self, other_id: str) -> Optional[Thing]:
-        return self._contains.pop(other_id)
+        return self.things.pop(other_id)
 
     def get_contents(self) -> Dict[str, Thing]:
-        return self._contains.items()
+        return self.things.items()
 
     def __contains__(self, other_key: str) -> bool:
-        return other_key in self._contains
+        return other_key in self.things
+
+
+@dataclass
+class Container(_Contains, Item):
+    pass
 
 
 @dataclass
@@ -230,7 +248,7 @@ def behavioursequence(behaviours: List[Type[Behaviour]]) -> Type[Behaviour]:
     """create a behaviour that runs each of the behaviours one after another"""
 
     @dataclass
-    class CombinedBehaviour(*behaviours):
+    class CombinedBehaviour(*behaviours, Behaviour):
         def __post_init__(self):
             # this must be a post-init because we must not overwrite the init by the behaviours
             # initialize each behaviour
@@ -269,9 +287,17 @@ def behavioursequence(behaviours: List[Type[Behaviour]]) -> Type[Behaviour]:
 
 
 @dataclass
-class Creature(Thing):
+class _CanDie:
     dead_description: str = None
     alive: bool = True
+
+    def die(self):
+        self.alive = False
+        self.description = self.dead_description or self.description
+
+
+@dataclass
+class _Behaves:
     # behaviours could look like this: {"spawn": {"probability": 0.2, "rooms": ["field_0", "field_1"]}}
     behaviours: Dict[str, Behaviour] = field(default_factory=dict)
 
@@ -293,24 +319,32 @@ class Creature(Thing):
             msg += self.call_behaviour(name, state)
         return msg
 
+
+@dataclass
+class Creature(_CanDie, _Behaves, Movable):
     def die(self):
-        self.alive = False
-        self.description = self.dead_description or self.description
+        super().die()
         for behaviour in self.behaviours.values():
             behaviour.switch_off()
 
 
 @dataclass
-class Monster(Creature):
-    strength: float = 0
-    strenth_variation: float = 0.0
+class _CanFight(_HasStrength):
     health: float = 100
     fight_message: str = None
     win_message: str = None  # when the player wins
     loose_message: str = None  # when the player looses
 
-    def calculate_damage(self, random_engine: Random) -> float:
-        # the state's random engine gets passed so that everything
-        # is determined by the state's seed
-        variation = random_engine.uniform(-1, 1) * self.strenth_variation
-        return abs(self.strength * (1 - variation))
+
+@dataclass
+class Monster(_CanFight, Creature):
+    pass
+
+
+@dataclass
+class TakableMonster(Takable, Monster):
+    takable = False
+
+    def die(self):
+        self.takable = True
+        return super().die()
