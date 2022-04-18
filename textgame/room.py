@@ -1,6 +1,6 @@
 from typing import Dict, Optional, Tuple, List
 from .messages import m, DESCRIPTIONS, MOVING, INFO
-from .things import Item
+from .things import Creature, Item
 from .defaults.words import DIRECTIONS
 
 import logging
@@ -51,7 +51,7 @@ class Room:
         # items that lie around in this room, format {ID: item}
         self.items = {}
         # monsters that are in this room, format {ID: monster}
-        self.monsters = {}
+        self.creatures = {}
         self.visited = False
         self.hiddendoors = {}
         self.description = m(description)
@@ -120,7 +120,7 @@ class Room:
         descript = self.description if long else self.shortdescription
         for item in self.items.values():
             descript += item.describe()
-        for monster in self.monsters.values():
+        for monster in self.creatures.values():
             descript += monster.describe()
         return descript
 
@@ -197,14 +197,26 @@ class Room:
         if item.id not in self.items:
             self.items[item.id] = item
         else:
-            logger.warning(f"You try to add item {item.id} to room {self.id} but it's already there")
+            logger.warning(f"You try to add item {item.id!r} to room {self.id} but it's already there")
 
     def get_item(self, item_id: str) -> Item:
         return self.items.get(item_id)
 
     def pop_item(self, item_id: str) -> Item:
-        return self.items.pop(item_id)
+        return self.items.pop(item_id, None)
 
     def get_itemnames(self) -> List[str]:
         return list(self.items.keys())
+    
+    def add_creature(self, creature: Creature):
+        if creature.id not in self.creatures:
+            self.creatures[creature.id] = creature
+        else:
+            logger.warning(f"You try to add monster {monster.id!r} to room {self.id} but it's already there")
+    
+    def get_creature(self, creature_id: str) -> Creature:
+        return self.creatures.get(creature_id)
+    
+    def pop_creature(self, creature_id: str) -> Creature:
+        return self.creatures.pop(creature_id, None)
 
