@@ -29,28 +29,33 @@ class YesNoQuestion:
     :param no: same as yes
     """
 
-    def __init__(self, question: m, yes: Union[m, Callable], no: Union[m, Callable]):
+    def __init__(
+        self,
+        question: m | str,
+        yes: str | MessageType | Callable[[], MessageType],
+        no: str | MessageType | Callable[[], MessageType],
+    ):
         self.question = question
         self._yes = yes
         self._no = no
 
     @wrap_m
-    def yes(self) -> m:
+    def yes(self) -> MessageType:
         """
         if yes is callable, return its result, else return it
         """
         if callable(self._yes):
             return self._yes()
-        return self._yes
+        return self._yes  # type: ignore
 
     @wrap_m
-    def no(self) -> m:
+    def no(self) -> MessageType:
         """
         if no is callable, return its result, else return it
         """
         if callable(self._no):
             return self._no()
-        return self._no
+        return self._no  # type: ignore
 
     def to_message(self) -> m:
         return m(self.question)
@@ -59,7 +64,7 @@ class YesNoQuestion:
 class MultipleChoiceQuestion:
     def __init__(
         self,
-        question: m,
+        question: m | str,
         answers: Dict[m | str, MessageType | Callable[[], MessageType]],
         cancel: bool = True,
     ):
@@ -70,7 +75,7 @@ class MultipleChoiceQuestion:
         self.answers = {str(i + 1): a for i, a in enumerate(answers_list)}
 
     def to_message(self) -> m:
-        q = self._question
+        q = m(self._question)
         for i, answer in self.answers.items():
             q += m(f" ({i}) {answer[0]}")
         return q
