@@ -5,6 +5,7 @@ from typing import (
     Type,
     TypeVar,
     Mapping,
+    overload,
 )
 
 from typing import TYPE_CHECKING
@@ -23,17 +24,23 @@ C = TypeVar("C")
 
 
 class Registry(dict, Mapping[str, C]):
-    def register(self, name: str, func: C = None) -> C | Callable[[C], C]:
+    @overload
+    def register(self, name: str) -> Callable[[C], C]:
+        ...
+
+    @overload
+    def register(self, name: str, func: C) -> C:
+        ...
+
+    def register(self, name: str, func: C = None):
+        def decorator(_func: C) -> C:
+            self[name] = _func
+            return _func
+
         if func is None:
-
-            def decorator(_func: C) -> C:
-                self[name] = _func
-                return _func
-
             return decorator
         else:
-            self[name] = func
-            return func
+            return decorator(func)
 
     def unregister(self, name: str):
         self.pop(name, None)
