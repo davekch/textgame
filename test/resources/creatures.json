@@ -1,0 +1,17 @@
+[
+    {
+        "id": "dealer",
+        "description": "A dealer stands in his booth with a fine collection of wooden bows.",
+        "name": "dealer",
+        "initlocation": "marketplace"
+    },
+    {
+        "id": "bat",
+        "description": "A bat flies by.",
+        "name": "bat",
+        "initlocation": "storage_room",
+        "behaviours": {
+            "randomappearance": {"probability": 0.5, "rooms": ["field"]}
+        }
+    }
+]

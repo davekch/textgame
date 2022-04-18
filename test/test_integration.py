@@ -30,9 +30,12 @@ def resources() -> Dict:
         room_dicts = json.load(f)
     with open(os.path.join(BASEDIR, "resources", "items.json")) as f:
         item_dicts = json.load(f)
+    with open(os.path.join(BASEDIR, "resources", "creatures.json")) as f:
+        creature_dicts = json.load(f)
     return {
         "rooms": room_dicts,
         "items": item_dicts,
+        "creatures": creature_dicts,
     }
 
 
@@ -114,14 +117,14 @@ class TestHooks:
         def time(state: State) -> m:
             state.time += 1
             return m()
-        
+
         def daylight(state: State) -> m:
             if state.time >= 2:
                 for room in state.rooms.values():
                     room.dark["now"] = True
             if state.time == 2:
                 return m("The sun has set. It is dark now.")
-        
+
         register_precommandhook("daylight", daylight)
         register_postcommandhook("time", time)
         assert game.state.time == 0
@@ -133,7 +136,7 @@ class TestHooks:
             " Anytime soon, you'll probably get attacked by some night creature."
         )
         assert game.state.time == 3
-    
+
     def teardown_method(self, test_method):
         # unregister everything
         for hook in precommandhook_registry:

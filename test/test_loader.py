@@ -2,9 +2,9 @@ import pytest
 import json
 import os
 from typing import List, Dict
-from textgame.loader import ItemLoader, RoomLoader, Factory
+from textgame.loader import CreatureLoader, ItemLoader, RoomLoader, Factory
 from textgame.room import Room
-from textgame.things import Item, Key
+from textgame.things import Creature, Item, Key
 
 
 BASEDIR = os.path.dirname(os.path.abspath(__file__))
@@ -22,6 +22,13 @@ def items():
     with open(os.path.join(BASEDIR, "resources", "items.json")) as f:
         items = json.load(f)
     return items
+
+
+@pytest.fixture
+def creatures():
+    with open(os.path.join(BASEDIR, "resources", "creatures.json")) as f:
+        creatures = json.load(f)
+    return creatures
 
 
 class TestLoader:
@@ -45,3 +52,7 @@ class TestLoader:
         assert isinstance(item_objs[-1], Key)
         assert item_objs[-1].key_id == items[-1]["key_id"]
         assert len([i for i in item_objs if isinstance(i, Key)]) == 1
+    
+    def test_load_creatures(self, creatures: List[Dict]):
+        creature_objs = CreatureLoader.load(creatures)
+        assert isinstance(creature_objs[0], Creature)
