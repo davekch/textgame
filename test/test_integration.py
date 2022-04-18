@@ -1,5 +1,6 @@
 from textgame.game import Game
-from textgame.loader import WorldBuilder
+from textgame.parser import SimpleParser
+from textgame.loader import StateBuilder
 from textgame.state import State
 from textgame.messages import ACTION, MOVING, EnterYesNoLoop, m, INFO
 from textgame.room import Room
@@ -28,15 +29,15 @@ def resources() -> Dict:
 
 
 @pytest.fixture
-def rooms(resources) -> Dict[str, Room]:
-    builder = WorldBuilder()
-    return builder.build(**resources)
+def game(resources) -> Game:
+    state = StateBuilder().build(initial_location="field_0", **resources)
+    parser = SimpleParser()
+    return Game(initial_state=state, parser=parser)
 
 
 @pytest.fixture
-def game(rooms) -> Game:
-    state = State(rooms=rooms, player_location=rooms["field_0"])
-    return Game(initial_state=state)
+def rooms(game) -> Dict[str, Room]:
+    return game.state.rooms
 
 
 class TestGamePlay:

@@ -2,6 +2,7 @@ from json import load
 from typing import List, Dict, Any, Callable
 from .room import Room
 from .items import Item, Key
+from .state import State
 
 
 class Factory:
@@ -62,15 +63,16 @@ class ItemLoader(Loader):
     defaultclass = "item"
 
 
-class WorldBuilder:
+class StateBuilder:
     """class to put everything together"""
 
-    def __init__(self, itemloader: Loader = ItemLoader, roomloader: Loader = RoomLoader):
+    def __init__(self, state_class = State, itemloader: Loader = ItemLoader, roomloader: Loader = RoomLoader):
+        self.state_class = state_class
         self.itemloader = itemloader
         self.roomloader = roomloader
     
     @staticmethod
-    def build_graph(rooms: List[Room]) -> Dict[str, Room]:
+    def build_room_graph(rooms: List[Room]) -> Dict[str, Room]:
         """
         convert a list of rooms to a dictionary of room-ids mapping to 
         room objects and also convert every room.door dict from Dict[str, str]
@@ -86,10 +88,12 @@ class WorldBuilder:
                     room.hiddendoors[direction] = graph[room.hiddendoors[direction]]
         return graph
     
-    def build(self, rooms: List[Dict], items: List[Dict]) -> Dict[str, Room]:
+    def build(self, initial_location: str, rooms: List[Dict], items: List[Dict]) -> State:
         """load rooms and items and place the items inside the rooms. return a graph of rooms"""
-        rooms = self.build_graph(self.roomloader.load(rooms))
+        # load everything
+        rooms = self.build_room_graph(self.roomloader.load(rooms))
         items = self.itemloader.load(items)
+        # put items in their locations
         for item in items:
             initlocation = rooms.get(item.initlocation)
             if not initlocation:
@@ -97,4 +101,5 @@ class WorldBuilder:
                     f"the initial location '{item.initlocation} of item '{item.name}' does not exist"
                 )
             initlocation.add_item(item)
-        return rooms
+
+        return self.state_class(rooms=rooms, player_location=rooms[initial_location])
