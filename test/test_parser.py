@@ -9,7 +9,6 @@ class TestSimpleParser:
         assert parser.parse_yesno("yes") == YesNoAnswer.YES
         assert parser.parse_yesno("no") == YesNoAnswer.NO
         parser.update_noun_synonyms({"no": ["quack"]})
-        print(parser.noun_synonyms)
         assert parser.parse_yesno("quack") == YesNoAnswer.NO
     
     def test_parse_command(self):

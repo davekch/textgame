@@ -2,7 +2,7 @@ from itertools import chain
 from json import load
 from typing import List, Dict, Any, Callable
 from .room import Room
-from .things import Item, Key, Creature
+from .things import Container, Item, Key, Creature, Monster
 from .state import State
 from .exceptions import ConfigurationError
 
@@ -13,7 +13,9 @@ class Factory:
         "room": Room,
         "item": Item,
         "key": Key,
+        "container": Container,
         "creature": Creature,
+        "monster": Monster,
     }
 
     @classmethod
@@ -105,7 +107,7 @@ class StateBuilder:
         items: List[Dict] = None,
         creatures: List[Dict] = None
     ) -> State:
-        """load rooms and items and place the items inside the rooms. return a graph of rooms"""
+        """load rooms, items and creatures and place them inside the rooms. return state object"""
         # load everything
         rooms = self.build_room_graph(self.roomloader.load(rooms))
         items = self.itemloader.load(items or [])
@@ -116,10 +118,15 @@ class StateBuilder:
             items={i.id: i for i in items},
             creatures={c.id: c for c in creatures}
         )
+
         # connect the room's stores to the state's storemanagers
         for room in rooms.values():
             state.items.add_store(room.items)
             state.creatures.add_store(room.creatures)
+        # connect all container's stores to the state's storemanager
+        for item in items:
+            if isinstance(item, Container):
+                state.items.add_store(item._contains)
 
         # put items and creatures in their locations
         for thing in chain(items, creatures):

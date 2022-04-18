@@ -1,4 +1,7 @@
 from textgame.things import StorageManager, Store
+from textgame.things import Container, StorageManager, Store
+from textgame.exceptions import StoreLimitExceededError
+from textgame.loader import Factory
 from unittest.mock import MagicMock
 import pytest
 from typing import Dict, List, Tuple
@@ -48,3 +51,46 @@ class TestStores:
         things = manager.storage
         stores["store_0"].add(things["thing_0"])
         assert stores["store_0"].get("thing_0") == things["thing_0"]
+    
+    def test_limit(self, managed_stores: Tuple[StorageManager, Dict[str, Store]]):
+        manager, stores = managed_stores
+        things = manager.storage
+        stores["store_0"].limit = 2
+        stores["store_0"].add(things["thing_0"])
+        stores["store_0"].add(things["thing_1"])
+        with pytest.raises(StoreLimitExceededError):
+            stores["store_0"].add(things["thing_2"])
+        # adding the same thing again should not be a problem?
+        stores["store_0"].add(things["thing_1"])
+
+
+@pytest.fixture
+def container() -> Container:
+    container_specs = {
+        "id": "basket",
+        "name": "wooden basket",
+        "description": "a wooden basket lies around.",
+        "initlocation": "-",
+        "type": "container",
+        "limit": 1,
+    }
+    return Factory.create(container_specs)
+
+
+class TestContainers:
+
+    def test_containerfactory(self, container: Container):
+        assert isinstance(container, Container)
+    
+    def test_container(self, container: Container, things: Dict[str, MagicMock]):
+        things["basket"] = container   # make it nested
+        manager = StorageManager(things)
+        manager.add_store(container._contains)
+        container.insert(things["thing_0"])
+        assert "thing_0" in container
+        with pytest.raises(StoreLimitExceededError):
+            container.insert(things["thing_1"])
+
+        inside = container.pop("thing_0")
+        assert inside == things["thing_0"]
+        assert container.get_contents() == {}

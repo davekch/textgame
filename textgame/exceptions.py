@@ -4,3 +4,7 @@ class ConfigurationError(ValueError):
 
 class UniqueConstraintError(ValueError):
     pass
+
+
+class StoreLimitExceededError(RuntimeError):
+    pass

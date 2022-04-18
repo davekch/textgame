@@ -5,7 +5,7 @@ from functools import wraps
 from collections import defaultdict
 from .messages import m
 from .registry import behaviour_registry
-from .exceptions import ConfigurationError, UniqueConstraintError
+from .exceptions import ConfigurationError, StoreLimitExceededError, UniqueConstraintError
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
@@ -94,8 +94,9 @@ class Store:
         manage where which item is without copying the items
     """
 
-    def __init__(self, store_id: str):
+    def __init__(self, store_id: str, limit: int = None):
         self.id = store_id
+        self.limit = limit
         self.manager: StorageManager = None
 
     def set_manager(self, manager: StorageManager):
@@ -103,6 +104,9 @@ class Store:
 
     # todo: rename add -> put ? 
     def add(self, thing: Thing):
+        already_there = self.keys()
+        if self.limit is not None and thing.id not in already_there and len(already_there) == self.limit:
+            raise StoreLimitExceededError(f"cannot add {thing.id!r} to store {self.id!r}: store is full")
         self.manager.add_thing_to_store(thing.id, self.id)
     
     def get(self, thing_id: str) -> Optional[Thing]:
@@ -138,6 +142,27 @@ class Key(Item):
 @dataclass
 class Weapon(Item):
     strength: int = 0
+
+
+@dataclass
+class Container(Item):
+    limit: Optional[int] = None
+    _contains: Store = None
+
+    def __post_init__(self):
+        self._contains = Store(self.id, limit=self.limit)
+
+    def insert(self, other: Thing):
+        self._contains.add(other)
+    
+    def pop(self, other_id: str) -> Optional[Thing]:
+        return self._contains.pop(other_id)
+    
+    def get_contents(self) -> Dict[str, Thing]:
+        return self._contains.items()
+    
+    def __contains__(self, other_key: str) -> bool:
+        return other_key in self._contains
 
 
 @dataclass
