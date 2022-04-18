@@ -75,7 +75,7 @@ class State:
         self.player_location = player_location
         self.player_location.visit()  # mark the initial room as visited
         # throw creatures and items into the things_manager
-        things: Dict[str, Thing] = {**(items or {}), **(creatures or {})}
+        things: Dict[str, Movable] = {**(items or {}), **(creatures or {})}
         self.things_manager = StorageManager(things)
         # create a store for inventory and register it in the items manager
         inventory: Store[Movable] = Store("inventory")
@@ -99,7 +99,7 @@ class State:
             raise RoomNotFoundError(f"could not find room {room_id!r}")
         return self.rooms[room_id]
 
-    def get_location_of(self, thing: Thing) -> Optional[Room]:
+    def get_location_of(self, thing: Movable) -> Optional[Room]:
         maybe = self.things_manager.get_store_id_from_thing(thing)
         if not maybe:
             return None

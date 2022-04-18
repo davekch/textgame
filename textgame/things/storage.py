@@ -145,22 +145,22 @@ class Store(Generic[T]):
 
 
 @dataclass
-class _Contains:
+class _Contains(Generic[T]):
     limit: Optional[int] = None
     # gets set in post_init
-    things: Store = field(default=None, init=False)  # type: ignore
+    things: Store[T] = field(default=None, init=False)  # type: ignore
 
     def __post_init__(self):
         self.things = Store(self.id, limit=self.limit)
 
     # improve api to have get_thing and add_thing
-    def insert(self, other: Thing):
+    def insert(self, other: T):
         self.things.add(other)
 
-    def pop(self, other_id: str) -> Optional[Thing]:
+    def pop(self, other_id: str) -> Optional[T]:
         return self.things.pop(other_id)
 
-    def get_contents(self) -> Dict[str, Thing]:
+    def get_contents(self) -> Dict[str, T]:
         return self.things.items()
 
     def __contains__(self, other_key: str) -> bool:

@@ -1,7 +1,7 @@
 from __future__ import annotations
 from dataclasses import dataclass, field
-from typing import Dict, Optional, Tuple, Union, TYPE_CHECKING
-from .things import Lightsource, Thing, _Contains
+from typing import Dict, Optional, Tuple, TypeVar, Union, TYPE_CHECKING
+from .things import Lightsource, Thing, _Contains, Movable
 from .messages import m, DESCRIPTIONS, MOVING, INFO
 from .defaults.words import DIRECTIONS
 from .registry import roomhook_registry
@@ -15,10 +15,11 @@ logger = logging.getLogger("textgame.room")
 logger.addHandler(logging.NullHandler())
 
 DirectionType = Union[str, m]
+M = TypeVar("M", bound=Movable)
 
 
 @dataclass
-class Room(_Contains, Thing):
+class Room(_Contains[M], Thing):
     """
     :param ID: unique identifier
     :param description: string describing the room

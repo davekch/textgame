@@ -1,4 +1,3 @@
-from platform import machine
 from unittest.mock import MagicMock
 import pytest
 from textgame.messages import m
@@ -43,7 +42,7 @@ class TestEvent:
         assert event.call(state) == m("quack")
 
     def test_ready_timer(self, state: State):
-        timer = Timer(time=0, then=None)
+        timer = Timer(time=0, then=MagicMock())
         state.set_event(timer)
         assert timer in state.events["ready"]
         assert state.pop_ready_events() == [timer]
