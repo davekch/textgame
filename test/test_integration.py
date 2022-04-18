@@ -14,19 +14,11 @@ from textgame.messages import (
 from textgame.room import Room
 from textgame.state import State
 from textgame.registry import (
-    register_command,
-    register_precommandhook,
-    register_postcommandhook,
+    command_registry,
     precommandhook_registry,
     postcommandhook_registry,
-    register_roomhook,
-    unregister_postcommandhook,
-    unregister_precommandhook,
     behaviour_registry,
-    register_behaviour,
     roomhook_registry,
-    unregister_behaviour,
-    unregister_roomhook,
 )
 from textgame.defaults import commands, behaviours, hooks
 from textgame.things import Monster, Weapon
@@ -58,9 +50,9 @@ def resources() -> Dict:
 
 @pytest.fixture
 def game(resources) -> Game:
-    register_behaviour("randomappearance", behaviours.RandomAppearance)
-    register_behaviour("randomwalk", behaviours.RandomWalk)
-    register_behaviour("random_spawn_once", behaviours.RandomSpawnOnce)
+    behaviour_registry.register("randomappearance", behaviours.RandomAppearance)
+    behaviour_registry.register("randomwalk", behaviours.RandomWalk)
+    behaviour_registry.register("random_spawn_once", behaviours.RandomSpawnOnce)
     state = StateBuilder().build(initial_location="field_0", **resources)
     caller = SimpleCaller()
     return Game(initial_state=state, caller=caller)
@@ -88,14 +80,14 @@ class TestGamePlay:
         ) + "\n" + str(game.state.items.get("lamp").description)
 
     def test_custom_command(self, game: Game):
-        @register_command("scream")
+        @command_registry.register("scream")
         def scream(noun: str, state: State) -> m:
             return m(f"{noun.upper()}!!!")
 
         assert game.play("scream hello") == "HELLO!!!"
 
     def test_yesno(self, game: Game):
-        @register_command("jump")
+        @command_registry.register("jump")
         def jump(_noun: str, state: State) -> YesNoQuestion:
             return YesNoQuestion(
                 question=m("Really?"), yes=m("You said yes."), no=m("You said no.")
@@ -109,7 +101,7 @@ class TestGamePlay:
         assert game.play("no") == "You said no."
 
     def test_nested_yesno(self, game: Game):
-        @register_command("jump")
+        @command_registry.register("jump")
         def jump(_noun: str, state: State):
             return YesNoQuestion(
                 question="Do you really want to jump?",
@@ -135,7 +127,7 @@ class TestGamePlay:
             },
         )
 
-        @register_command("trade")
+        @command_registry.register("trade")
         def trade(noun: str, state: State) -> MultipleChoiceQuestion:
             return question
 
@@ -183,7 +175,7 @@ class TestGamePlay:
         assert game.play("hint") == str(INFO.NO_HINT)
 
     def test_fight(self, game: Game):
-        register_postcommandhook("fight", hooks.manage_fights)
+        postcommandhook_registry.register("fight", hooks.manage_fights)
         goblin: Monster = game.state.creatures.storage["goblin"]
         game.state.get_room("marketplace").creatures.add(goblin)
         response = game.play("go west")
@@ -202,7 +194,7 @@ class TestGamePlay:
         assert goblin.dead_description in game.play("look")
 
     def test_roomhook(self, game: Game):
-        @register_roomhook("field_1")
+        @roomhook_registry.register("field_1")
         def teleport_back(state: State):
             state.player_location = state.player_location_old
             return m("Some magic does not let you go there.")
@@ -217,21 +209,21 @@ class TestGamePlay:
     def teardown_method(self, test_method):
         # unregister everything
         for hook in list(precommandhook_registry.keys()):
-            unregister_precommandhook(hook)
+            precommandhook_registry.unregister(hook)
         for hook in list(postcommandhook_registry.keys()):
-            unregister_postcommandhook(hook)
+            postcommandhook_registry.unregister(hook)
         for behaviour in list(behaviour_registry.keys()):
-            unregister_behaviour(behaviour)
+            behaviour_registry.unregister(behaviour)
         for hook in list(roomhook_registry.keys()):
-            unregister_roomhook(hook)
+            roomhook_registry.unregister(hook)
 
 
 class TestHooks:
     def test_timehooks(self, game: Game):
-        register_precommandhook(
+        precommandhook_registry.register(
             "daylight", hooks.daylight(duration_day=2, duration_night=3)
         )
-        register_postcommandhook("time", hooks.time)
+        postcommandhook_registry.register("time", hooks.time)
         # first remove the lamp
         game.state.player_location.items.pop("lamp")
         assert game.state.time == 0
@@ -245,9 +237,9 @@ class TestHooks:
         assert game.state.time == 3
 
     def test_randomwalk_hook(self, game: Game):
-        register_postcommandhook("time", hooks.time)
-        register_behaviour("randomwalk", behaviours.RandomWalk)
-        register_precommandhook(
+        postcommandhook_registry.register("time", hooks.time)
+        behaviour_registry.register("randomwalk", behaviours.RandomWalk)
+        precommandhook_registry.register(
             "randomwalkhook", hooks.singlebehaviourhook("randomwalk")
         )
         randomwalker = game.state.creatures.storage["randomwalker"]
@@ -274,8 +266,10 @@ class TestHooks:
                 assert game.state.get_location_of(randomwalker) == next(walk_iter)
 
     def test_randomspawn_hook(self, game: Game):
-        register_behaviour("random_spawn_once", behaviours.RandomSpawnOnce)
-        register_precommandhook("spawn", hooks.singlebehaviourhook("random_spawn_once"))
+        behaviour_registry.register("random_spawn_once", behaviours.RandomSpawnOnce)
+        precommandhook_registry.register(
+            "spawn", hooks.singlebehaviourhook("random_spawn_once")
+        )
         random = mock.MagicMock()
         random.random = yield_sequence(
             [0.8, 0.2]
@@ -290,10 +284,10 @@ class TestHooks:
         assert "randomspawner" in game.state.player_location.creatures
 
     def test_daytime_hook(self, game: Game):
-        register_precommandhook(
+        precommandhook_registry.register(
             "daylight", hooks.daylight(duration_day=2, duration_night=3)
         )
-        register_postcommandhook("time", hooks.time)
+        postcommandhook_registry.register("time", hooks.time)
         # first, remove the lightsource from the room
         game.state.player_location.items.pop("lamp")
         for _ in range(2):
@@ -318,8 +312,8 @@ class TestHooks:
     def teardown_method(self, test_method):
         # unregister everything
         for hook in list(precommandhook_registry.keys()):
-            unregister_precommandhook(hook)
+            precommandhook_registry.unregister(hook)
         for hook in list(postcommandhook_registry.keys()):
-            unregister_postcommandhook(hook)
+            postcommandhook_registry.unregister(hook)
         for behaviour in list(behaviour_registry.keys()):
-            unregister_behaviour(behaviour)
+            behaviour_registry.unregister(behaviour)

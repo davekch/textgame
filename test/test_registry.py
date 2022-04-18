@@ -13,7 +13,9 @@ class TestSkipHooks:
         assert test1("arg") == "arg"
 
         # register a dummy hook
-        registry.register_precommandhook("something", lambda *args, **kwargs: None)
+        registry.precommandhook_registry.register(
+            "something", lambda *args, **kwargs: None
+        )
 
         # skip all
         @registry.skip_precommandhook
@@ -34,7 +36,9 @@ class TestSkipHooks:
         assert test1("arg") == "arg"
 
         # register a dummy hook
-        registry.register_postcommandhook("something", lambda *args, **kwargs: None)
+        registry.postcommandhook_registry.register(
+            "something", lambda *args, **kwargs: None
+        )
 
         # skip all
         @registry.skip_postcommandhook
@@ -46,7 +50,7 @@ class TestSkipHooks:
 
     def teardown_method(self, test_method):
         # unregister everything
-        for hook in registry.precommandhook_registry:
-            registry.unregister_precommandhook(hook)
-        for hook in registry.postcommandhook_registry:
-            registry.unregister_postcommandhook(hook)
+        for hook in list(registry.precommandhook_registry.keys()):
+            registry.precommandhook_registry.unregister(hook)
+        for hook in list(registry.postcommandhook_registry.keys()):
+            registry.postcommandhook_registry.unregister(hook)

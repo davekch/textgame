@@ -3,7 +3,7 @@ import json
 import os
 from typing import List, Dict
 from textgame.loader import CreatureLoader, ItemLoader, RoomLoader, Factory
-from textgame.registry import register_behaviour
+from textgame.registry import behaviour_registry
 from textgame.room import Room
 from textgame.things import Creature, Item, Key
 from textgame.defaults import behaviours
@@ -55,8 +55,8 @@ class TestLoader:
 
     def test_load_creatures(self, creatures: List[Dict]):
         # works only if the behaviours that the creatures have are registered
-        register_behaviour("randomappearance", behaviours.RandomAppearance)
-        register_behaviour("randomwalk", behaviours.RandomWalk)
-        register_behaviour("random_spawn_once", behaviours.RandomSpawnOnce)
+        behaviour_registry.register("randomappearance", behaviours.RandomAppearance)
+        behaviour_registry.register("randomwalk", behaviours.RandomWalk)
+        behaviour_registry.register("random_spawn_once", behaviours.RandomSpawnOnce)
         creature_objs = CreatureLoader.load(creatures)
         assert isinstance(creature_objs[0], Creature)
