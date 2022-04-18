@@ -45,7 +45,7 @@ class Event(EventABC):
     def condition(self, state: State) -> bool:
         return self.when(state)
 
-    def call(self, state: State) -> bool:
+    def call(self, state: State) -> Optional[m]:
         return self.then(state)
 
 
@@ -57,7 +57,7 @@ class Timer(EventABC):
     def condition(self, state: State) -> bool:
         return state.time >= self.time
 
-    def call(self, state: State) -> bool:
+    def call(self, state: State) -> Optional[m]:
         return self.then(state)
 
 
@@ -74,14 +74,14 @@ class State:
         self.player_location = player_location
         self.player_location.visit()  # mark the initial room as visited
         # throw creatures and items into the things_manager
-        things = {**(items or {}), **(creatures or {})}
+        things: Dict[str, Thing] = {**(items or {}), **(creatures or {})}
         self.things_manager = StorageManager(things)
         # create a store for inventory and register it in the items manager
         inventory = Store("inventory")
         self.things_manager.add_store(inventory)
         self.inventory = inventory
         self.player_status: PlayerStatus = PlayerStatus.NORMAL
-        self.player_location_old: Room = None
+        self.player_location_old: Optional[Room] = None
         self.misc: Dict[str, Any] = {}
         self.score = 0
         self.health = 100
@@ -98,6 +98,8 @@ class State:
 
     def get_location_of(self, thing: Thing) -> Optional[Room]:
         maybe = self.things_manager.get_store_id_from_thing(thing)
+        if not maybe:
+            return None
         return self.get_room(maybe)
 
     def set_random_seed(self, seed: int):
