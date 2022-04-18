@@ -1,4 +1,4 @@
-.. automodule:: textgame.globals
+.. automodule:: textgame.messages
    :members:
    :undoc-members:
    :show-inheritance:

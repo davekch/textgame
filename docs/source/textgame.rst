@@ -11,9 +11,14 @@ Submodules
 
 .. toctree::
 
-   textgame.globals
-   textgame.movable
-   textgame.parser
-   textgame.player
+   textgame.things
    textgame.room
-   textgame.world
+   textgame.state
+   textgame.messages
+   textgame.defaults
+   textgame.registry
+   textgame.caller
+   textgame.parser
+   textgame.exceptions
+   textgame.game
+   textgame.loader
