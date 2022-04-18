@@ -69,18 +69,6 @@ class MultipleChoiceParser(Parser):
 
 
 class CommandParser(Parser):
-    def update_verb_synonyms(self, synonyms: Dict[str, List[str]]):
-        """
-        define synonyms for verbs
-
-        :param synonym_dict: dict of the form ``{command: [synonyms], ...}``
-        """
-        for command, synonyms in synonyms.items():
-            if type(synonyms) is not list:
-                raise TypeError("synonyms must be defined as a list")
-            for s in synonyms:
-                self.verb_synonyms[s] = command
-
     def parse_input(self, input: str) -> Optional[Command]:
         """
         take input and return a Command
