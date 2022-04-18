@@ -1,7 +1,6 @@
 from dataclasses import dataclass
 from itertools import chain
-from json import load
-from typing import List, Dict, Any, Callable, Type
+from typing import Generic, List, Dict, Any, Optional, Type, TypeVar
 from pathlib import Path
 import json
 from copy import deepcopy
@@ -22,7 +21,7 @@ from .caller import Caller, SimpleCaller
 from .state import State
 from .exceptions import ConfigurationError, FactoryNotFoundError
 from .game import Game
-from .registry import behaviour_registry, Registry
+from .registry import Registry
 
 import logging
 
@@ -32,7 +31,7 @@ logger.addHandler(logging.NullHandler())
 
 class Factory:
 
-    creation_funcs = Registry(
+    creation_funcs: Registry[Type[Thing]] = Registry(
         {
             "room": Room,
             "item": Item,
@@ -46,7 +45,7 @@ class Factory:
     )
 
     @classmethod
-    def register(cls, obj_type: str, creation_func: Callable[..., Any] = None):
+    def register(cls, obj_type: str, creation_func: Type[Thing] = None):
         return cls.creation_funcs.register(obj_type, creation_func)
 
     @classmethod
@@ -82,13 +81,16 @@ def load_resources(path: Path, format: str = "json") -> Dict[str, List[Dict]]:
     return resources
 
 
-class Loader:
+T = TypeVar("T", bound=Thing)
 
-    defaultclass: str = None
-    factory: Factory = Factory
+
+class Loader(Generic[T]):
+
+    defaultclass: Optional[str] = None
+    factory: Type[Factory] = Factory
 
     @classmethod
-    def load_objs(cls, dicts: List[Dict[str, Any]], obj_type=None) -> List[Thing]:
+    def load_objs(cls, dicts: List[Dict[str, Any]], obj_type=None) -> List[T]:
         # make sure to not accidentally mutate the original list
         dicts = deepcopy(dicts)
         objs = []
@@ -102,7 +104,7 @@ class Loader:
         return objs
 
     @classmethod
-    def load(cls, dicts: List[Dict[str, Any]]) -> List[Thing]:
+    def load(cls, dicts: List[Dict[str, Any]]) -> List[T]:
         return cls.load_objs(dicts, obj_type=cls.defaultclass)
 
 
@@ -122,7 +124,7 @@ class CreatureLoader(Loader):
 class StateBuilder:
     """class to put everything together"""
 
-    state_class: Type = State
+    state_class: Type[State] = State
     itemloader: Type[Loader] = ItemLoader
     roomloader: Type[Loader] = RoomLoader
     creatureloader: Type[Loader] = CreatureLoader
@@ -157,31 +159,31 @@ class StateBuilder:
         """load rooms, items and creatures and place them inside the rooms. return state object"""
         # load everything
         logger.debug("create rooms")
-        rooms = self.build_room_graph(self.roomloader.load(rooms))
+        room_graph = self.build_room_graph(self.roomloader.load(rooms))
         logger.debug("create items")
-        items = self.itemloader.load(items or [])
+        item_objs = self.itemloader.load(items or [])
         logger.debug("create creatures")
-        creatures = self.creatureloader.load(creatures or [])
+        creature_objs = self.creatureloader.load(creatures or [])
         state = self.state_class(
-            rooms=rooms,
-            player_location=rooms[initial_location],
-            items={i.id: i for i in items},
-            creatures={c.id: c for c in creatures},
+            rooms=room_graph,
+            player_location=room_graph[initial_location],
+            items={i.id: i for i in item_objs},
+            creatures={c.id: c for c in creature_objs},
         )
 
         # connect all stores to the state's storemanagers
         # iterate also over items and creatures, as they might be containers too
-        for container in chain(rooms.values(), items, creatures):
+        for container in chain(room_graph.values(), item_objs, creature_objs):
             if isinstance(container, _Contains):
                 state.things_manager.add_store(container.things)
 
         logger.debug("put items and creatures in their locations")
-        for thing in chain(items, creatures):
-            if thing.initlocation not in rooms:
+        for thing in chain(item_objs, creature_objs):
+            if thing.initlocation not in room_graph:
                 raise ConfigurationError(
                     f"the initial location {thing.initlocation!r} of thing {thing.name!r} does not exist"
                 )
-            rooms[thing.initlocation].things.add(thing)
+            room_graph[thing.initlocation].things.add(thing)
 
         return state
 
