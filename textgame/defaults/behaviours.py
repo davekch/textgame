@@ -7,7 +7,7 @@ logger = logging.getLogger("textgame.defaults.behaviours")
 logger.addHandler(logging.NullHandler())
 
 
-def singleencounter(creature: Creature, state: State, probability: float, rooms: List[str]):
+def randomappearance(creature: Creature, state: State, probability: float, rooms: List[str]):
     """
     spawns a creature in the same place as the player, but it vanishes after one step
     """
