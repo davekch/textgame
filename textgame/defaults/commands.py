@@ -203,7 +203,14 @@ def take(itemid: str, state: State) -> m:
             state.inventory.add(item)
             return ACTION.SUCC_TAKE.format(item.name)
         return ACTION.FAIL_TAKE
-    elif itemid in state.player_location or itemid in state.player_location.description:
+    elif (
+        itemid in state.player_location
+        or itemid in state.player_location.description
+        or any(
+            itemid in thing.describe()
+            for thing in state.player_location.things.values()
+        )
+    ):
         return ACTION.FAIL_TAKE
     return ACTION.NO_SUCH_ITEM.format(itemid)
 
