@@ -1,6 +1,5 @@
 from textgame.defaults import hooks
-from textgame.things import Creature
-from typing import Dict
+from textgame.messages import m
 from unittest.mock import MagicMock
 import pytest
 
@@ -11,7 +10,9 @@ def fake_creatures() -> MagicMock:
     for i in range(3):
         creature = MagicMock()
         creature.behaviours = {"mockbehaviour": {}}
-        creature.call_behaviour = MagicMock()
+        behaviourmethod = MagicMock()
+        behaviourmethod.return_value = m()
+        creature.call_behaviour = behaviourmethod
         creature_dict[f"creature_{i}"] = creature
     creatures = MagicMock()
     creatures.storage = creature_dict

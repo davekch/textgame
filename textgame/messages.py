@@ -1,8 +1,13 @@
 from __future__ import annotations
-from typing import Union, Callable
+from typing import Protocol, Union, Callable, Dict, List
 
 
-class EnterYesNoLoop:
+class MessageType(Protocol):
+    def to_message(self) -> m:
+        ...
+
+
+class YesNoQuestion:
     """
     :param question: a yes/no question
     :type question: m
@@ -31,6 +36,36 @@ class EnterYesNoLoop:
             return self._no()
         return self._no
 
+    def to_message(self) -> m:
+        return m(self.question)
+
+
+class MultipleChoiceQuestion:
+    def __init__(
+        self, question: m, answers: Dict[m, m | Callable], cancel: bool = True
+    ):
+        self._question = question
+        answers = list(answers.items())
+        if cancel:
+            answers.append((m("Cancel"), m("Ok.")))
+        self.answers = {str(i): a for i, a in enumerate(answers)}
+
+    def to_message(self) -> m:
+        q = self._question
+        for i, answer in self.answers.items():
+            q += m(f" ({i}) {answer[0]}")
+        return q
+
+    def get_response(self, choice: str) -> m:
+        _, response = self.answers[choice]
+        if callable(response):
+            return response()
+        return response
+
+    @property
+    def possible_answers(self) -> List[str]:
+        return self.answers.keys()
+
 
 class m:
 
@@ -41,8 +76,15 @@ class m:
         # don't accidentally nest messages
         if isinstance(msg, m):
             msg = msg.data
+        elif msg and not isinstance(msg, str):
+            raise TypeError(
+                f"Can't convert {msg!r} to type {self.__class__.__name__!r}"
+            )
 
         self._data = msg
+
+    def to_message(self) -> m:
+        return self
 
     @property
     def data(self):
@@ -85,7 +127,7 @@ class m:
         return string in self.data
 
     def __str__(self) -> str:
-        return self.data
+        return self.data or ""
 
     def __repr__(self) -> str:
         return f'<{self.__class__.__name__} "{str(self)}">'
@@ -152,7 +194,9 @@ class ACTION(DefaultMessage):
     FAIL_DROP = m("You don't have one.")
     FAIL_TAKE = m("You can't take that.")
     NO_SUCH_ITEM = m("I see no {} here.")
+    NO_SUCH_FIGHT = m("There is no {} which wants to fight with you.")
     NO_INVENTORY = m("You don't have anything with you.")
+    NO_WEAPONS = m("You don't have any weapons!")
     FAIL_OPENDIR = m(
         "I can only {0} doors if you tell me the direction. Eg. '{0} west'."
     )

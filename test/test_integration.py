@@ -1,8 +1,8 @@
 from textgame.game import Game
-from textgame.parser import SimpleParser
+from textgame.caller import SimpleCaller
 from textgame.loader import StateBuilder
 from textgame.state import Daytime, State
-from textgame.messages import ACTION, MOVING, EnterYesNoLoop, m, INFO
+from textgame.messages import ACTION, MOVING, YesNoQuestion, m, INFO
 from textgame.room import Room
 from textgame.state import State
 from textgame.registry import (
@@ -47,8 +47,8 @@ def resources() -> Dict:
 @pytest.fixture
 def game(resources) -> Game:
     state = StateBuilder().build(initial_location="field_0", **resources)
-    parser = SimpleParser()
-    return Game(initial_state=state, parser=parser)
+    caller = SimpleCaller()
+    return Game(initial_state=state, caller=caller)
 
 
 class TestGamePlay:
@@ -69,8 +69,8 @@ class TestGamePlay:
 
     def test_yesno(self, game: Game):
         @register_command("jump")
-        def jump(_noun: str, state: State) -> EnterYesNoLoop:
-            return EnterYesNoLoop(
+        def jump(_noun: str, state: State) -> YesNoQuestion:
+            return YesNoQuestion(
                 question=m("Really?"), yes=m("You said yes."), no=m("You said no.")
             )
 
