@@ -46,11 +46,11 @@ def go(direction: str, state: State) -> m:
                 state.player_location_old = state.player_location
                 state.player_location = destination
 
+                # call the hook of the new location
+                msg = state.player_location.call_hook(state)
                 # if the room is not dark, add dir_description to the beginning
                 if not state.player_location.is_dark() and dir_description:
-                    msg = m(dir_description)
-                else:
-                    msg = m()
+                    msg += m(dir_description)
                 msg += state.player_location.describe()
                 if not state.player_location.visited:
                     state.score += state.player_location.visit()
@@ -230,7 +230,6 @@ def drop(itemid: str, state: State) -> m:
     if not itemid in state.inventory:
         return ACTION.FAIL_DROP
     # move item from inventory to current room
-    state.put_item_in_room(state.inventory.pop(itemid), state.player_location)
     state.player_location.items.add(state.inventory.pop(itemid))
     return ACTION.SUCC_DROP
 

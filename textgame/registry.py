@@ -20,6 +20,7 @@ command_registry: Dict[str, CommandFunc] = {}
 behaviour_registry: Dict[str, BehaviourFunc] = {}
 precommandhook_registry: OrderedDict[str, HookFunc] = OrderedDict()
 postcommandhook_registry: OrderedDict[str, HookFunc] = OrderedDict()
+roomhook_registry: Dict[str, HookFunc] = {}
 
 
 C = TypeVar("C")
@@ -69,12 +70,20 @@ def unregister_precommandhook(name: str):
     precommandhook_registry.pop(name, None)
 
 
-def register_postcommandhook(name: str, func: HookFunc):
+def register_postcommandhook(name: str, func: HookFunc = None):
     return _register_decoratorfactory(postcommandhook_registry)(name, func)
 
 
 def unregister_postcommandhook(name: str):
     postcommandhook_registry.pop(name, None)
+
+
+def register_roomhook(name: str, func: HookFunc = None):
+    return _register_decoratorfactory(roomhook_registry)(name, func)
+
+
+def unregister_roomhook(name: str):
+    roomhook_registry.pop(name, None)
 
 
 def _skip_decoratorfactory(flag: str):

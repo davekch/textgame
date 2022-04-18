@@ -18,11 +18,14 @@ from textgame.registry import (
     register_postcommandhook,
     precommandhook_registry,
     postcommandhook_registry,
+    register_roomhook,
     unregister_postcommandhook,
     unregister_precommandhook,
     behaviour_registry,
     register_behaviour,
+    roomhook_registry,
     unregister_behaviour,
+    unregister_roomhook,
 )
 from textgame.defaults import commands, behaviours, hooks
 from textgame.things import Monster, Weapon
@@ -166,6 +169,30 @@ class TestGamePlay:
         assert goblin.win_message in response
         assert not goblin.alive
         assert goblin.dead_description in game.play("look")
+
+    def test_roomhook(self, game: Game):
+        @register_roomhook("field_1")
+        def teleport_back(state: State):
+            state.player_location = state.player_location_old
+            return m("Some magic does not let you go there.")
+
+        assert game.play(
+            "go north"
+        ) == "Some magic does not let you go there." + m.seperator + str(
+            game.state.player_location.describe()
+        )
+        assert game.state.player_location.id == "field_0"
+
+    def teardown_method(self, test_method):
+        # unregister everything
+        for hook in list(precommandhook_registry.keys()):
+            unregister_precommandhook(hook)
+        for hook in list(postcommandhook_registry.keys()):
+            unregister_postcommandhook(hook)
+        for behaviour in list(behaviour_registry.keys()):
+            unregister_behaviour(behaviour)
+        for hook in list(roomhook_registry.keys()):
+            unregister_roomhook(hook)
 
 
 class TestHooks:

@@ -52,10 +52,7 @@ class Factory:
 
 def behaviour_factory(behaviourname: str, params: Dict[str, Any]) -> Behaviour:
     if behaviourname not in behaviour_registry:
-        raise ConfigurationError(
-            f"an error occured while creating the creature {behaviourname!r}: "
-            f"behaviour {behaviourname!r} is not registered"
-        )
+        raise ConfigurationError(f"behaviour {behaviourname!r} is not registered")
     behaviour_class = behaviour_registry[behaviourname]
     switch = params.pop("switch", None)
     if switch is None:

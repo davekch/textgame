@@ -16,3 +16,7 @@ class FactoryNotFoundError(KeyError):
 
 class ModeNotFoundError(KeyError):
     pass
+
+
+class ThingNotFoundError(KeyError):
+    pass

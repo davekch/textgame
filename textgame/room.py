@@ -1,8 +1,12 @@
 from __future__ import annotations
-from typing import Dict, Optional, Tuple, List
+from typing import Dict, Optional, Tuple, List, TYPE_CHECKING
 from .things import Store
 from .messages import m, DESCRIPTIONS, MOVING, INFO
 from .defaults.words import DIRECTIONS
+from .registry import roomhook_registry
+
+if TYPE_CHECKING:
+    from .state import State
 
 import logging
 
@@ -136,6 +140,12 @@ class Room:
             self.visited = True
             return self.value
         return 0
+
+    def call_hook(self, state: State) -> m:
+        if self.id in roomhook_registry:
+            logger.debug(f"call roomhook for room {self.id!r}")
+            return roomhook_registry[self.id](state) or m()
+        return m()
 
     def is_locked(self, direction: str) -> bool:
         """return ``True`` if the door in ``direction`` is locked"""

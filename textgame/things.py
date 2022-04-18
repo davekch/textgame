@@ -10,6 +10,7 @@ from .registry import behaviour_registry
 from .exceptions import (
     ConfigurationError,
     StoreLimitExceededError,
+    ThingNotFoundError,
     UniqueConstraintError,
 )
 
@@ -40,7 +41,7 @@ def _require_thing_exists(func: Callable) -> Callable:
     @wraps(func)
     def decorated_method(self: StorageManager, thing_id: str, *args, **kwargs):
         if thing_id not in self.storage:
-            raise KeyError(f"{thing_id!r} does not exist")
+            raise ThingNotFoundError(f"{thing_id!r} does not exist")
         return func(self, thing_id, *args, **kwargs)
 
     return decorated_method
@@ -54,8 +55,9 @@ class StorageManager:
         # maps the ids of thing to the names of stores they are in
         self._thing_stores: Dict[str, str] = {}
 
-    def get(self, thing_id: str) -> Optional[Thing]:
-        return self.storage.get(thing_id, None)
+    @_require_thing_exists
+    def get(self, thing_id: str) -> Thing:
+        return self.storage[thing_id]
 
     def add_store(self, store: Store):
         if store.id in self._stores:
