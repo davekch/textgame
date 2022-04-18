@@ -8,18 +8,21 @@ if TYPE_CHECKING:
     from .messages import m
     from .state import State
 
-
-CommandArgTypes = TypeVar("CommandArgTypes")
-BehaviourArgTypes = TypeVar("BehaviourArgTypes")
-
-command_registry: Dict[str, Callable[[CommandArgTypes], m]] = {}
-behaviour_registry: Dict[str, Callable[[BehaviourArgTypes], Optional[m]]] = {}
-precommandhook_registry: OrderedDict[str, Callable[[State], m]] = OrderedDict()
-postcommandhook_registry: OrderedDict[str, Callable[[State], m]] = OrderedDict()
+    CommandArgTypes = TypeVar("CommandArgTypes")
+    BehaviourArgTypes = TypeVar("BehaviourArgTypes")
+    CommandFunc = Callable[[CommandArgTypes], m]
+    BehaviourFunc = Callable[[BehaviourArgTypes], Optional[m]]
+    HookFunc = Callable[[State], m]
 
 
-def register_command(command: str):
-    def decorated(func: Callable):
+command_registry: Dict[str, CommandFunc] = {}
+behaviour_registry: Dict[str, BehaviourFunc] = {}
+precommandhook_registry: OrderedDict[str, HookFunc] = OrderedDict()
+postcommandhook_registry: OrderedDict[str, HookFunc] = OrderedDict()
+
+
+def register_command(command: str) -> Callable[[CommandFunc], CommandFunc]:
+    def decorated(func: CommandFunc) -> CommandFunc:
         command_registry[command] = func
         return func
     return decorated
@@ -29,11 +32,11 @@ def unregister_command(command: str):
     command_registry.pop(command, None)
 
 
-def register_behaviour(name: str, func: Callable[[BehaviourArgTypes], Optional[m]] = None):
+def register_behaviour(name: str, func: BehaviourFunc = None):
     if not func:
         # this means that this is called as a decorator @register_behaviour("behaviour")
 
-        def decorator(_func: Callable[[BehaviourArgTypes], Optional[m]]):
+        def decorator(_func: BehaviourFunc) -> BehaviourFunc:
             behaviour_registry[name] = _func
             return _func
         return decorator
@@ -46,7 +49,7 @@ def unregister_behaviour(name: str):
     behaviour_registry.pop(name, None)
 
 
-def register_precommandhook(name: str, func: Callable[[State], m]):
+def register_precommandhook(name: str, func: HookFunc):
     precommandhook_registry[name] = func
 
 
@@ -54,7 +57,7 @@ def unregister_precommandhook(name: str):
     precommandhook_registry.pop(name, None)
 
 
-def register_postcommandhook(name: str, func: Callable[[State], m]):
+def register_postcommandhook(name: str, func: HookFunc):
     postcommandhook_registry[name] = func
 
 
@@ -81,11 +84,11 @@ def _skip_decoratorfactory(flag: str):
     return skip_decorator
 
 
-def skip_precommandhook(func: Callable = None, skip: List[str] = None):
+def skip_precommandhook(func: CommandFunc = None, skip: List[str] = None):
     return _skip_decoratorfactory("skip_precommandhook")(func, skip)
 
 
-def get_precommandhook_skips(func: Callable) -> List[str]:
+def get_precommandhook_skips(func: CommandFunc) -> List[str]:
     if not hasattr(func, "skip_precommandhook"):
         return []
     if func.skip_precommandhook == "all":
@@ -94,11 +97,11 @@ def get_precommandhook_skips(func: Callable) -> List[str]:
         return func.skip_precommandhook
 
 
-def skip_postcommandhook(func: Callable = None, skip: List[str] = None):
+def skip_postcommandhook(func: CommandFunc = None, skip: List[str] = None):
     return _skip_decoratorfactory("skip_postcommandhook")(func, skip)
 
 
-def get_postcommandhook_skips(func: Callable) -> List[str]:
+def get_postcommandhook_skips(func: CommandFunc) -> List[str]:
     if not hasattr(func, "skip_postcommandhook"):
         return []
     if func.skip_postcommandhook == "all":
