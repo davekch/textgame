@@ -29,6 +29,24 @@ def time(state: State):
     state.time += 1
 
 
+def timers(state: State) -> m:
+    """call the timers that were set by state.set_timer"""
+    msg = m()
+    for callback in state.pop_timers():
+        logger.debug(f"calling timer {callback}")
+        msg += callback(state)
+    return msg
+
+
+def missed_timers(state: State) -> m:
+    """call timers that were set by state.set_timers and were missed"""
+    msg = m()
+    for callback in state.pop_missed_timers():
+        logger.debug(f"calling missed timer {callback}")
+        msg += callback(state)
+    return msg
+
+
 def daylight(
     duration_day: int,
     duration_night: int,

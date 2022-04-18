@@ -1,9 +1,11 @@
 from __future__ import annotations
+from collections import defaultdict
 from enum import Enum, auto
-from typing import Dict, Any, Optional
+from typing import Callable, Dict, Any, List, Optional
 from random import Random
 from .room import Room
 from .things import Item, Creature, Store, Thing, StorageManager
+from .messages import m
 
 import logging
 
@@ -49,6 +51,9 @@ class State:
         self.score = 0
         self.health = 100
         self.time = 0
+        self.timed_events: defaultdict[
+            int, List[Callable[[State], Optional[m]]]
+        ] = defaultdict(list)
         self.daytime: Daytime = Daytime.DAY
         self.random = Random()
 
@@ -63,3 +68,21 @@ class State:
 
     def set_random_seed(self, seed: int):
         self.random.seed(seed)
+
+    def set_timer(self, time: int, callback: Callable[[State], m]):
+        """set a callback function to be run after the internal clock has ticked `time` steps.
+        only makes sense if textgame.defaults.hooks.time and textgame.defaults.hooks.timers is enabled
+        """
+        self.timed_events[self.time + time].append(callback)
+
+    def pop_timers(self) -> List[Callable[[State], m]]:
+        """get a list of callback functions that should be run now"""
+        return self.timed_events.pop(self.time, [])
+
+    def pop_missed_timers(self) -> List[Callable[[State], m]]:
+        """get dict of times and callbacks that were missed"""
+        missed = []
+        for time in list(self.timed_events.keys()):
+            if time < self.time:
+                missed.extend(self.timed_events.pop(time), [])
+        return missed
