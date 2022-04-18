@@ -1,5 +1,5 @@
 from __future__ import annotations
-from abc import abstractmethod
+from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 import importlib
 from itertools import chain
@@ -24,7 +24,14 @@ from .caller import Caller, SimpleCaller
 from .state import State
 from .exceptions import ConfigurationError, FactoryNotFoundError
 from .game import Game
-from .registry import command_registry, Registry
+from .registry import (
+    command_registry,
+    Registry,
+    precommandhook_registry,
+    postcommandhook_registry,
+    behaviour_registry,
+    roomhook_registry,
+)
 from .parser import Dictionary
 
 import logging
@@ -72,7 +79,7 @@ class Factory:
             raise FactoryNotFoundError(f"{obj_type!r} is not a registered type")
 
 
-def load_file(path: str, format: str = "json") -> Dict[str, Any]:
+def load_file(path: str | Path, format: str = "json") -> List[Dict[str, Any]]:
     with open(path) as f:
         if format == "json":
             content = json.load(f)
@@ -85,7 +92,7 @@ def load_file(path: str, format: str = "json") -> Dict[str, Any]:
     return content
 
 
-def load_resources(path: Path, format: str = "json") -> Dict[str, List[Dict]]:
+def load_resources(path: Path, format: str = "json") -> Dict[str, List[Dict[str, Any]]]:
     files = [f for f in os.listdir(path) if f.endswith(format)]
     resources = {}
     for file in files:
@@ -213,17 +220,28 @@ class GameBuilder:
         )
 
 
-class SettingsLoader:
+def load_module(module: str) -> Any:
+    return importlib.import_module(module)
+
+
+def load_object(objpath: str) -> Any:
+    # import the module and get the object from it
+    modulename, objname = objpath.rsplit(".", 1)
+    module = load_module(modulename)
+    return getattr(module, objname)
+
+
+def load_registry(registry_dict: Dict[str, str], registry: Registry):
+    for key, funcpath in registry_dict.items():
+        func = load_object(funcpath)
+        # register the function
+        registry.register(key, func)
+
+
+class SettingsLoader(ABC):
     @abstractmethod
     def load(self):
         pass
-
-    @staticmethod
-    def import_object(objpath: str) -> Any:
-        # import the module and get the object from it
-        modulename, objname = objpath.rsplit(".", 1)
-        module = importlib.import_module(modulename)
-        return getattr(module, objname)
 
 
 @dataclass
@@ -238,43 +256,75 @@ class DictionarySettingsLoader(SettingsLoader):
             Dictionary.update_synonyms(self.synonyms)
 
 
+@dataclass
 class CommandsSettingsLoader(SettingsLoader):
     use_defaults: bool = True
-    commands: Dict[str, str] = field(default_factory=dict)
+    exclude: List[str] = field(default_factory=list)
+    import_module: str = ""
+    registry: Dict[str, str] = field(default_factory=dict)
 
     def load(self):
         if self.use_defaults:
             from .defaults import commands
 
-            commands.use_defaults()
-        if self.commands:
-            for command, funcpath in self.commands.items():
-                func = self.import_object(funcpath)
-                # register the function
-                command_registry.register(command, func)
+            commands.use_defaults(self.exclude)
+        if self.import_module:
+            load_module(self.import_module)
+        load_registry(self.registry, command_registry)
 
 
+@dataclass
 class HooksSettingsLoader(SettingsLoader):
-    pass
+    precommand_registry: Dict[str, str] = field(default_factory=dict)
+    postcommand_registry: Dict[str, str] = field(default_factory=dict)
+    room_registry: Dict[str, str] = field(default_factory=dict)
+    import_module: str = ""
+
+    def load(self):
+        if self.import_module:
+            load_module(self.import_module)
+        load_registry(self.precommand_registry, precommandhook_registry)
+        load_registry(self.postcommand_registry, postcommandhook_registry)
+        load_registry(self.room_registry, roomhook_registry)
 
 
-_settingsloader_registry: Registry[str, Type[SettingsLoader]] = Registry(
+@dataclass
+class FactorySettingsLoader(SettingsLoader):
+    registry: Dict[str, str] = field(default_factory=dict)
+    import_module: str = ""
+
+    def load(self):
+        if self.import_module:
+            load_module(self.import_module)
+        load_registry(self.registry, Factory.creation_funcs)
+
+
+@dataclass
+class BehaviourSettingsLoader(SettingsLoader):
+    import_module: str = ""
+    registry: Dict[str, str] = field(default_factory=dict)
+
+    def load(self):
+        if self.import_module:
+            load_module(self.import_module)
+        load_registry(self.registry, behaviour_registry)
+
+
+_settingsloader_registry: Registry[Type[SettingsLoader]] = Registry(
     {
         "dictionary": DictionarySettingsLoader,
         "commands": CommandsSettingsLoader,
         "hooks": HooksSettingsLoader,
+        "behaviours": BehaviourSettingsLoader,
+        "factory": FactorySettingsLoader,
     }
 )
 
 
-def load_settings(settingsfile: str, format: str = "json"):
-    """load settings specified in settingsfile"""
-    settings = load_file(settingsfile, format=format)
+def load_settings(settings: Dict[str, Dict[str, Any]]):
     for section, data in settings.items():
         if section not in _settingsloader_registry:
-            raise ConfigurationError(
-                f"in file {settingsfile!r}: could not parse {section!r}"
-            )
+            raise ConfigurationError(f"could not parse section {section!r} in settings")
         # get the loader and initialize it with data
         loader = _settingsloader_registry[section](**data)
         loader.load()

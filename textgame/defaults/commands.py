@@ -22,10 +22,10 @@ defaultcommand_registry: Registry[
 
 
 def use_defaults(exclude: List[str] = None):
-    """register the commands that are defined in textgame.defaults.commands"""
+    """register the commands that are defined in textgame.defaults.commands and are not already registered"""
     exclude = exclude or []
     for command, func in defaultcommand_registry.items():
-        if command not in exclude:
+        if command not in exclude and command not in command_registry:
             command_registry.register(command, func)
 
 
