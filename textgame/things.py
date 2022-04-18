@@ -7,6 +7,11 @@ from .messages import m
 from .registry import behavior_registry
 from .exceptions import ConfigurationError, UniqueConstraintError
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    # State is only used as a type-hint in this file
+    from .state import State
+
 import logging
 logger = logging.getLogger("textgame.things")
 logger.addHandler(logging.NullHandler())
@@ -93,6 +98,7 @@ class Store:
     def set_manager(self, manager: StorageManager):
         self.manager = manager
 
+    # todo: rename add -> put ? 
     def add(self, thing: Thing):
         self.manager.add_thing_to_store(thing.id, self.id)
     
@@ -138,7 +144,7 @@ class Creature(Thing):
     # behaviours could look like this: {"spawn": {"probability": 0.2, "rooms": ["field_0", "field_1"]}}
     behaviours: Dict[str, Dict[str, Any]] = field(default_factory=dict)
 
-    def call_behaviour(self, behaviourname: str, state):
+    def call_behaviour(self, behaviourname: str, state: State) -> Optional[m]:
         if behaviourname not in self.behaviours:
             raise ConfigurationError(f"the behaviour {behaviourname!r} is not defined for the Creature {self!r}")
         params = self.behaviours[behaviourname]
@@ -147,12 +153,14 @@ class Creature(Thing):
         behaviour = behavior_registry[behaviourname]
         return behaviour(self, state, **params)
 
-    def behave(self, state):
+    def behave(self, state: State) -> Optional[m]:
         """
         call all functions specified in behaviours with the given parameters
         """
+        msg = m()
         for name in self.behaviours:
-            self.call_behaviour(name, state)
+            msg += self.call_behaviour(name, state)
+        return msg
 
     def die(self):
         self.alive = False
