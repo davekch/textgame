@@ -43,5 +43,17 @@
                 ]
             }
         }
+    },
+    {
+        "id": "goblin",
+        "description": "A mean goblin is in the room.",
+        "initlocation": "storage_room",
+        "name": "mean goblin",
+        "type": "monster",
+        "fight_message": "The goblin tries to stab you!",
+        "win_message": "You killed the goblin!",
+        "loose_message": "Oh no. The goblin stabbed you in the chest.",
+        "dead_description": "A dead goblin lies on the floor",
+        "strength": 25
     }
 ]

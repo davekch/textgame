@@ -20,6 +20,7 @@ from .registry import (
     get_precommandhook_skips,
     get_postcommandhook_skips,
 )
+from .exceptions import ModeNotFoundError
 
 import logging
 
@@ -68,6 +69,7 @@ class Interpreter(ABC):
 
 class CommandInterpreter(Interpreter):
     def interpret(self, input: Command, state: State) -> Response:
+        logger.debug(f"got {input!r} as command")
         return self.call_with_hooks(input, state)
 
     def call_command(self, command: Command, state: State) -> Any:
@@ -82,15 +84,15 @@ class CommandInterpreter(Interpreter):
         return result
 
     def call_with_hooks(self, command: Command, state: State) -> Response:
-        logger.debug(f"got {command} as command")
         try:
-            func = command_registry[command.verb]
+            self.success = True
+            func = self.get_function(command)
         except KeyError:
             self.success = False
             return Response(INFO.NOT_UNDERSTOOD)
 
         prehookmsg = call_precommandhook(state, skip=get_precommandhook_skips(func))
-        commandresponse = self.call_command(command, state)
+        commandresponse = self.call_function(func, command, state)
         posthookmsg = call_postcommandhook(state, skip=get_postcommandhook_skips(func))
         return Response(
             value=[prehookmsg, commandresponse, posthookmsg], type=type(commandresponse)
@@ -100,17 +102,20 @@ class CommandInterpreter(Interpreter):
         self, function: Callable[..., m], command: Command, state: State
     ) -> m:
         """define how a function should be called given the state and parsed command"""
+        logger.debug(f"calling {function}")
         return function(command.noun, state)
 
     def get_function(self, command: Command) -> Callable[[str, State], m]:
         if command.verb not in command_registry:
+            logger.debug(f"could not find function for verb {command.verb!r}")
             raise KeyError
+        logger.debug(f"got function {command_registry[command.verb]}")
         return command_registry[command.verb]
 
 
 class YesNoInterpreter(Interpreter):
     def interpret(self, answer: YesNoAnswer, _state: State) -> Response:
-        logger.debug(f"got answer {answer}")
+        logger.debug(f"got answer {answer!r}")
         self.success = True
         # if the previous result was multiple messages, get the question first
         if isinstance(self.previous_result.value, list):
@@ -199,15 +204,19 @@ class SimpleCaller(Caller):
         self.mode_switches[switch_type] = mode
 
     def call(self, input: str, state: State) -> m:
+        logger.debug(f"process input {input!r}")
         parsed = self.parsers[self.mode].parse_input(input)
         result = self.interpreters[self.mode].interpret(parsed, state)
+        logger.debug(f"got result {result!r}")
         # check in which mode we should switch
         self.check_result(result)
         return result.to_message()
 
     def check_result(self, result: Response) -> m:
         if result.type not in self.mode_switches:
-            raise RuntimeError("blah")
+            raise ModeNotFoundError(
+                f"response contains unexpected type: {result.type!r}. no mode is configured for this type"
+            )
         # only switch if the current interpreter is done
         if self.interpreters[self.mode].success:
             self.mode = self.mode_switches[result.type]
@@ -217,6 +226,10 @@ class SimpleCaller(Caller):
             # backup the result for the coming parser
             next_interpreter = self.interpreters[self.mode]
             next_interpreter.backup_result(result)
+        else:
+            logger.debug(
+                f"the interpreter {self.interpreters[self.mode]} reported no success, staying in mode {self.mode!r}"
+            )
 
 
 def call_precommandhook(state: State, skip: List[str] = None) -> m:

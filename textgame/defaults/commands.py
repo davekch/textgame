@@ -1,8 +1,16 @@
 from ..registry import register_command
 from ..state import State, PlayerStatus
-from ..messages import INFO, m, EnterYesNoLoop, MOVING, ACTION, DESCRIPTIONS
+from ..messages import (
+    INFO,
+    MultipleChoiceQuestion,
+    m,
+    YesNoQuestion,
+    MOVING,
+    ACTION,
+    DESCRIPTIONS,
+)
 from ..defaults.words import DIRECTIONS
-from ..things import Key
+from ..things import Key, Monster, Weapon
 
 
 # change register_command to register_defaultcommand and add use_defaults function
@@ -249,7 +257,7 @@ def listen(_: str, state: State) -> m:
 
 
 @register_command("hint")
-def ask_hint(_: str, state: State):
+def ask_hint(_: str, state: State) -> YesNoQuestion:
     """
     ask for a hint in the current location,
     if there is one, return :class:`textgame.parser.EnterYesNoLoop` if the hint
@@ -265,4 +273,31 @@ def ask_hint(_: str, state: State):
 
     # stuff hint_conversation inside the EnterYesNoLoop,
     # this will be called during conversation
-    return EnterYesNoLoop(question=warning, yes=hint_conversation, no=m("ok."))
+    return YesNoQuestion(question=warning, yes=hint_conversation, no=m("ok."))
+
+
+@register_command("fight")
+def fight(noun: str, state: State) -> m:
+    if noun and noun not in state.player_location.creatures:
+        return ACTION.NO_SUCH_FIGHT.format(noun)
+    weapons = state.inventory.values(filter=[Weapon])
+    if not weapons:
+        return ACTION.NO_WEAPONS
+    if len(weapons) > 1:
+        return MultipleChoiceQuestion(
+            question=m("Which weapon do you want to use?"),
+            answers={w.id: lambda: use_weapon(w.id, state) for w in weapons},
+        )
+    return use_weapon(list(weapons)[0].id, state)
+
+
+def use_weapon(weapon_id: str, state: State) -> m:
+    # assumes that the weapon is in inventory
+    weapon = state.inventory.get(weapon_id)
+    msg = m()
+    for monster in state.player_location.creatures.values(filter=[Monster]):
+        monster.health -= weapon.calculate_damage(state.random)
+        msg += m(f"You use the {weapon.name} against the {monster.name}!")
+    if not msg:
+        return ACTION.NO_SUCH_FIGHT.format("monster")
+    return msg

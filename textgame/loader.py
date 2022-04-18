@@ -2,9 +2,9 @@ from itertools import chain
 from json import load
 from typing import List, Dict, Any, Callable
 from .room import Room
-from .things import Container, Item, Key, Creature, Monster
+from .things import Container, Item, Key, Creature, Monster, Weapon
 from .state import State
-from .exceptions import ConfigurationError
+from .exceptions import ConfigurationError, FactoryNotFoundError
 
 
 class Factory:
@@ -13,6 +13,7 @@ class Factory:
         "room": Room,
         "item": Item,
         "key": Key,
+        "weapon": Weapon,
         "container": Container,
         "creature": Creature,
         "monster": Monster,
@@ -31,7 +32,10 @@ class Factory:
         args_copy = args.copy()
         if not obj_type:
             obj_type = args_copy.pop("type")
-        return cls.creation_funcs[obj_type](**args_copy)
+        try:
+            return cls.creation_funcs[obj_type](**args_copy)
+        except KeyError:
+            raise FactoryNotFoundError(f"{obj_type!r} is not a registered type")
 
 
 class Loader:

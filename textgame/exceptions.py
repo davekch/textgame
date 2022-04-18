@@ -8,3 +8,11 @@ class UniqueConstraintError(ValueError):
 
 class StoreLimitExceededError(RuntimeError):
     pass
+
+
+class FactoryNotFoundError(KeyError):
+    pass
+
+
+class ModeNotFoundError(KeyError):
+    pass

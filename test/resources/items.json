@@ -36,6 +36,14 @@
         "initlocation": "storage_room"
     },
     {
+        "id": "sword",
+        "type": "weapon",
+        "description": "A sharp sword lies there.",
+        "name": "sword",
+        "initlocation": "storage_room",
+        "strength": 100
+    },
+    {
         "id": "key",
         "type": "key",
         "description": "A key lies here.",

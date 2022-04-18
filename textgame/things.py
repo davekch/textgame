@@ -1,5 +1,6 @@
 from __future__ import annotations
 from dataclasses import dataclass, field
+from random import Random
 from typing import List, Set, Dict, Any, Callable, Optional, Type
 from functools import wraps
 from collections import defaultdict
@@ -130,7 +131,9 @@ class Store:
     def items(self, filter: List[Type] = None) -> Dict[str, Thing]:
         things = self.manager.get_things_from_store(self.id)
         if filter:
-            return {k: v for k, v in things if any(isinstance(v, t) for t in filter)}
+            return {
+                k: v for k, v in things.items() if any(isinstance(v, t) for t in filter)
+            }
         return things
 
     def keys(self, filter: List[Type] = None) -> List[str]:
@@ -156,7 +159,12 @@ class Key(Item):
 
 @dataclass
 class Weapon(Item):
-    strength: int = 0
+    strength: float = 0
+    strength_variation: float = 0
+
+    def calculate_damage(self, random_engine: Random) -> float:
+        variation = random_engine.uniform(-1, 1) * self.strength_variation
+        return abs(self.strength * (1 - variation))
 
 
 @dataclass
@@ -214,4 +222,15 @@ class Creature(Thing):
 
 @dataclass
 class Monster(Creature):
-    strength: int = 0
+    strength: float = 0
+    strenth_variation: float = 0.0
+    health: float = 100
+    fight_message: str = None
+    win_message: str = None  # when the player wins
+    loose_message: str = None  # when the player looses
+
+    def calculate_damage(self, random_engine: Random) -> float:
+        # the state's random engine gets passed so that everything
+        # is determined by the state's seed
+        variation = random_engine.uniform(-1, 1) * self.strenth_variation
+        return abs(self.strength * (1 - variation))

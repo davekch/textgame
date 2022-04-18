@@ -46,6 +46,7 @@ class State:
         self.player_location_old: Room = None
         self.misc: Dict[str, Any] = {}
         self.score = 0
+        self.health = 100
         self.time = 0
         self.daytime: Daytime = Daytime.DAY
         self.random = Random()

@@ -25,6 +25,7 @@ from textgame.registry import (
     unregister_behaviour,
 )
 from textgame.defaults import commands, behaviours, hooks
+from textgame.things import Monster, Weapon
 from utils import yield_sequence
 from typing import Dict
 import json
@@ -143,6 +144,25 @@ class TestGamePlay:
         assert game.state.score == -game.state.player_location.hint_value
         game.state.player_location = game.state.rooms["field_1"]
         assert game.play("hint") == str(INFO.NO_HINT)
+
+    def test_fight(self, game: Game):
+        register_postcommandhook("fight", hooks.manage_fights)
+        goblin: Monster = game.state.creatures.storage["goblin"]
+        game.state.get_room("marketplace").creatures.add(goblin)
+        response = game.play("go west")
+        assert goblin.fight_message in response
+        assert game.state.health == 100 - goblin.strength
+        response = game.play("fight goblin")
+        assert str(ACTION.NO_WEAPONS) in response
+        assert goblin.health == 100
+        assert game.state.health == 50
+        sword: Weapon = game.state.items.storage["sword"]
+        game.state.inventory.add(sword)
+        response = game.play("fight goblin")
+        assert "You use the sword against the mean goblin" in response
+        assert goblin.win_message in response
+        assert not goblin.alive
+        assert goblin.dead_description in game.play("look")
 
 
 class TestHooks:
