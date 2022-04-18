@@ -4,7 +4,7 @@ from enum import Enum, auto
 from typing import Callable, Dict, Any, List, Optional
 from random import Random
 from .room import Room
-from .things import Item, Creature, Store, Thing, StorageManager
+from .things import Item, Creature, Lightsource, Store, Thing, StorageManager
 from .messages import m
 
 import logging
@@ -56,6 +56,9 @@ class State:
         ] = defaultdict(list)
         self.daytime: Daytime = Daytime.DAY
         self.random = Random()
+
+    def lighting(self) -> bool:
+        return bool(self.inventory.keys(filter=[Lightsource]))
 
     def get_room(self, room_id: str) -> Optional[Room]:
         return self.rooms.get(room_id)

@@ -1,6 +1,6 @@
 from __future__ import annotations
 from typing import Dict, Optional, Tuple, List, TYPE_CHECKING
-from .things import Store
+from .things import Lightsource, Store
 from .messages import m, DESCRIPTIONS, MOVING, INFO
 from .defaults.words import DIRECTIONS
 from .registry import roomhook_registry
@@ -162,12 +162,14 @@ class Room:
         return self.doors.get(direction)
 
     def is_dark(self) -> bool:
-        return self.dark["now"]
+        return self.dark["now"] and not self.items.keys(filter=[Lightsource])
 
-    def describe(self, long: bool = False) -> m:
+    def describe(self, long: bool = False, light: bool = False) -> m:
         long = long or not self.visited
-        if self.dark["now"]:
+        # if the room is dark, only give the description if there is light
+        if self.is_dark() and not light:
             return DESCRIPTIONS.DARK_L
+
         descript = self.description if long else self.shortdescription
         for item in self.items.values():
             descript += item.describe()

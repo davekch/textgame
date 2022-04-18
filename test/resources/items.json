@@ -29,11 +29,12 @@
         "initlocation": "storage_room"
     },
     {
-        "id": "grail",
-        "description": "A golden grail stands there.",
-        "name": "grail",
-        "value": 10,
-        "initlocation": "storage_room"
+        "id": "lamp",
+        "type": "lightsource",
+        "description": "An old lamp stands on the ground.",
+        "name": "lamp",
+        "value": 0,
+        "initlocation": "field_0"
     },
     {
         "id": "sword",

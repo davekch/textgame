@@ -51,7 +51,7 @@ def go(direction: str, state: State) -> m:
                 # if the room is not dark, add dir_description to the beginning
                 if not state.player_location.is_dark() and dir_description:
                     msg += m(dir_description)
-                msg += state.player_location.describe()
+                msg += state.player_location.describe(light=state.lighting())
                 if not state.player_location.visited:
                     state.score += state.player_location.visit()
                 return msg
@@ -156,7 +156,7 @@ def look(_, state: State) -> m:
     """
     get the long description of the current location.
     """
-    return state.player_location.describe(long=True)
+    return state.player_location.describe(long=True, light=state.lighting())
 
 
 @register_command("take")
@@ -171,7 +171,7 @@ def take(itemid: str, state: State) -> m:
     elif itemid == "all":
         return takeall(state)
 
-    if state.player_location.dark["now"]:
+    if state.player_location.is_dark() and not state.lighting():
         return DESCRIPTIONS.DARK_S
     if itemid in state.inventory:
         return ACTION.OWN_ALREADY

@@ -69,7 +69,6 @@ class StorageManager:
 
     @_require_thing_exists
     def add_thing_to_store(self, thing_id: str, store_id: str):
-        logger.debug(f"adding {thing_id!r} to store {store_id!r}")
         # first, remove the thing from where it is if it already has a place
         if thing_id in self._thing_stores and self._thing_stores[thing_id]:
             current_store = self._thing_stores[thing_id]
@@ -78,6 +77,7 @@ class StorageManager:
             )
             self._stores[current_store].remove(thing_id)
         # now add the thing to the intended store and update the thing's store
+        logger.debug(f"adding {thing_id!r} to store {store_id!r}")
         self._stores[store_id].append(thing_id)
         self._thing_stores[thing_id] = store_id
 
@@ -156,6 +156,10 @@ class Store:
 class Item(Thing):
     value: int = 0
     takable: bool = True
+
+
+class Lightsource(Item):
+    pass
 
 
 @dataclass

@@ -6,7 +6,16 @@ from pathlib import Path
 import json
 import os
 from .room import Room
-from .things import Behaviour, Container, Item, Key, Creature, Monster, Weapon
+from .things import (
+    Behaviour,
+    Container,
+    Item,
+    Key,
+    Creature,
+    Lightsource,
+    Monster,
+    Weapon,
+)
 from .caller import Caller, SimpleCaller
 from .state import State
 from .exceptions import ConfigurationError, FactoryNotFoundError
@@ -26,6 +35,7 @@ class Factory:
         "item": Item,
         "key": Key,
         "weapon": Weapon,
+        "lightsource": Lightsource,
         "container": Container,
         "creature": Creature,
         "monster": Monster,

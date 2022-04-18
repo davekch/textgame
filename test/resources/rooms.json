@@ -13,10 +13,23 @@
         "doors": {
             "north": "field_1",
             "up": "field_1",
-            "west": "marketplace"
+            "west": "marketplace",
+            "east": "darkroom"
         },
         "dir_descriptions": {
             "up": "You spread your wings and start to fly."
+        }
+    },
+    {
+        "id": "darkroom",
+        "description": "You are in the dark room. The walls are pitch black.",
+        "shortdescription": "You are in the dark room.",
+        "doors": {
+            "west": "field_0"
+        },
+        "dark": {
+            "now": true,
+            "always": true
         }
     },
     {

@@ -4,6 +4,7 @@ from textgame.loader import StateBuilder
 from textgame.state import Daytime, State
 from textgame.messages import (
     ACTION,
+    DESCRIPTIONS,
     MOVING,
     MultipleChoiceQuestion,
     YesNoQuestion,
@@ -71,8 +72,20 @@ class TestGamePlay:
             str(game.state.rooms["field_0"].description)
             + "\n"
             + str(game.state.rooms["field_0"].items.get("diamond").description)
+            + "\n"
+            + str(game.state.rooms["field_0"].items.get("lamp").description)
         )
         assert game.play("look") == expected
+
+    def test_darkness(self, game: Game):
+        assert game.play("go east") == str(DESCRIPTIONS.DARK_L)
+        game.state.inventory.add(game.state.items.get("lamp"))
+        assert game.play("look") == str(game.state.get_room("darkroom").description)
+        # should also work if the lamp is in the room
+        game.play("drop lamp")
+        assert game.play("look") == str(
+            game.state.get_room("darkroom").description
+        ) + "\n" + str(game.state.items.get("lamp").description)
 
     def test_custom_command(self, game: Game):
         @register_command("scream")
@@ -197,21 +210,18 @@ class TestGamePlay:
 
 class TestHooks:
     def test_timehooks(self, game: Game):
-        @register_precommandhook("daylight")
-        def daylight(state: State) -> m:
-            if state.time >= 2:
-                for room in state.rooms.values():
-                    room.dark["now"] = True
-            if state.time == 2:
-                return m("The sun has set. It is dark now.")
-
+        register_precommandhook(
+            "daylight", hooks.daylight(duration_day=2, duration_night=3)
+        )
         register_postcommandhook("time", hooks.time)
+        # first remove the lamp
+        game.state.player_location.items.pop("lamp")
         assert game.state.time == 0
         game.play("go")
         assert game.state.time == 1
         game.play("go")
         assert game.play("look") == (
-            "The sun has set. It is dark now.\nIt's pitch dark here. You can't see anything."
+            "The sun has set. Night comes in.\nIt's pitch dark here. You can't see anything."
             " Anytime soon, you'll probably get attacked by some night creature."
         )
         assert game.state.time == 3
@@ -266,6 +276,8 @@ class TestHooks:
             "daylight", hooks.daylight(duration_day=2, duration_night=3)
         )
         register_postcommandhook("time", hooks.time)
+        # first, remove the lightsource from the room
+        game.state.player_location.items.pop("lamp")
         for _ in range(2):
             response = game.play("look")
             assert (
