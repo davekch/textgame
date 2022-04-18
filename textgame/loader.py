@@ -1,7 +1,8 @@
+from itertools import chain
 from json import load
 from typing import List, Dict, Any, Callable
 from .room import Room
-from .things import Item, Key
+from .things import Item, Key, Creature
 from .state import State
 from .exceptions import ConfigurationError
 
@@ -12,6 +13,7 @@ class Factory:
         "room": Room,
         "item": Item,
         "key": Key,
+        "creature": Creature,
     }
 
     @classmethod
@@ -60,13 +62,24 @@ class ItemLoader(Loader):
     defaultclass = "item"
 
 
+class CreatureLoader(Loader):
+    defaultclass = "creature"
+
+
 class StateBuilder:
     """class to put everything together"""
 
-    def __init__(self, state_class = State, itemloader: Loader = ItemLoader, roomloader: Loader = RoomLoader):
+    def __init__(
+        self,
+        state_class = State,
+        itemloader: Loader = ItemLoader,
+        roomloader: Loader = RoomLoader,
+        creatureloader: Loader = CreatureLoader
+    ):
         self.state_class = state_class
         self.itemloader = itemloader
         self.roomloader = roomloader
+        self.creatureloader = creatureloader
     
     @staticmethod
     def build_room_graph(rooms: List[Room]) -> Dict[str, Room]:
@@ -85,18 +98,28 @@ class StateBuilder:
                     room.hiddendoors[direction] = graph[room.hiddendoors[direction]]
         return graph
     
-    def build(self, initial_location: str, rooms: List[Dict], items: List[Dict]) -> State:
+    def build(
+        self,
+        initial_location: str,
+        rooms: List[Dict],
+        items: List[Dict] = None,
+        creatures: List[Dict] = None
+    ) -> State:
         """load rooms and items and place the items inside the rooms. return a graph of rooms"""
         # load everything
         rooms = self.build_room_graph(self.roomloader.load(rooms))
-        items = self.itemloader.load(items)
-        # put items in their locations
-        for item in items:
-            initlocation = rooms.get(item.initlocation)
+        items = self.itemloader.load(items or [])
+        creatures = self.creatureloader.load(creatures or [])
+        # put items and creatures in their locations
+        for thing in chain(items, creatures):
+            initlocation = rooms.get(thing.initlocation)
             if not initlocation:
                 raise ConfigurationError(
-                    f"the initial location '{item.initlocation} of item '{item.name}' does not exist"
+                    f"the initial location '{thing.initlocation} of thing '{thing.name}' does not exist"
                 )
-            initlocation.add_item(item)
+            if isinstance(thing, Item):
+                initlocation.add_item(thing)
+            elif isinstance(thing, Creature):
+                initlocation.add_creature(thing)
 
         return self.state_class(rooms=rooms, player_location=rooms[initial_location])
