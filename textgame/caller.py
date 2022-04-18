@@ -48,13 +48,13 @@ class Response:
         if not self.type:
             self.type = type(self.value)
 
-    def to_message(self):
+    def to_message(self) -> m:
         if isinstance(self.value, list):
             msg = m()
             for v in self.value:
                 msg += v.to_message()
             return msg
-        return self.value
+        return self.value.to_message()
 
 
 class Interpreter(ABC):

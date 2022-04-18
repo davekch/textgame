@@ -108,6 +108,24 @@ class TestGamePlay:
         assert game.play("jump") == "Really?"
         assert game.play("no") == "You said no."
 
+    def test_nested_yesno(self, game: Game):
+        @register_command("jump")
+        def jump(_noun: str, state: State):
+            return YesNoQuestion(
+                question="Do you really want to jump?",
+                yes=YesNoQuestion(question="Really??", yes="ok, jump!", no="phew."),
+                no="You said no.",
+            )
+
+        assert game.play("jump") == "Do you really want to jump?"
+        assert game.play("no") == "You said no."
+        game.play("jump")
+        assert game.play("yes") == "Really??"
+        assert game.play("no") == "phew."
+        game.play("jump")
+        game.play("yes")
+        assert game.play("yes") == "ok, jump!"
+
     def test_multiplechoicequestion(self, game: Game):
         question = MultipleChoiceQuestion(
             question=m("What do you want to buy?"),
