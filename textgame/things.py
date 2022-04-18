@@ -54,6 +54,9 @@ class StorageManager:
         # maps the ids of thing to the names of stores they are in
         self._thing_stores: Dict[str, str] = {}
 
+    def get(self, thing_id: str) -> Optional[Thing]:
+        return self.storage.get(thing_id, None)
+
     def add_store(self, store: Store):
         if store.id in self._stores:
             raise UniqueConstraintError(
@@ -190,18 +193,28 @@ class Container(Item):
 
 
 class Behaviour(ABC):
-    def __init__(self, on=True, params: Dict[str, Any] = None):
-        self.on = on
+    parameters: List[str] = None
+
+    def __init__(self, switch=True, params: Dict[str, Any] = None):
+        for p in self.parameters:
+            if p not in params:
+                raise ConfigurationError(
+                    f"the behaviour {self.__class__} requires {p!r} to be defined"
+                )
+        self.switch = switch
         self.params = params
 
     def switch_on(self):
-        self.on = True
+        self.switch = True
 
     def switch_off(self):
-        self.on = False
+        self.switch = False
 
     def toggle(self):
-        self.on = not self.on
+        self.switch = not self.switch
+
+    def is_switched_on(self) -> bool:
+        return self.switch
 
     @abstractmethod
     def run(self, creature: Creature, state: State) -> Optional[m]:
@@ -220,7 +233,9 @@ class Creature(Thing):
             raise ConfigurationError(
                 f"the behaviour {behaviourname!r} is not defined for the Creature {self!r}"
             )
-        return self.behaviours[behaviourname].run(self, state)
+        if self.behaviours[behaviourname].is_switched_on():
+            logger.debug(f"call behaviour {behaviourname!r} for creature {self.id!r}")
+            return self.behaviours[behaviourname].run(self, state)
 
     def behave(self, state: State) -> Optional[m]:
         """

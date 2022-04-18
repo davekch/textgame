@@ -11,6 +11,8 @@ logger.addHandler(logging.NullHandler())
 
 
 class RandomAppearance(Behaviour):
+    parameters = ["probability", "rooms"]
+
     def run(self, creature: Creature, state: State):
         """
         spawns a creature in the same place as the player, but it vanishes after one step
@@ -27,6 +29,8 @@ class RandomAppearance(Behaviour):
 
 
 class RandomWalk(Behaviour):
+    parameters = ["mobility"]
+
     def run(self, creature: Creature, state: State):
         logger.debug(f"calling randomwalk behaviour of {creature.id!r}")
         # get the creature's current room
@@ -47,6 +51,8 @@ class RandomWalk(Behaviour):
 
 
 class RandomSpawnOnce(Behaviour):
+    parameters = ["rooms"]
+
     def run(self, creature: Creature, state: State):
         """randomly spawns in one of the rooms."""
         # only spawn creatures that are in the storage_room

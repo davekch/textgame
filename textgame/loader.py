@@ -13,6 +13,11 @@ from .exceptions import ConfigurationError, FactoryNotFoundError
 from .game import Game
 from .registry import behaviour_registry
 
+import logging
+
+logger = logging.getLogger("textgame.loader")
+logger.addHandler(logging.NullHandler())
+
 
 class Factory:
 
@@ -49,14 +54,17 @@ def behaviour_factory(behaviourname: str, params: Dict[str, Any]) -> Behaviour:
     if behaviourname not in behaviour_registry:
         raise ConfigurationError
     behaviour_class = behaviour_registry[behaviourname]
-    on = params.pop("on", True)
-    return behaviour_class(on=on, params=params)
+    switch = params.pop("switch", None)
+    if switch is None:
+        return behaviour_class(params=params)
+    return behaviour_class(switch=switch, params=params)
 
 
 def load_resources(path: Path, format: str = "json") -> Dict[str, List[Dict]]:
     files = [f for f in os.listdir(path) if f.endswith(format)]
     resources = {}
     for file in files:
+        logger.debug(f"load resource {Path(path) / file}")
         with open(Path(path) / file) as f:
             if format == "json":
                 resource = json.load(f)
@@ -113,10 +121,14 @@ class CreatureLoader(Loader):
                     behaviour = behaviour_factory(behaviourname, params)
                 except ConfigurationError:
                     raise ConfigurationError(
-                        f"an error occured while creating the creature {creature.id!r}:"
+                        f"an error occured while creating the creature {creature.id!r}: "
                         f"behaviour {behaviourname!r} is not registered"
                     )
                 # overwrite the creature's behaviour
+                logger.debug(
+                    f"add behaviour of type {type(behaviour)} to creature {creature.id!r}. "
+                    f"behaviour is switched {'on' if behaviour.switch else 'off'}"
+                )
                 creature.behaviours[behaviourname] = behaviour
         return objs
 
@@ -144,6 +156,7 @@ class StateBuilder:
         to Dict[str, Room]
         """
         graph = {room.id: room for room in rooms}
+        logger.debug("connect rooms")
         for room in graph.values():
             for direction in room.doors:
                 if room.has_connection_in(direction):
@@ -162,8 +175,11 @@ class StateBuilder:
     ) -> State:
         """load rooms, items and creatures and place them inside the rooms. return state object"""
         # load everything
+        logger.debug("create rooms")
         rooms = self.build_room_graph(self.roomloader.load(rooms))
+        logger.debug("create items")
         items = self.itemloader.load(items or [])
+        logger.debug("create creatures")
         creatures = self.creatureloader.load(creatures or [])
         state = self.state_class(
             rooms=rooms,
@@ -181,7 +197,7 @@ class StateBuilder:
             if isinstance(item, Container):
                 state.items.add_store(item._contains)
 
-        # put items and creatures in their locations
+        logger.debug("put items and creatures in their locations")
         for thing in chain(items, creatures):
             if thing.initlocation not in rooms:
                 raise ConfigurationError(
