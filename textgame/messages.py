@@ -81,6 +81,9 @@ class m:
     def __bool__(self) -> bool:
         return bool(self.data)
     
+    def __contains__(self, string: str) -> bool:
+        return string in self.data
+    
     def __str__(self) -> str:
         return self.data
 

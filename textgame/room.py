@@ -212,7 +212,7 @@ class Room:
         if creature.id not in self.creatures:
             self.creatures[creature.id] = creature
         else:
-            logger.warning(f"You try to add monster {monster.id!r} to room {self.id} but it's already there")
+            logger.warning(f"You try to add monster {creature.id!r} to room {self.id} but it's already there")
     
     def get_creature(self, creature_id: str) -> Creature:
         return self.creatures.get(creature_id)

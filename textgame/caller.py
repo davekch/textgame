@@ -105,6 +105,7 @@ def call_precommandhook(state: State, skip: List[str] = None) -> m:
     msg = m()
     for name, func in precommandhook_registry.items():
         if name not in (skip or []):
+            logger.debug(f"call precommandhook {func!r}")
             msg += func(state)
     return msg
 
@@ -113,5 +114,6 @@ def call_postcommandhook(state: State, skip: List[str] = None) -> m:
     msg = m()
     for name, func in postcommandhook_registry.items():
         if name not in (skip or []):
+            logger.debug(f"call postcommandhook {func!r}")
             msg += func(state)
     return msg
