@@ -3,7 +3,13 @@ from abc import ABC, abstractmethod
 from .parser import ParsedInput, YesNoAnswer, Command
 from .state import State
 from .messages import m, EnterYesNoLoop, INFO
-from .registry import command_registry, precommandhook_registry, postcommandhook_registry
+from .registry import (
+    command_registry,
+    precommandhook_registry,
+    postcommandhook_registry,
+    get_precommandhook_skips,
+    get_postcommandhook_skips,
+)
 
 import logging
 logger = logging.getLogger("textgame.caller")
@@ -79,17 +85,9 @@ class SimpleCaller(Caller):
         except KeyError:
             return INFO.NOT_UNDERSTOOD
         
-        if not getattr(func, "skip_all_precommandhooks", False):
-            skip = getattr(func, "skip_precommandhooks", [])
-            prehookmsg = call_precommandhook(state, skip=skip)
-        else:
-            prehookmsg = m()
+        prehookmsg = call_precommandhook(state, skip=get_precommandhook_skips(func))
         commandresponse = self.call_command(command, state)
-        if not getattr(func, "skip_all_postcommandhooks", False):
-            skip = getattr(func, "skip_postcommandhooks", [])
-            posthookmsg = call_postcommandhook(state, skip=skip)
-        else:
-            posthookmsg = m()
+        posthookmsg = call_postcommandhook(state, skip=get_postcommandhook_skips(func))
         return prehookmsg + commandresponse + posthookmsg
     
     def call_yesno(self, answer: YesNoAnswer) -> m:
