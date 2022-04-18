@@ -21,7 +21,7 @@ from .caller import Caller, SimpleCaller
 from .state import State
 from .exceptions import ConfigurationError, FactoryNotFoundError
 from .game import Game
-from .registry import behaviour_registry
+from .registry import behaviour_registry, Registry
 
 import logging
 
@@ -31,24 +31,26 @@ logger.addHandler(logging.NullHandler())
 
 class Factory:
 
-    creation_funcs = {
-        "room": Room,
-        "item": Item,
-        "key": Key,
-        "weapon": Weapon,
-        "lightsource": Lightsource,
-        "container": Container,
-        "creature": Creature,
-        "monster": Monster,
-    }
+    creation_funcs = Registry(
+        {
+            "room": Room,
+            "item": Item,
+            "key": Key,
+            "weapon": Weapon,
+            "lightsource": Lightsource,
+            "container": Container,
+            "creature": Creature,
+            "monster": Monster,
+        }
+    )
 
     @classmethod
-    def register(cls, obj_type: str, creation_func: Callable[..., Any]):
-        cls.creation_funcs[obj_type] = creation_func
+    def register(cls, obj_type: str, creation_func: Callable[..., Any] = None):
+        return cls.creation_funcs.register(obj_type, creation_func)
 
     @classmethod
     def unregister(cls, obj_type: str):
-        cls.creation_funcs.pop(obj_type, None)
+        cls.creation_funcs.unregister(obj_type)
 
     @classmethod
     def create(cls, args: Dict[str, Any], obj_type: str = None) -> Any:
