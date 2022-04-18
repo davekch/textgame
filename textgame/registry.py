@@ -21,11 +21,27 @@ precommandhook_registry: OrderedDict[str, HookFunc] = OrderedDict()
 postcommandhook_registry: OrderedDict[str, HookFunc] = OrderedDict()
 
 
-def register_command(command: str) -> Callable[[CommandFunc], CommandFunc]:
-    def decorated(func: CommandFunc) -> CommandFunc:
-        command_registry[command] = func
-        return func
-    return decorated
+C = TypeVar("C")
+def _register_decoratorfactory(registry: Dict[str, C]):
+    """returns a decorator that can be used to register functions in the registry
+    """
+    def register_decorator(name: str, func: C = None) -> Callable[[C], C]:
+        # this decorator can be used like this
+        # @decorator(name) or like this decorator(name, func)
+        # in the first case, func is none and we must return another decorator
+        if not func:
+            def decorator(_func: C) -> C:
+                registry[name] = _func
+                return _func
+            return decorator
+        else:
+            registry[name] = func
+    
+    return register_decorator
+
+
+def register_command(command: str, func: CommandFunc = None):
+    return _register_decoratorfactory(command_registry)(command, func)
 
 
 def unregister_command(command: str):
@@ -33,24 +49,15 @@ def unregister_command(command: str):
 
 
 def register_behaviour(name: str, func: BehaviourFunc = None):
-    if not func:
-        # this means that this is called as a decorator @register_behaviour("behaviour")
-
-        def decorator(_func: BehaviourFunc) -> BehaviourFunc:
-            behaviour_registry[name] = _func
-            return _func
-        return decorator
-    
-    else:
-        behaviour_registry[name] = func
+    return _register_decoratorfactory(behaviour_registry)(name, func)
 
 
 def unregister_behaviour(name: str):
     behaviour_registry.pop(name, None)
 
 
-def register_precommandhook(name: str, func: HookFunc):
-    precommandhook_registry[name] = func
+def register_precommandhook(name: str, func: HookFunc = None):
+    return _register_decoratorfactory(precommandhook_registry)(name, func)
 
 
 def unregister_precommandhook(name: str):
@@ -58,7 +65,7 @@ def unregister_precommandhook(name: str):
 
 
 def register_postcommandhook(name: str, func: HookFunc):
-    postcommandhook_registry[name] = func
+    return _register_decoratorfactory(postcommandhook_registry)(name, func)
 
 
 def unregister_postcommandhook(name: str):

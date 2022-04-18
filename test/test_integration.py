@@ -119,6 +119,7 @@ class TestHooks:
 
     def test_timehooks(self, game: Game):
 
+        @register_precommandhook("daylight")
         def daylight(state: State) -> m:
             if state.time >= 2:
                 for room in state.rooms.values():
@@ -126,7 +127,6 @@ class TestHooks:
             if state.time == 2:
                 return m("The sun has set. It is dark now.")
 
-        register_precommandhook("daylight", daylight)
         register_postcommandhook("time", hooks.time)
         assert game.state.time == 0
         game.play("go")
