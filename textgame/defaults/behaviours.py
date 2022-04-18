@@ -1,4 +1,5 @@
-from typing import List
+from functools import wraps
+from typing import Callable, List, Dict, Any
 from ..state import State
 from ..things import Creature
 
@@ -7,6 +8,19 @@ logger = logging.getLogger("textgame.defaults.behaviours")
 logger.addHandler(logging.NullHandler())
 
 
+def require_alive(func: Callable) -> Callable:
+    """
+    decorator for behaviour function that makes the behaviour return immediately if the creature is not alive
+    """
+    @wraps(func)
+    def decorated(creature, state, *args, **kwargs):
+        if not creature.alive:
+            return
+        return func(creature, state, *args, **kwargs)
+    return decorated
+
+
+@require_alive
 def randomappearance(creature: Creature, state: State, probability: float, rooms: List[str]):
     """
     spawns a creature in the same place as the player, but it vanishes after one step
@@ -17,13 +31,13 @@ def randomappearance(creature: Creature, state: State, probability: float, rooms
         # put the creature inside the storage room
         state.get_room("storage_room").creatures.add(creature)
     elif (
-        creature.alive
-        and state.random.random() < probability
+        state.random.random() < probability
         and any(r in state.player_location.id for r in rooms)
     ):
         state.player_location.creatures.add(creature)
 
 
+@require_alive
 def randomwalk(creature: Creature, state: State, mobility: float):
     logger.debug(f"calling randomwalk behaviour of {creature.id!r}")
     # get the creature's current room
