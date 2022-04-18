@@ -103,7 +103,11 @@ class CommandInterpreter(Interpreter):
     ) -> m:
         """define how a function should be called given the state and parsed command"""
         logger.debug(f"calling {function}")
-        return function(command.noun, state)
+        result = function(command.noun, state)
+        # convert result to m if it is a string
+        if isinstance(result, str):
+            result = m(result)
+        return result
 
     def get_function(self, command: Command) -> Callable[[str, State], m]:
         if command.verb not in command_registry:

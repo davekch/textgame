@@ -95,6 +95,9 @@ class m:
     def format(self, *args, **kwargs) -> m:
         return m(self.data.format(*args, **kwargs))
 
+    def replace(self, old: str, new: str) -> m:
+        return m(self.data.replace(old, new))
+
     @classmethod
     def update_translations(cls, dict):
         cls.translations.update(dict)

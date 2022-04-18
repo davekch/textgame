@@ -48,7 +48,7 @@ def go(direction: str, state: State) -> m:
 
                 # if the room is not dark, add dir_description to the beginning
                 if not state.player_location.is_dark() and dir_description:
-                    msg = dir_description
+                    msg = m(dir_description)
                 else:
                     msg = m()
                 msg += state.player_location.describe()

@@ -121,6 +121,15 @@ class Room:
         else:
             self.hiddendoors[dir] = room_id
 
+    def reveal_hiddendoors(self):
+        """add all hidden connections to visible connections"""
+        logger.debug(
+            "revealing hiddendoors in room {} to {}".format(
+                self.id, ", ".join([dir for dir in self.hiddendoors])
+            )
+        )
+        self.doors.update(self.hiddendoors)
+
     def visit(self) -> int:
         """mark this room as visited if it's not dark and return its value"""
         if not self.dark["now"]:
