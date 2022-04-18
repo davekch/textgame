@@ -43,9 +43,8 @@ class RandomAppearance(InRooms, Behaviour):
         """
         spawns a creature in the same place as the player, but it vanishes after one step
         """
-        logger.debug(f"calling the randomappearance of {creature.id!r}")
-        # check if the creature is in a room with the player
-        if creature.id in state.player_location.things:
+        # check if the creature is currently spawned
+        if state.get_location_of(creature).id != "storage_room":
             # put the creature inside the storage room
             state.get_room("storage_room").things.add(creature)
         elif (
@@ -56,23 +55,26 @@ class RandomAppearance(InRooms, Behaviour):
 
 
 @dataclass
-class RandomWalk(Behaviour):
-    mobility: float
+class RandomWalk(InRooms, Behaviour):
+    mobility: float = 1
 
     def run(self, creature: Creature, state: State):
-        logger.debug(f"calling randomwalk behaviour of {creature.id!r}")
         # get the creature's current room
         room = state.get_location_of(creature)
         if not room:
-            logging.debug(
+            logger.debug(
                 f"the location of the creature {creature.id!r} could not be found, skipping randomwalk"
             )
             return
 
         connections = list(room.get_open_connections().values())
+        # if there are any restrictions in which room the creature can move, filter the connections
+        can_move_in = self.get_room_ids(state)
+        if can_move_in:
+            connections = [room for room in connections if room.id in can_move_in]
         if state.random.random() < self.mobility:
             next_location = state.random.choice(connections)
-            logging.debug(
+            logger.debug(
                 f"changing location of {creature.id!r} to {next_location.id!r}"
             )
             next_location.things.add(creature)
