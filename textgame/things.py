@@ -1,6 +1,6 @@
 from __future__ import annotations
 from abc import ABC, abstractmethod
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, fields
 from random import Random
 from typing import List, Set, Dict, Any, Callable, Optional, Type
 from functools import wraps
@@ -213,7 +213,10 @@ class Behaviour(ABC):
         self.switch = False
 
     def toggle(self):
-        self.switch = not self.switch
+        if self.is_switched_on():
+            self.switch_off()
+        else:
+            self.switch_on()
 
     def is_switched_on(self) -> bool:
         return self.switch
@@ -221,6 +224,48 @@ class Behaviour(ABC):
     @abstractmethod
     def run(self, creature: Creature, state: State) -> Optional[m]:
         pass
+
+
+def behavioursequence(behaviours: List[Type[Behaviour]]) -> Type[Behaviour]:
+    """create a behaviour that runs each of the behaviours one after another"""
+
+    @dataclass
+    class CombinedBehaviour(*behaviours):
+        def __post_init__(self):
+            # this must be a post-init because we must not overwrite the init by the behaviours
+            # initialize each behaviour
+            self.behaviours: List[Behaviour] = []
+            for behaviour in behaviours:
+                # collect the parameters that are meant for this behaviour
+                parameters = {
+                    field.name: getattr(self, field.name)
+                    for field in fields(behaviour)
+                    if field.init
+                }
+                self.behaviours.append(behaviour(**parameters))
+
+        def run(self, creature: Creature, state: State) -> m:
+            for behaviour in self.behaviours:
+                if behaviour.is_switched_on():
+                    msg = behaviour.run(creature, state)
+                    break
+            else:
+                # no break, this means all behaviours are switched off
+                self.switch_off()
+                msg = m()
+            return msg
+
+        def switch_on(self):
+            super().switch_on()
+            for behaviour in self.behaviours:
+                behaviour.switch_on()
+
+        def switch_off(self):
+            super().switch_off()
+            for behaviour in self.behaviours:
+                behaviour.switch_off()
+
+    return CombinedBehaviour
 
 
 @dataclass

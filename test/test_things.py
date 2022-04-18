@@ -1,4 +1,6 @@
-from textgame.things import StorageManager, Store
+from dataclasses import dataclass, field
+from textgame.messages import m
+from textgame.things import Behaviour, StorageManager, Store, behavioursequence
 from textgame.things import Container, StorageManager, Store
 from textgame.exceptions import StoreLimitExceededError
 from textgame.loader import Factory
@@ -92,3 +94,42 @@ class TestContainers:
         inside = container.pop("thing_0")
         assert inside == things["thing_0"]
         assert container.get_contents() == {}
+
+
+@dataclass
+class BehaviourA(Behaviour):
+    repeat: int
+    counter: int = field(default=0, init=False)
+
+    def run(self, _creature, _state) -> m:
+        if self.counter < self.repeat - 1:
+            self.counter += 1
+            return m(f"round {self.counter}")
+        else:
+            self.counter = 0
+            self.switch_off()
+            return m("last round")
+
+
+@dataclass
+class BehaviourB(Behaviour):
+    scream: str
+
+    def run(self, _creature, _state) -> m:
+        self.switch_off()
+        return m(self.scream)
+
+
+class TestBehaviours:
+    def test_combine_behaviours(self):
+        BehaviourAB = behavioursequence([BehaviourA, BehaviourB])
+        behaviourA = BehaviourA(switch=True, repeat=3)
+        behaviourB = BehaviourB(switch=True, scream="AAH!")
+        behaviourAB = BehaviourAB(switch=True, repeat=3, scream="AAH!")
+        # first, behaviourAB should be like behaviourA, then behaviourB
+        for i in range(3):
+            assert behaviourA.run(None, None) == behaviourAB.run(None, None)
+        assert behaviourB.run(None, None) == behaviourAB.run(None, None)
+        # now it should be finished
+        assert behaviourAB.run(None, None) == m()
+        assert not behaviourAB.is_switched_on()
