@@ -63,7 +63,8 @@ def go(direction: str, state: State) -> m:
                 if (
                     not state.player_location.is_dark() or state.lighting()
                 ) and dir_description:
-                    msg += m(dir_description)
+                    # put the directional description first
+                    msg = m(dir_description) + msg
                 msg += state.player_location.describe(light=state.lighting())
                 # if the room is not dark and we weren't here before, add the room's score
                 if not state.player_location.visited and (
