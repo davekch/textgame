@@ -1,0 +1,46 @@
+[
+    {
+        "id": "diamond",
+        "description": "A sparkling diamond lies around!",
+        "name": "sparkling diamond",
+        "value": 12,
+        "initlocation": "field_0"
+    },
+    {
+        "id": "boulder",
+        "description": "A large boulder lies on the ground.",
+        "name": "boulder",
+        "value": 0,
+        "initlocation": "field_1",
+        "takable": false
+    },
+    {
+        "id": "wand",
+        "description": "A wand lies around.",
+        "name": "wand",
+        "value": 0,
+        "initlocation": "field_1"
+    },
+    {
+        "id": "bow",
+        "description": "A wooden bow lies on the ground.",
+        "name": "bow",
+        "value": 12,
+        "initlocation": "storage_room"
+    },
+    {
+        "id": "grail",
+        "description": "A golden grail stands there.",
+        "name": "grail",
+        "value": 10,
+        "initlocation": "storage_room"
+    },
+    {
+        "id": "key",
+        "type": "key",
+        "description": "A key lies here.",
+        "name": "key",
+        "initlocation": "marketplace",
+        "key_id": 123
+    }
+]

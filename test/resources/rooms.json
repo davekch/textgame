@@ -1,0 +1,60 @@
+[
+    {
+        "ID": "field_0",
+        "description": "You are in a wide rocky pit. An aisle leads upwards to the north.",
+        "shortdescription": "You're in the rocky pit.",
+        "value": 0,
+        "errors": {
+            "south": "The slope is too steep here.",
+            "east": "The slope is too steep here."
+        },
+        "hint": "here's my special hint for you.",
+        "hint_value": 7,
+        "doors": {
+            "north": "field_1",
+            "up": "field_1",
+            "west": "marketplace"
+        },
+        "dir_descriptions": {
+            "up": "You spread your wings and start to fly."
+        }
+    },
+    {
+        "ID": "field_1",
+        "description": "You are standing in the middle of a wide open field. In the west the silhouette of an enormeous castle cuts the sky. A slippery aisle leads downwards to the south.",
+        "shortdescription": "You are in a wide open field.",
+        "doors": {
+            "south": "field_0",
+            "down": "field_0"
+        }
+    },
+    {
+        "ID": "hidden_place",
+        "description": "You are in a secret room! Magic skribblings decorate the walls. There is a door leading west.",
+        "shortdescription": "You are in the secret room.",
+        "value": 10,
+        "doors": {
+            "west": "hidden_place2"
+        },
+        "locked": {
+            "west": {"locked": true, "key": 123}
+        }
+    },
+    {
+        "ID": "hidden_place2",
+        "description": "You are in the most secret room.",
+        "value": 10
+    },
+    {
+        "ID": "marketplace",
+        "description": "You are at the marketplace in the middle of a small village.",
+        "shortdescription": "You are at the marketplace.",
+        "doors": {
+            "east": "field_0"
+        }
+    },
+    {
+        "ID": "storage_room",
+        "description": "place to store stuff that is not supposed to be lying around in-game"
+    }
+]
