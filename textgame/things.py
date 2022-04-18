@@ -41,7 +41,7 @@ def _require_thing_exists(func: Callable) -> Callable:
     @wraps(func)
     def decorated_method(self: StorageManager, thing_id: str, *args, **kwargs):
         if thing_id not in self.storage:
-            raise ThingNotFoundError(f"{thing_id!r} does not exist")
+            return None
         return func(self, thing_id, *args, **kwargs)
 
     return decorated_method
