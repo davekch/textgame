@@ -2,8 +2,8 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Dict, Optional, Tuple, TypeVar, Union, TYPE_CHECKING
 from .things import Lightsource, Thing, _Contains, Movable
-from .messages import m, DESCRIPTIONS, MOVING, INFO
-from .defaults.words import DIRECTIONS
+from .messages import m
+from .defaults.words import DIRECTIONS, DESCRIPTIONS, MOVING, INFO
 from .registry import roomhook_registry
 
 if TYPE_CHECKING:

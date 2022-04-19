@@ -2,17 +2,8 @@ from __future__ import annotations
 from typing import Callable, List, Optional
 from ..registry import command_registry, Registry
 from ..state import State, PlayerStatus
-from ..messages import (
-    INFO,
-    MessageType,
-    MultipleChoiceQuestion,
-    m,
-    YesNoQuestion,
-    MOVING,
-    ACTION,
-    DESCRIPTIONS,
-)
-from ..defaults.words import DIRECTIONS
+from ..messages import MessageType, MultipleChoiceQuestion, m, YesNoQuestion
+from ..defaults.words import DIRECTIONS, INFO, MOVING, ACTION, DESCRIPTIONS
 from ..things import Key, Monster, Takable, Weapon
 
 

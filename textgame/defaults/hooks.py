@@ -1,7 +1,8 @@
 from typing import Callable, List
 from ..state import Daytime, PlayerStatus, State
 from ..things import Monster, _Behaves
-from ..messages import INFO, m
+from ..messages import m
+from ..defaults.words import INFO
 
 import logging
 

@@ -2,15 +2,7 @@ from textgame.game import Game
 from textgame.caller import SimpleCaller
 from textgame.loader import StateBuilder
 from textgame.state import Daytime, State
-from textgame.messages import (
-    ACTION,
-    DESCRIPTIONS,
-    MOVING,
-    MultipleChoiceQuestion,
-    YesNoQuestion,
-    m,
-    INFO,
-)
+from textgame.messages import MultipleChoiceQuestion, YesNoQuestion, m
 from textgame.room import Room
 from textgame.state import State
 from textgame.registry import (
@@ -21,6 +13,7 @@ from textgame.registry import (
     roomhook_registry,
 )
 from textgame.defaults import commands, behaviours, hooks
+from textgame.defaults.words import ACTION, DESCRIPTIONS, MOVING, INFO
 from textgame.things import Item, Monster, Weapon
 from utils import yield_sequence
 from typing import Dict

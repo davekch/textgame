@@ -17,7 +17,6 @@ from .messages import (
     MultipleChoiceQuestion,
     m,
     YesNoQuestion,
-    INFO,
     wrap_m,
 )
 from .registry import (
@@ -28,6 +27,7 @@ from .registry import (
     get_postcommandhook_skips,
 )
 from .exceptions import ModeNotFoundError
+from .defaults.words import INFO
 from ._util import obj_info
 
 import logging

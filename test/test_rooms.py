@@ -1,6 +1,6 @@
 import pytest
 from textgame.room import Room
-from textgame.messages import DESCRIPTIONS, MOVING
+from textgame.defaults.words import DESCRIPTIONS, MOVING
 
 
 @pytest.fixture
