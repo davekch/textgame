@@ -18,19 +18,22 @@ class InRooms:
     """
 
     rooms: List[str] = field(default_factory=list)
-    room_patterns: Optional[List[str]] = None
+    room_patterns: List[str] = field(default_factory=list)
     _computed: bool = field(default=False, init=False, repr=False)
 
     def get_room_ids(self, state: State) -> List[str]:
         """find out list of rooms from rooms and room_patterns"""
         # compute only once
-        if not self._computed and self.room_patterns:
-            rooms_from_patterns = [
-                rid
-                for rid in state.rooms.keys()
-                if any(p in rid for p in self.room_patterns)
-            ]
-            self.rooms.extend(rooms_from_patterns)
+        if not self._computed:
+            if not self.rooms and not self.room_patterns:
+                self.rooms = list(state.rooms.keys())
+            else:
+                rooms_from_patterns = [
+                    rid
+                    for rid in state.rooms.keys()
+                    if any(p in rid for p in self.room_patterns)
+                ]
+                self.rooms.extend(rooms_from_patterns)
             self._computed = True
         return self.rooms
 
