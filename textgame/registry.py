@@ -12,11 +12,11 @@ from ._util import obj_info
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from .messages import m, MessageType
+    from .messages import m, MessageProtocol
     from .state import State
     from .things import Behaviour
 
-    CommandFunc = Callable[[str, State], MessageType]
+    CommandFunc = Callable[[str, State], MessageProtocol]
     BehaviourFunc = Type[Behaviour]
     HookFunc = Callable[[State], m]
 

@@ -13,7 +13,7 @@ from .parser import (
 )
 from .state import State
 from .messages import (
-    MessageType,
+    MessageProtocol,
     MultipleChoiceQuestion,
     m,
     YesNoQuestion,
@@ -42,8 +42,8 @@ class Response:
     # the interpreters get messages and wrap them in a response, setting a type
     # so that the caller can check the type and set its mode accordingly.
     # case where this is really necessary: when a response is preehookmsg + enteryesnoloop + posthookmsg
-    value: MessageType | List[MessageType]
-    type: Type[MessageType] = None  # type: ignore
+    value: MessageProtocol | List[MessageProtocol]
+    type: Type[MessageProtocol] = None  # type: ignore
 
     def __post_init__(self):
         if not self.type:
@@ -172,7 +172,7 @@ class MultipleChoiceInterpreter(Interpreter):
 
 class Caller(ABC, Generic[StateType]):
     @abstractmethod
-    def call(self, input: str, state: StateType) -> MessageType:
+    def call(self, input: str, state: StateType) -> MessageProtocol:
         """parse input and call the function corresponding to the parsed input"""
         pass
 

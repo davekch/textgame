@@ -3,12 +3,14 @@ from functools import wraps
 from typing import Protocol, Union, Callable, Dict, List
 
 
-class MessageType(Protocol):
+class MessageProtocol(Protocol):
     def to_message(self) -> m:
         ...
 
 
-def wrap_m(func: Callable[..., str | MessageType]) -> Callable[..., MessageType]:
+def wrap_m(
+    func: Callable[..., str | MessageProtocol]
+) -> Callable[..., MessageProtocol]:
     """decorator that converts the returned value of func into m if it's a string"""
 
     @wraps(func)
@@ -32,15 +34,15 @@ class YesNoQuestion:
     def __init__(
         self,
         question: m | str,
-        yes: str | MessageType | Callable[[], MessageType],
-        no: str | MessageType | Callable[[], MessageType],
+        yes: str | MessageProtocol | Callable[[], MessageProtocol],
+        no: str | MessageProtocol | Callable[[], MessageProtocol],
     ):
         self.question = question
         self._yes = yes
         self._no = no
 
     @wrap_m
-    def yes(self) -> MessageType:
+    def yes(self) -> MessageProtocol:
         """
         if yes is callable, return its result, else return it
         """
@@ -49,7 +51,7 @@ class YesNoQuestion:
         return self._yes  # type: ignore
 
     @wrap_m
-    def no(self) -> MessageType:
+    def no(self) -> MessageProtocol:
         """
         if no is callable, return its result, else return it
         """
@@ -65,7 +67,7 @@ class MultipleChoiceQuestion:
     def __init__(
         self,
         question: m | str,
-        answers: Dict[m | str, MessageType | Callable[[], MessageType]],
+        answers: Dict[m | str, MessageProtocol | Callable[[], MessageProtocol]],
         cancel: bool = True,
     ):
         self._question = question
@@ -84,7 +86,7 @@ class MultipleChoiceQuestion:
         return f"<{self.__class__.__name__} question={self._question!r} answers={self.answers}>"
 
     @wrap_m
-    def get_response(self, choice: str) -> MessageType:
+    def get_response(self, choice: str) -> MessageProtocol:
         _, response = self.answers[choice]
         if callable(response):
             return response()

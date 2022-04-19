@@ -2,13 +2,13 @@ from __future__ import annotations
 from typing import Callable, List, Optional
 from ..registry import command_registry, Registry
 from ..state import State, PlayerStatus
-from ..messages import MessageType, MultipleChoiceQuestion, m, YesNoQuestion
+from ..messages import MessageProtocol, MultipleChoiceQuestion, m, YesNoQuestion
 from ..defaults.words import DIRECTIONS, INFO, MOVING, ACTION, DESCRIPTIONS
 from ..things import Key, Monster, Takable, Weapon
 
 
 defaultcommand_registry: Registry[
-    Callable[[str, State], Optional[MessageType]]
+    Callable[[str, State], Optional[MessageProtocol]]
 ] = Registry()
 
 
@@ -21,7 +21,7 @@ def use_defaults(exclude: List[str] = None):
 
 
 @defaultcommand_registry.register("go")
-def go(direction: str, state: State) -> Optional[MessageType]:
+def go(direction: str, state: State) -> Optional[MessageProtocol]:
     """
     change location to the room in the direction ``noun``. ``noun`` can be
     in :class:`textgame.globals.DIRECTIONS` or 'back'. On different inputs, return
@@ -73,7 +73,7 @@ def go(direction: str, state: State) -> Optional[MessageType]:
             return state.player_location.describe_error(direction)
 
 
-def goback(state: State) -> Optional[MessageType]:
+def goback(state: State) -> Optional[MessageProtocol]:
     """
     change location to previous location if there's a connection
     """
@@ -95,37 +95,37 @@ def goback(state: State) -> Optional[MessageType]:
 
 
 @defaultcommand_registry.register("north")
-def go_north(_, state: State) -> Optional[MessageType]:
+def go_north(_, state: State) -> Optional[MessageProtocol]:
     return go("north", state)
 
 
 @defaultcommand_registry.register("east")
-def go_east(_, state: State) -> Optional[MessageType]:
+def go_east(_, state: State) -> Optional[MessageProtocol]:
     return go("east", state)
 
 
 @defaultcommand_registry.register("south")
-def go_south(_, state: State) -> Optional[MessageType]:
+def go_south(_, state: State) -> Optional[MessageProtocol]:
     return go("south", state)
 
 
 @defaultcommand_registry.register("west")
-def go_west(_, state: State) -> Optional[MessageType]:
+def go_west(_, state: State) -> Optional[MessageProtocol]:
     return go("west", state)
 
 
 @defaultcommand_registry.register("up")
-def go_up(_, state: State) -> Optional[MessageType]:
+def go_up(_, state: State) -> Optional[MessageProtocol]:
     return go("up", state)
 
 
 @defaultcommand_registry.register("down")
-def go_down(_, state: State) -> Optional[MessageType]:
+def go_down(_, state: State) -> Optional[MessageProtocol]:
     return go("down", state)
 
 
 @defaultcommand_registry.register("close")
-def close(direction: str, state: State) -> Optional[MessageType]:
+def close(direction: str, state: State) -> Optional[MessageProtocol]:
     """
     lock the door in direction ``direction`` if player has a key in inventory
     that fits
@@ -134,7 +134,7 @@ def close(direction: str, state: State) -> Optional[MessageType]:
 
 
 @defaultcommand_registry.register("open")
-def open(direction: str, state: State) -> Optional[MessageType]:
+def open(direction: str, state: State) -> Optional[MessageProtocol]:
     """
     open the door in direction ``direction`` if player has a key in inventory
     that fits
@@ -142,7 +142,7 @@ def open(direction: str, state: State) -> Optional[MessageType]:
     return _close_or_lock("open", direction, state)
 
 
-def _close_or_lock(action, direction: str, state: State) -> Optional[MessageType]:
+def _close_or_lock(action, direction: str, state: State) -> Optional[MessageProtocol]:
     if direction not in DIRECTIONS:
         return ACTION.FAIL_OPENDIR.format(action)
     # check if there's a door
@@ -167,7 +167,7 @@ def _close_or_lock(action, direction: str, state: State) -> Optional[MessageType
 
 
 @defaultcommand_registry.register("look")
-def look(_, state: State) -> Optional[MessageType]:
+def look(_, state: State) -> Optional[MessageProtocol]:
     """
     get the long description of the current location.
     """
@@ -177,7 +177,7 @@ def look(_, state: State) -> Optional[MessageType]:
 
 
 @defaultcommand_registry.register("take")
-def take(itemid: str, state: State) -> Optional[MessageType]:
+def take(itemid: str, state: State) -> Optional[MessageProtocol]:
     """
     see if something with the ID ``itemid`` is in the items of the current
     location. If yes and if it's takable and not dark, remove it from location
@@ -213,7 +213,7 @@ def take(itemid: str, state: State) -> Optional[MessageType]:
     return ACTION.NO_SUCH_ITEM.format(itemid)
 
 
-def takeall(state: State) -> Optional[MessageType]:
+def takeall(state: State) -> Optional[MessageProtocol]:
     """
     move all items in the current location to inventory
     """
@@ -228,7 +228,7 @@ def takeall(state: State) -> Optional[MessageType]:
 
 
 @defaultcommand_registry.register("inventory")
-def list_inventory(_: str, state: State) -> Optional[MessageType]:
+def list_inventory(_: str, state: State) -> Optional[MessageProtocol]:
     """
     return a pretty formatted list of what's inside inventory
     """
@@ -241,7 +241,7 @@ def list_inventory(_: str, state: State) -> Optional[MessageType]:
 
 
 @defaultcommand_registry.register("drop")
-def drop(itemid: str, state: State) -> Optional[MessageType]:
+def drop(itemid: str, state: State) -> Optional[MessageProtocol]:
     """
     see if something with the ID ``noun`` is in the inventory. If yes, remove
     it from inventory and add it to location
@@ -259,7 +259,7 @@ def drop(itemid: str, state: State) -> Optional[MessageType]:
     return ACTION.SUCC_DROP
 
 
-def dropall(state: State) -> Optional[MessageType]:
+def dropall(state: State) -> Optional[MessageProtocol]:
     """
     move all items in the inventory to current location
     """
@@ -271,17 +271,17 @@ def dropall(state: State) -> Optional[MessageType]:
 
 
 @defaultcommand_registry.register("score")
-def show_score(_: str, state: State) -> Optional[MessageType]:
+def show_score(_: str, state: State) -> Optional[MessageProtocol]:
     return INFO.SCORE.format(state.score)
 
 
 @defaultcommand_registry.register("listen")
-def listen(_: str, state: State) -> Optional[MessageType]:
+def listen(_: str, state: State) -> Optional[MessageProtocol]:
     return m(state.player_location.sound)
 
 
 @defaultcommand_registry.register("hint")
-def ask_hint(_: str, state: State) -> Optional[MessageType]:
+def ask_hint(_: str, state: State) -> Optional[MessageProtocol]:
     """
     ask for a hint in the current location,
     if there is one, return :class:`textgame.parser.EnterYesNoLoop` if the hint
@@ -301,7 +301,7 @@ def ask_hint(_: str, state: State) -> Optional[MessageType]:
 
 
 @defaultcommand_registry.register("fight")
-def fight(noun: str, state: State) -> Optional[MessageType]:
+def fight(noun: str, state: State) -> Optional[MessageProtocol]:
     if noun and noun not in state.player_location.things:
         return ACTION.NO_SUCH_FIGHT.format(noun)
     weapons = state.inventory.values(filter=[Weapon])
