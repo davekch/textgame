@@ -22,8 +22,10 @@ import logging
 logger = logging.getLogger("textgame.things")
 logger.addHandler(logging.NullHandler())
 
+C = TypeVar("C", bound=Callable)
 
-def _require_thing_exists(func: Callable) -> Callable:
+
+def _require_thing_exists(func: C) -> C:
     @wraps(func)
     def decorated_method(self: StorageManager, thing_id: str, *args, **kwargs):
         if thing_id not in self.storage:
