@@ -1,3 +1,10 @@
+"""
+textgame.messages
+====================
+
+This module contains classes that represent messages or questions to the player.
+"""
+
 from __future__ import annotations
 from functools import wraps
 from typing import Protocol, Union, Callable, Dict, List
@@ -25,9 +32,11 @@ def wrap_m(
 
 class YesNoQuestion:
     """
+    Represents a yes/no question to the player.
+
     :param question: a yes/no question
     :type question: m
-    :param yes: m to return or a function with signature ``f() -> m`` or ``f() -> EnterYesNoLoop`` that should get called if player answeres 'yes' to the question
+    :param yes: MessageProtocol to return or a function with signature ``f() -> MessageProtocol`` that should get called if player answeres 'yes' to the question
     :param no: same as yes
     """
 
@@ -64,6 +73,15 @@ class YesNoQuestion:
 
 
 class MultipleChoiceQuestion:
+    """
+    represents a multiple-choice question to the player.
+
+    :param question: a question
+    :type question: m
+    :param answers: a dictionary that maps possible answers to functions that should be called when chosen or to MessageProtocols that should be returned when chosen
+    :param cancel: if ``True``, a choice to cancel the dialog is added
+    """
+
     def __init__(
         self,
         question: m | str,
@@ -77,6 +95,7 @@ class MultipleChoiceQuestion:
         self.answers = {str(i + 1): a for i, a in enumerate(answers_list)}
 
     def to_message(self) -> m:
+        """get the question and possible answers as m"""
         q = m(self._question)
         for i, answer in self.answers.items():
             q += m(f" ({i}) {answer[0]}")
@@ -87,6 +106,7 @@ class MultipleChoiceQuestion:
 
     @wrap_m
     def get_response(self, choice: str) -> MessageProtocol:
+        """get the response to the given choice. if the response is callable, return its result"""
         _, response = self.answers[choice]
         if callable(response):
             return response()
@@ -98,11 +118,15 @@ class MultipleChoiceQuestion:
 
 
 class m:
+    """
+    represents a message to the player. when added together,
+    messages are seperated by ``m.seperator``.
+    """
 
     seperator = "\n"
     translations: Dict[str, str] = {}
 
-    def __init__(self, msg: str | m = "", needs_answer: bool = False):
+    def __init__(self, msg: str | m = ""):
         # don't accidentally nest messages
         if isinstance(msg, m):
             msg = msg.data
@@ -123,9 +147,11 @@ class m:
         return self._data
 
     def format(self, *args, **kwargs) -> m:
+        """like str.format"""
         return m(self.data.format(*args, **kwargs))
 
     def replace(self, old: str, new: str) -> m:
+        """like str.replace"""
         return m(self.data.replace(old, new))
 
     @classmethod
