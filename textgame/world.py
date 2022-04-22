@@ -85,6 +85,7 @@ class World:
         self.nighttime = 200
         # dummy room to keep stuff out of the actual world
         self.storage_room = Room("storage")
+        self.status = {}  # dict for miscellaneous attributes
 
         self._fill_resources(items=items, rooms=rooms, weapons=weapons, monsters=monsters)
 
@@ -111,7 +112,7 @@ class World:
                 try:
                     with open(file) as f:
                         resources[resource] = loader(f)
-                    logger.info("load {} into world".format(os.path.join(dir, file)))
+                    logger.info("load {} into world".format(file))
                 except:
                     msg = "An unexpected exception occured while trying to read {} with {}".format(
                         os.path.join(dir, file),

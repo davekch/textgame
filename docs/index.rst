@@ -40,6 +40,7 @@ Go checkout the examples!
 
    source/intro
    source/examples
+   source/tutorial
    textgame
 
 

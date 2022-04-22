@@ -63,7 +63,7 @@ class Game:
     def over(self):
         """returns ``True`` if the player is dead
         """
-        return self._gameover
+        return self.gameover
 
     def save_game(self, path="", session=""):
         """
