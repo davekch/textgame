@@ -20,7 +20,7 @@ logger.addHandler(logging.NullHandler())
 
 
 @dataclass
-class _Behaves(Thing):
+class Behaves(Thing):
     # behaviours could look like this: {"spawn": {"probability": 0.2, "rooms": ["field_0", "field_1"]}}
     behaviours: Dict[str, Behaviour] = field(default_factory=dict)
 
@@ -60,7 +60,7 @@ class _Behaves(Thing):
         return msg
 
 
-CanBehave = TypeVar("CanBehave", bound=_Behaves)
+CanBehave = TypeVar("CanBehave", bound=Behaves)
 
 # this is a bug in mypy, so ignore it for now
 # https://github.com/python/mypy/issues/5374

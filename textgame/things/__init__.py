@@ -2,11 +2,11 @@ from .base import (
     Thing,
     Movable,
     Takable,
-    _HasStrength,
-    _CanDie,
-    _CanFight,
+    HasStrength,
+    CanDie,
+    CanFight,
 )
 from .items import Item, Lightsource, Key, Weapon, Container
 from .creatures import Creature, Monster, TakableMonster
-from .behaviour import Behaviour, BehaviourSequence, behaviour_factory, _Behaves
-from .storage import StorageManager, Store, _Contains
+from .behaviour import Behaviour, BehaviourSequence, behaviour_factory, Behaves
+from .storage import StorageManager, Store, Contains

@@ -147,7 +147,7 @@ class Store(Generic[T]):
 
 
 @dataclass
-class _Contains(Generic[T]):
+class Contains(Generic[T]):
     limit: Optional[int] = None
     # gets set in post_init
     things: Store[T] = field(default=None, init=False)  # type: ignore

@@ -1,6 +1,6 @@
 from typing import Callable, List
 from ..state import Daytime, PlayerStatus, State
-from ..things import Monster, _Behaves
+from ..things import Monster, Behaves
 from ..messages import m
 from ..defaults.words import INFO
 
@@ -20,7 +20,7 @@ def singlebehaviourhook(behaviourname: str) -> Callable[[State], m]:
         msg = m()
         for behaves in state.things_manager.storage.values():
             # iterate over all things and select the ones which can behave
-            if not isinstance(behaves, _Behaves):
+            if not isinstance(behaves, Behaves):
                 continue
             if behaviourname in behaves.behaviours:
                 msg += behaves.call_behaviour(behaviourname, state)

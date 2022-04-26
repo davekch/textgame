@@ -11,7 +11,7 @@ import os
 from .room import Room
 from .things import (
     Container,
-    _Contains,
+    Contains,
     Item,
     Key,
     Creature,
@@ -195,7 +195,7 @@ class StateBuilder:
         # connect all stores to the state's storemanagers
         # iterate also over items and creatures, as they might be containers too
         for container in chain(room_graph.values(), item_objs, creature_objs):
-            if isinstance(container, _Contains):
+            if isinstance(container, Contains):
                 state.things_manager.add_store(container.things)
 
         logger.debug("put items and creatures in their locations")

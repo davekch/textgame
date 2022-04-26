@@ -1,6 +1,6 @@
 from dataclasses import dataclass
-from .base import Takable, Movable, _HasStrength
-from .storage import _Contains
+from .base import Takable, Movable, HasStrength
+from .storage import Contains
 
 
 @dataclass
@@ -18,10 +18,10 @@ class Key(Item):
 
 
 @dataclass
-class Weapon(_HasStrength, Item):
+class Weapon(HasStrength, Item):
     pass
 
 
 @dataclass
-class Container(_Contains, Item):
+class Container(Contains, Item):
     pass

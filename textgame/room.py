@@ -1,7 +1,7 @@
 from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Dict, Optional, Tuple, TypeVar, Union, TYPE_CHECKING
-from .things import Lightsource, Thing, _Contains, Movable
+from .things import Lightsource, Thing, Contains, Movable
 from .messages import m
 from .defaults.words import DIRECTIONS, DESCRIPTIONS, MOVING, INFO
 from .registry import roomhook_registry
@@ -19,7 +19,7 @@ M = TypeVar("M", bound=Movable)
 
 
 @dataclass
-class Room(_Contains[M], Thing):
+class Room(Contains[M], Thing):
     """
     :param ID: unique identifier
     :param description: string describing the room

@@ -1,10 +1,10 @@
 from dataclasses import dataclass
-from .base import _CanDie, Movable, _CanFight, Takable
-from .behaviour import _Behaves
+from .base import CanDie, Movable, CanFight, Takable
+from .behaviour import Behaves
 
 
 @dataclass
-class Creature(_CanDie, _Behaves, Movable):
+class Creature(CanDie, Behaves, Movable):
     def die(self):
         super().die()
         for behaviour in self.behaviours.values():
@@ -12,7 +12,7 @@ class Creature(_CanDie, _Behaves, Movable):
 
 
 @dataclass
-class Monster(_CanFight, Creature):
+class Monster(CanFight, Creature):
     pass
 
 

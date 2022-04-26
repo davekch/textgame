@@ -24,7 +24,7 @@ class Takable:
 
 
 @dataclass
-class _HasStrength:
+class HasStrength:
     strength: float = 0
     strength_variation: float = 0
 
@@ -36,7 +36,7 @@ class _HasStrength:
 
 
 @dataclass
-class _CanDie:
+class CanDie:
     dead_description: str = ""
     alive: bool = True
 
@@ -46,7 +46,7 @@ class _CanDie:
 
 
 @dataclass
-class _CanFight(_HasStrength):
+class CanFight(HasStrength):
     health: float = 100
     fight_message: str = ""
     win_message: str = ""  # when the player wins
