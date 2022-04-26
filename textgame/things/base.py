@@ -1,3 +1,11 @@
+"""
+textgame.things.base
+=====================
+
+This submodule defines the base classes :class:`Thing` and :class:`Movable` as well as
+some dataclass mixins with reusable properties and methods.
+"""
+
 from dataclasses import dataclass
 from random import Random
 from ..messages import m
@@ -5,6 +13,8 @@ from ..messages import m
 
 @dataclass
 class Thing:
+    """represents something that can be described"""
+
     id: str
     description: str
 
@@ -14,17 +24,23 @@ class Thing:
 
 @dataclass
 class Movable(Thing):
+    """represents a :class:`Thing` that has a name and location"""
+
     name: str
     initlocation: str
 
 
 @dataclass
 class Takable:
+    """dataclass mixin for something that can be taken by the player"""
+
     takable: bool = True
 
 
 @dataclass
 class HasStrength:
+    """dataclass mixin for something that has (variable) strength"""
+
     strength: float = 0
     strength_variation: float = 0
 
@@ -37,6 +53,8 @@ class HasStrength:
 
 @dataclass
 class CanDie:
+    """dataclass mixin for something that can die"""
+
     dead_description: str = ""
     alive: bool = True
 
@@ -47,6 +65,8 @@ class CanDie:
 
 @dataclass
 class CanFight(HasStrength):
+    """dataclass mixin for something that can fight"""
+
     health: float = 100
     fight_message: str = ""
     win_message: str = ""  # when the player wins

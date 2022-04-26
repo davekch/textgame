@@ -1,3 +1,11 @@
+"""
+textgame.things.behaviour
+============================
+
+This submodule contains an abstract base class :class:`Behaviour` that can be used
+to give :class:`Thing` s additional functionality to become "sentient".
+"""
+
 from __future__ import annotations
 from dataclasses import dataclass, fields, field
 from abc import ABC, abstractmethod
@@ -21,6 +29,18 @@ logger.addHandler(logging.NullHandler())
 
 @dataclass
 class Behaves(Thing):
+    """
+    represents a :class:`Thing` that has behaviours.
+
+    :param behaviours: dictionary mapping names of behaviours to their parameters. each name must
+                       appear in :py:obj:`textgame.registry.behaviour_registry`. the given parameters must be a dictionary
+                       of keyword arguments and their values to the referenced behaviour class
+                    
+    For each (name, parameter) pair given in ``behaviours``, an actual Behaviour instance is created.
+    If the name is not present in :py:obj:`textgame.registry.behaviour_registry`, :py:exc:`textgame.exceptions.ConfigurationError`
+    gets raised on creation.
+    """
+
     # behaviours could look like this: {"spawn": {"probability": 0.2, "rooms": ["field_0", "field_1"]}}
     behaviours: Dict[str, Behaviour] = field(default_factory=dict)
 
@@ -41,6 +61,7 @@ class Behaves(Thing):
             self.behaviours[behaviourname] = behaviour
 
     def call_behaviour(self, behaviourname: str, state: State) -> Optional[m]:
+        """call the behaviour ``behaviourname``"""
         if behaviourname not in self.behaviours:
             raise ConfigurationError(
                 f"the behaviour {behaviourname!r} is not defined for the Creature {self.id!r}"
@@ -52,7 +73,7 @@ class Behaves(Thing):
 
     def behave(self, state: State) -> Optional[m]:
         """
-        call all functions specified in behaviours with the given parameters
+        call all behaviours in sequence
         """
         msg = m()
         for name in self.behaviours:
@@ -66,6 +87,8 @@ CanBehave = TypeVar("CanBehave", bound=Behaves)
 # https://github.com/python/mypy/issues/5374
 @dataclass  # type: ignore
 class Behaviour(ABC, Generic[CanBehave]):
+    """ABC to define a behaviour for a :class:`Behaves`"""
+
     switch: bool
     # note: switch gets a default of True by loader.behaviour_factory if nothing
     # else is set. this is ugly but necessary because default-values in dataclass
@@ -95,6 +118,10 @@ class Behaviour(ABC, Generic[CanBehave]):
 # todo: maybe this should go in textgame.defaults.behaviours?
 @dataclass
 class BehaviourSequence(Behaviour):
+    """represents a sequence of Behaviours that are run in sequence. The next behaviour only starts
+    if the previous one is switched off
+    """
+
     sequence: List[Dict[str, Any]] = field(default_factory=list)
 
     def __post_init__(self):
@@ -127,6 +154,9 @@ class BehaviourSequence(Behaviour):
 
 
 def behaviour_factory(behaviourname: str, params: Dict[str, Any]) -> Behaviour:
+    """create a Behaviour instance from ``params``, looking up ``behaviourname`` in
+    :py:obj:`textgame.registry.behaviour_registry`
+    """
     if behaviourname not in behaviour_registry:
         raise ConfigurationError(f"behaviour {behaviourname!r} is not registered")
     behaviour_class = behaviour_registry[behaviourname]
