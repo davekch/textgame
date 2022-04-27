@@ -11,6 +11,7 @@ Items, Creatures and also behaviours for these things.
     textgame.things.items
     textgame.things.behaviour
     textgame.things.creatures
+    textgame.things.storage
 """
 
 from .base import (
