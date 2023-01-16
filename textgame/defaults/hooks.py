@@ -61,7 +61,6 @@ def daylight(
                 f"current time is {time!r} (absolute: {state.time!r}), it's sunset"
             )
             state.daytime = Daytime.NIGHT
-            msg += INFO.SUNSET
             if callable(on_sunset):
                 msg += on_sunset(state)
             # turn all lights down
@@ -72,7 +71,6 @@ def daylight(
                 f"current time is {time!r} (absolute: {state.time!r}), it's sunrise"
             )
             state.daytime = Daytime.DAY
-            msg += INFO.SUNRISE
             if callable(on_sunrise):
                 msg += on_sunrise(state)
             # turn all lights on
