@@ -234,7 +234,10 @@ class TestGamePlay:
 class TestHooks:
     def test_timehooks(self, game: Game):
         precommandhook_registry.register(
-            "daylight", hooks.daylight(duration_day=2, duration_night=3)
+            "daylight",
+            hooks.daylight(
+                duration_day=2, duration_night=3, on_sunset=lambda s: INFO.SUNSET
+            ),
         )
         postcommandhook_registry.register("time", hooks.time)
         # first remove the lamp
@@ -298,7 +301,13 @@ class TestHooks:
 
     def test_daytime_hook(self, game: Game):
         precommandhook_registry.register(
-            "daylight", hooks.daylight(duration_day=2, duration_night=3)
+            "daylight",
+            hooks.daylight(
+                duration_day=2,
+                duration_night=3,
+                on_sunset=lambda s: INFO.SUNSET,
+                on_sunrise=lambda s: INFO.SUNRISE,
+            ),
         )
         postcommandhook_registry.register("time", hooks.time)
         # first, remove the lightsource from the room
