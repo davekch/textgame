@@ -20,7 +20,6 @@ from .base import (
     Takable,
     HasStrength,
     CanDie,
-    CanFight,
 )
 from .items import Item, Lightsource, Key, Weapon, Container
 from .creatures import Creature, Monster, TakableMonster

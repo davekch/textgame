@@ -5,7 +5,7 @@ textgame.things.creatures
 This module contains classes for Things that can die and behave.
 """
 from dataclasses import dataclass
-from .base import CanDie, Movable, CanFight, Takable
+from .base import CanDie, Movable, HasStrength, Takable
 from .behaviour import Behaves
 
 
@@ -20,7 +20,7 @@ class Creature(CanDie, Behaves, Movable):
 
 
 @dataclass
-class Monster(CanFight, Creature):
+class Monster(HasStrength, Creature):
     """represents a creature that can fight"""
 
 

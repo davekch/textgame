@@ -1,8 +1,8 @@
 from dataclasses import dataclass, field
 from functools import wraps
 from typing import List, Optional
-from ..state import State
-from ..things import Creature, Behaviour
+from ..state import State, PlayerStatus
+from ..things import Creature, Monster, Behaviour
 from ..messages import m
 
 import logging
@@ -51,9 +51,8 @@ class RandomAppearance(InRooms, Behaviour):
         if current_location and current_location.id != "storage_room":
             # put the creature inside the storage room
             state.get_room("storage_room").things.add(creature)
-        elif (
-            state.random.random() < self.probability
-            and state.player_location in self.get_room_ids(state)
+        elif state.random.random() < self.probability and state.player_location in self.get_room_ids(
+            state
         ):
             state.player_location.things.add(creature)
 
@@ -108,3 +107,28 @@ class Monologue(Behaviour):
         # get stuck at the last sentence
         self.index = min(self.index + 1, len(self.sentences) - 1)
         return msg
+
+
+@dataclass
+class Fight(Behaviour):
+    fight_message: str
+    win_message: str
+    loose_message: str
+
+    def run(self, monster: Monster, state: State) -> Optional[m]:
+        if state.player_location != state.get_location_of(monster):
+            return
+
+        logger.debug(f"calculate fight outcome with monster {monster.id!r}")
+        if monster.health <= 0:
+            monster.die()  # this also switches all behaviours off
+            return m(self.win_message)
+        else:
+            damage = monster.calculate_damage(state.random)
+            logger.debug(f"{monster.id} has a damage of {damage}")
+            state.health -= damage
+            if state.health <= 0:
+                state.player_status = PlayerStatus.DEAD
+                return m(self.loose_message)
+            else:
+                return m(self.fight_message)

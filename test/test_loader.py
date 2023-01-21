@@ -58,5 +58,6 @@ class TestLoader:
         behaviour_registry.register("randomappearance", behaviours.RandomAppearance)
         behaviour_registry.register("randomwalk", behaviours.RandomWalk)
         behaviour_registry.register("random_spawn_once", behaviours.RandomSpawnOnce)
+        behaviour_registry.register("fight", behaviours.Fight)
         creature_objs = CreatureLoader.load(creatures)
         assert isinstance(creature_objs[0], Creature)

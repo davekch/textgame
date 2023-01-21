@@ -79,28 +79,3 @@ def daylight(
         return msg
 
     return daytimehook
-
-
-def manage_fights(state: State) -> m:
-    logger.debug("manage ongoing fights")
-    msg = m()
-    for monster in state.player_location.things.values(filter=[Monster]):
-        if not monster.alive:
-            continue
-
-        logger.debug(f"calculate fight outcome with monster {monster.id!r}")
-        if monster.health <= 0:
-            monster.die()
-            msg += m(monster.win_message)
-        else:
-            damage = monster.calculate_damage(state.random)
-            logger.debug(f"monster has damage of {damage!r}")
-            state.health -= damage
-            if state.health <= 0:
-                state.player_status = PlayerStatus.DEAD
-                msg += m(monster.loose_message)
-                break
-            else:
-                msg += m(monster.fight_message)
-
-    return msg

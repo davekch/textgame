@@ -56,18 +56,12 @@ class CanDie:
     """dataclass mixin for something that can die"""
 
     dead_description: str = ""
-    alive: bool = True
+    health: float = 100
+
+    @property
+    def alive(self):
+        return self.health > 0
 
     def die(self):
-        self.alive = False
+        self.health = -1
         self.description = self.dead_description or self.description
-
-
-@dataclass
-class CanFight(HasStrength):
-    """dataclass mixin for something that can fight"""
-
-    health: float = 100
-    fight_message: str = ""
-    win_message: str = ""  # when the player wins
-    loose_message: str = ""  # when the player looses

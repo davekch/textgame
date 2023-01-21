@@ -47,6 +47,7 @@ def state(resources) -> State:
     behaviour_registry.register("randomappearance", behaviours.RandomAppearance)
     behaviour_registry.register("randomwalk", behaviours.RandomWalk)
     behaviour_registry.register("random_spawn_once", behaviours.RandomSpawnOnce)
+    behaviour_registry.register("fight", behaviours.Fight)
     return StateBuilder().build(initial_location="field_0", **resources)
 
 
@@ -188,11 +189,11 @@ class TestGamePlay:
         assert game.play("hint") == str(INFO.NO_HINT)
 
     def test_fight(self, game: Game):
-        postcommandhook_registry.register("fight", hooks.manage_fights)
+        postcommandhook_registry.register("fight", hooks.singlebehaviourhook("fight"))
         goblin: Monster = game.state.things_manager.storage["goblin"]
         game.state.get_room("marketplace").things.add(goblin)
         response = game.play("go west")
-        assert goblin.fight_message in response
+        assert goblin.behaviours["fight"].fight_message in response
         assert game.state.health == 100 - goblin.strength
         response = game.play("fight goblin")
         assert str(ACTION.NO_WEAPONS) in response
@@ -202,7 +203,7 @@ class TestGamePlay:
         game.state.inventory.add(sword)
         response = game.play("fight goblin")
         assert "You use the sword against the mean goblin" in response
-        assert goblin.win_message in response
+        assert goblin.behaviours["fight"].win_message in response
         assert not goblin.alive
         assert goblin.dead_description in game.play("look")
 
