@@ -6,9 +6,9 @@ NO = m("no")
 
 default_verb_synonyms = {
     "go": ["enter", "walk"],
-    "take": ["grab"],
+    "take": ["grab", "get"],
     "listen": ["hear"],
-    "attack": ["kill"],
+    "fight": ["kill", "attack"],
     "close": ["lock"],
     "north": ["n"],
     "east": ["e"],
@@ -84,7 +84,7 @@ class ACTION(DefaultMessage):
     FAIL_DROP = m("You don't have one.")
     FAIL_TAKE = m("You can't take that.")
     NO_SUCH_ITEM = m("I see no {} here.")
-    NO_SUCH_FIGHT = m("There is no {} which wants to fight with you.")
+    NO_SUCH_FIGHT = m("There is no {} that wants to fight with you.")
     NO_INVENTORY = m("You don't have anything with you.")
     NO_WEAPONS = m("You don't have any weapons!")
     FAIL_OPENDIR = m(
